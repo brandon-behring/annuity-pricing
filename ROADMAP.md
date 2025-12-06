@@ -17,7 +17,7 @@ Phase 0 → Phase 1 → Phase 3 → Phase 2 → Phase 4 → Phase 5 → Phase 6 
    ✅        ✅        ✅        ✅        ✅        ✅        ✅        ✅        ✅        ✅        ✅
 ```
 
-**Status**: All phases complete. 911 tests passing.
+**Status**: All phases complete. 953 tests passing.
 
 ---
 
@@ -176,12 +176,12 @@ Phase 0 → Phase 1 → Phase 3 → Phase 2 → Phase 4 → Phase 5 → Phase 6 
 ## Test Summary
 
 ```
-tests/unit/                 590 tests - All modules (including adapters, behavioral, glwb, regulatory, loaders)
-tests/integration/           93 tests - End-to-end pricing pipeline + registry + gates
-tests/anti_patterns/         21 tests - Put-call parity, buffer/floor, no-arbitrage sweeps
-tests/validation/            48 tests - BS known-answer, MC convergence, PV discounting
+tests/unit/                 741 tests - All modules (including adapters, behavioral, glwb, regulatory, loaders)
+tests/integration/           88 tests - End-to-end pricing pipeline + registry + gates
+tests/anti_patterns/         79 tests - Put-call parity, buffer/floor, no-arbitrage sweeps
+tests/validation/            45 tests - BS known-answer, MC convergence, PV discounting
 ─────────────────────────────────────
-Total:                      911 tests passing, 5 skipped (pyfeng not installed)
+Total:                      953 tests passing, 4 skipped (pyfeng scipy 1.12+)
 ```
 
 ---

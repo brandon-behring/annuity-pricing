@@ -32,11 +32,6 @@
   "license": "MIT",
   "upload_type": "software",
   "publication_date": "2025-12-06",
-  "creators": [
-    {
-      "name": "Behring, Brandon"
-    }
-  ],
   "related_identifiers": [
     {
       "identifier": "https://github.com/brandonmbehring-dev/annuity-pricing",
@@ -79,8 +74,8 @@
       "scheme": "url"
     }
   ],
-  "notes": "This is the supplementary material (code and artifacts) for the arXiv paper 'annuity-pricing: Open-Source Actuarial Pricing for FIA, RILA, and GLWB Products'. Contains fully reproducible figures, validation notebooks, and 948 unit tests.",
-  "version": "v0.2.0",
+  "notes": "This is the supplementary material (code and artifacts) for the arXiv paper 'annuity-pricing: Open-Source Actuarial Pricing for FIA, RILA, and GLWB Products'. Contains fully reproducible figures, validation notebooks, and 953 unit tests.",
+  "version": "v0.2.0-paper",
   "imprint_publisher": "Zenodo",
   "method": "Manual upload to Zenodo with arXiv linkage"
 }

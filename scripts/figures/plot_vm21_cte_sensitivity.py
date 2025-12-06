@@ -14,9 +14,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from annuity_pricing.regulatory.vm21 import VM21Calculator
-from annuity_pricing.regulatory.scenarios import RiskNeutralEquityParams
-from annuity_pricing.regulatory.scenarios import PolicyData
+from annuity_pricing.regulatory.vm21 import VM21Calculator, PolicyData
 
 
 def main():

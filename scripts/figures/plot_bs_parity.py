@@ -51,7 +51,7 @@ def main():
     # Compute using FinancePy
     try:
         adapter = FinancepyAdapter()
-        fp_result = adapter.price_call_with_greeks(
+        fp_raw = adapter.price_call_with_greeks(
             spot=spot,
             strike=strike,
             rate=rate,
@@ -59,6 +59,15 @@ def main():
             volatility=volatility,
             time_to_expiry=time_to_expiry
         )
+        # Scale to match our units: vega per 1% vol, theta per day, rho per 1% rate
+        fp_result = {
+            "price": fp_raw["price"],
+            "delta": fp_raw["delta"],
+            "gamma": fp_raw["gamma"],
+            "vega": fp_raw["vega"] / 100.0,
+            "theta": fp_raw["theta"] / 365.0,
+            "rho": fp_raw["rho"] / 100.0,
+        }
         has_financepy = True
     except ImportError:
         print("⚠ FinancePy not installed; skipping cross-validation")

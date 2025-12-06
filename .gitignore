@@ -44,3 +44,4 @@ Thumbs.db
 # Ruff
 .ruff_cache/
 docs/_build/
+codex_arxiv_stream_e_report.md

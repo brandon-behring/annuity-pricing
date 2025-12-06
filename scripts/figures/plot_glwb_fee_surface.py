@@ -15,8 +15,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from pathlib import Path
 
 from annuity_pricing.glwb.path_sim import GLWBPathSimulator
-from annuity_pricing.glwb.gwb_config import GWBConfig
-from annuity_pricing.glwb.config import RiskNeutralEquityParams
+from annuity_pricing.glwb.gwb_tracker import GWBConfig
 
 
 def main():
@@ -58,14 +57,6 @@ def main():
 
         for j, vol in enumerate(volatilities):
             try:
-                # Create equity parameters
-                equity_params = RiskNeutralEquityParams(
-                    spot=100.0,
-                    risk_free_rate=rate,
-                    dividend_yield=0.02,
-                    volatility=vol
-                )
-
                 # Simple approach: use fixed fee for demonstration
                 # In production, this would solve for fair fee (price = 0)
                 simulator = GLWBPathSimulator(

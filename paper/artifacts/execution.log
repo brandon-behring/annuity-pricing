@@ -1,0 +1,27 @@
+# Execution Log - annuity-pricing Paper Artifacts
+# Generated: 2025-12-06
+
+## Environment
+Python: Python 3.13.7
+Platform: Linux 6.17.0-7-generic
+Package: annuity-pricing v0.2.0
+
+## Figure Generation
+  /home/brandon_behring/Claude/annuity-pricing/paper/figures/bs_financepy_parity.pdf: Dec 6 12:06
+  /home/brandon_behring/Claude/annuity-pricing/paper/figures/glwb_fee_surface.pdf: Dec 6 12:08
+  /home/brandon_behring/Claude/annuity-pricing/paper/figures/mc_convergence.pdf: Dec 6 12:05
+  /home/brandon_behring/Claude/annuity-pricing/paper/figures/payoff_buffer_floor_cap.pdf: Dec 6 12:08
+  /home/brandon_behring/Claude/annuity-pricing/paper/figures/vm21_cte70.pdf: Dec 6 12:08
+
+## Paper Compilation
+  main.pdf: Dec 6 12:23, 397890 bytes
+
+## Test Summary
+  953 tests collected, 4 skipped (pyfeng scipy 1.12+)
+
+## Reproducibility Seeds
+  plot_rila_fia_payoffs.py: N/A (deterministic payoff formulas)
+  plot_mc_convergence.py: seed=1234
+  plot_bs_parity.py: N/A (analytical formulas)
+  plot_glwb_fee_surface.py: seed=5678
+  plot_vm21_cte_sensitivity.py: seed=9999

@@ -17,5 +17,5 @@
 # Figure output (auto-generated)
 /figures/*.pdf
 
-# Build artifacts
-/artifacts/
+# Build artifacts (tracked for reproducibility)
+# /artifacts/

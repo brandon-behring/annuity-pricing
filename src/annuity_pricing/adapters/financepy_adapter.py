@@ -247,6 +247,59 @@ class FinancepyAdapter(BaseAdapter):
             "theta": float(theta),
         }
 
+    def price_call_with_greeks(
+        self,
+        spot: float,
+        strike: float,
+        rate: float,
+        dividend: float,
+        volatility: float,
+        time_to_expiry: float,
+    ) -> Dict[str, float]:
+        """
+        Convenience helper to return price and Greeks from financepy.
+        """
+        self.require_available()
+
+        valuation_date = Date(1, 1, 2024)
+        expiry_date = valuation_date.add_years(time_to_expiry)
+
+        discount_curve = DiscountCurveFlat(valuation_date, rate)
+        dividend_curve = DiscountCurveFlat(valuation_date, dividend)
+
+        option = EquityVanillaOption(
+            expiry_date, strike, OptionTypes.EUROPEAN_CALL
+        )
+        model = BlackScholes(volatility)
+
+        price = option.value(
+            valuation_date, spot, discount_curve, dividend_curve, model
+        )
+        delta = option.delta(
+            valuation_date, spot, discount_curve, dividend_curve, model
+        )
+        gamma = option.gamma(
+            valuation_date, spot, discount_curve, dividend_curve, model
+        )
+        vega = option.vega(
+            valuation_date, spot, discount_curve, dividend_curve, model
+        )
+        theta = option.theta(
+            valuation_date, spot, discount_curve, dividend_curve, model
+        )
+        rho = option.rho(
+            valuation_date, spot, discount_curve, dividend_curve, model
+        )
+
+        return {
+            "price": float(price),
+            "delta": float(delta),
+            "gamma": float(gamma),
+            "vega": float(vega),
+            "theta": float(theta),
+            "rho": float(rho),
+        }
+
     def validate_call(
         self,
         our_price: float,
