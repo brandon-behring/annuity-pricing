@@ -1,0 +1,86 @@
+{
+  "title": "annuity-pricing: Open-Source Actuarial Pricing for FIA, RILA, and GLWB Products",
+  "description": "A Python library for risk-neutral valuation of indexed annuity products (FIA, RILA, GLWB) with integrated behavioral models, mortality tables, and regulatory prototypes (VM-21, VM-22). Includes cross-validation against financepy and QuantLib, Monte Carlo pricing, and reproducible analysis.",
+  "keywords": [
+    "annuity pricing",
+    "fixed indexed annuities",
+    "FIA",
+    "registered index-linked annuities",
+    "RILA",
+    "guaranteed lifetime withdrawal benefits",
+    "GLWB",
+    "Monte Carlo",
+    "Black-Scholes",
+    "option pricing",
+    "behavioral models",
+    "lapse assumptions",
+    "mortality tables",
+    "VM-21",
+    "VM-22",
+    "risk-neutral valuation",
+    "actuarial pricing",
+    "quantitative finance"
+  ],
+  "creators": [
+    {
+      "name": "Behring, Brandon",
+      "affiliation": "Independent Researcher",
+      "orcid": ""
+    }
+  ],
+  "contributors": [],
+  "license": "MIT",
+  "upload_type": "software",
+  "publication_date": "2025-12-06",
+  "creators": [
+    {
+      "name": "Behring, Brandon"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/brandonmbehring-dev/annuity-pricing",
+      "relation": "isSupplementedBy",
+      "resource_type": "software",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://pypi.org/project/annuity-pricing/",
+      "relation": "isIdenticalTo",
+      "resource_type": "software",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://annuity-pricing.readthedocs.io",
+      "relation": "isDocumentedBy",
+      "resource_type": "service",
+      "scheme": "url"
+    },
+    {
+      "identifier": "2025-12-06",
+      "relation": "isVersionOf",
+      "resource_type": "software"
+    }
+  ],
+  "subjects": [
+    {
+      "term": "Finance",
+      "identifier": "http://www.yso.fi/onto/yso/p10881",
+      "scheme": "url"
+    },
+    {
+      "term": "Insurance",
+      "identifier": "http://www.yso.fi/onto/yso/p8788",
+      "scheme": "url"
+    },
+    {
+      "term": "Mathematical Models",
+      "identifier": "http://www.yso.fi/onto/yso/p10876",
+      "scheme": "url"
+    }
+  ],
+  "notes": "This is the supplementary material (code and artifacts) for the arXiv paper 'annuity-pricing: Open-Source Actuarial Pricing for FIA, RILA, and GLWB Products'. Contains fully reproducible figures, validation notebooks, and 948 unit tests.",
+  "version": "v0.2.0",
+  "imprint_publisher": "Zenodo",
+  "method": "Manual upload to Zenodo with arXiv linkage"
+}
