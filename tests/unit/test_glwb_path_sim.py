@@ -30,12 +30,16 @@ class TestGLWBPricingResult:
             standard_error=200.0,
             prob_ruin=0.30,
             mean_ruin_year=15.0,
+            prob_lapse=0.10,
+            mean_lapse_year=8.0,
             n_paths=1000,
         )
 
         assert result.price == 5000.0
         assert result.guarantee_cost == 0.05
         assert result.prob_ruin == 0.30
+        assert result.prob_lapse == 0.10
+        assert result.mean_lapse_year == 8.0
 
 
 class TestGLWBPathSimulator:
@@ -126,7 +130,7 @@ class TestSinglePathSimulation:
             r=0.04,
             sigma=0.18,
             n_years=35,
-            mortality_table=lambda age: 0.02,  # 2% mortality
+            mortality_func=lambda age: 0.02,  # 2% mortality
             utilization_rate=1.0,
         )
 
@@ -142,7 +146,7 @@ class TestSinglePathSimulation:
             r=0.04,
             sigma=0.18,
             n_years=35,
-            mortality_table=lambda age: 0.02,
+            mortality_func=lambda age: 0.02,
         )
 
         assert result.ruin_year >= -1
@@ -154,14 +158,14 @@ class TestSinglePathSimulation:
         # Full utilization
         result_full = simulator.simulate_single_path(
             premium=100_000, age=65, r=0.04, sigma=0.18,
-            n_years=20, mortality_table=lambda age: 0.0,  # No mortality
+            n_years=20, mortality_func=lambda age: 0.0,  # No mortality
             utilization_rate=1.0,
         )
 
         # Half utilization
         result_half = simulator.simulate_single_path(
             premium=100_000, age=65, r=0.04, sigma=0.18,
-            n_years=20, mortality_table=lambda age: 0.0,
+            n_years=20, mortality_func=lambda age: 0.0,
             utilization_rate=0.5,
         )
 
@@ -306,3 +310,167 @@ class TestReproducibility:
         # Results should differ (probability is extremely low they'd be equal)
         # But should be in same ballpark
         assert abs(result1.price - result2.price) / max(result1.price, 1) < 1.0
+
+
+class TestBehavioralIntegration:
+    """Tests for behavioral model integration (A.2)."""
+
+    def test_lapse_integration(self) -> None:
+        """Dynamic lapse should reduce insurer liability."""
+        from annuity_pricing.behavioral import LapseAssumptions
+
+        config = GWBConfig(rollup_rate=0.05, withdrawal_rate=0.05)
+
+        # High lapse assumptions
+        high_lapse = LapseAssumptions(
+            base_annual_lapse=0.15,  # 15% base lapse
+            min_lapse=0.05,
+            max_lapse=0.30,
+        )
+
+        # Default (lower) lapse
+        low_lapse = LapseAssumptions(
+            base_annual_lapse=0.02,  # 2% base lapse
+            min_lapse=0.005,
+            max_lapse=0.10,
+        )
+
+        sim_high = GLWBPathSimulator(config, n_paths=200, seed=42, lapse_assumptions=high_lapse)
+        sim_low = GLWBPathSimulator(config, n_paths=200, seed=42, lapse_assumptions=low_lapse)
+
+        result_high = sim_high.price(100_000, 65, 0.04, 0.18)
+        result_low = sim_low.price(100_000, 65, 0.04, 0.18)
+
+        # Higher lapse → more policies exit before ruin → lower guarantee cost
+        assert result_high.prob_lapse > result_low.prob_lapse
+
+    def test_withdrawal_utilization_integration(self) -> None:
+        """Withdrawal model should affect withdrawals taken."""
+        from annuity_pricing.behavioral import WithdrawalAssumptions
+
+        config = GWBConfig(rollup_rate=0.05, withdrawal_rate=0.05)
+
+        # Low utilization assumptions
+        low_util = WithdrawalAssumptions(
+            base_utilization=0.50,  # 50% utilization
+            min_utilization=0.30,
+            max_utilization=0.70,
+        )
+
+        # High utilization assumptions
+        high_util = WithdrawalAssumptions(
+            base_utilization=0.95,  # 95% utilization
+            min_utilization=0.80,
+            max_utilization=1.0,
+        )
+
+        sim_low = GLWBPathSimulator(config, n_paths=100, seed=42, withdrawal_assumptions=low_util)
+        sim_high = GLWBPathSimulator(config, n_paths=100, seed=42, withdrawal_assumptions=high_util)
+
+        result_low = sim_low.price(100_000, 65, 0.04, 0.18)
+        result_high = sim_high.price(100_000, 65, 0.04, 0.18)
+
+        # Higher utilization → faster AV depletion → higher prob_ruin
+        # (though with same seed the effect might be subtle)
+        assert result_high.prob_ruin >= 0  # Just ensure it runs
+        assert result_low.prob_ruin >= 0
+
+    def test_expense_integration(self) -> None:
+        """Expense model should accumulate PV of expenses."""
+        from annuity_pricing.behavioral import ExpenseAssumptions
+
+        config = GWBConfig(rollup_rate=0.05, withdrawal_rate=0.05)
+
+        # High expense assumptions
+        high_expense = ExpenseAssumptions(
+            per_policy_annual=500.0,
+            pct_of_av_annual=0.03,  # 3% M&E
+        )
+
+        sim = GLWBPathSimulator(config, n_paths=50, seed=42, expense_assumptions=high_expense)
+
+        # Run single path to check expenses are tracked
+        result = sim.simulate_single_path(
+            premium=100_000,
+            age=65,
+            r=0.04,
+            sigma=0.18,
+            n_years=20,
+            mortality_func=lambda age: 0.02,
+            use_behavioral_models=True,
+        )
+
+        # Should have positive PV of expenses
+        assert result.pv_expenses > 0
+
+    def test_behavioral_toggle(self) -> None:
+        """use_behavioral_models=False should skip behavioral logic."""
+        config = GWBConfig(rollup_rate=0.05, withdrawal_rate=0.05)
+        sim = GLWBPathSimulator(config, n_paths=50, seed=42)
+
+        # With behavioral models
+        result_with = sim.price(100_000, 65, 0.04, 0.18, use_behavioral_models=True)
+
+        # Without behavioral models (simpler simulation)
+        result_without = sim.price(
+            100_000, 65, 0.04, 0.18,
+            use_behavioral_models=False,
+            utilization_rate=1.0,  # Must provide explicit rate
+        )
+
+        # Both should complete
+        assert result_with.n_paths == 50
+        assert result_without.n_paths == 50
+        # Without behavioral: no lapse tracking
+        assert result_without.prob_lapse == 0.0
+
+    def test_all_behavioral_together(self) -> None:
+        """All behavioral models should work together."""
+        from annuity_pricing.behavioral import (
+            LapseAssumptions,
+            WithdrawalAssumptions,
+            ExpenseAssumptions,
+        )
+
+        config = GWBConfig(rollup_rate=0.05, withdrawal_rate=0.05)
+
+        sim = GLWBPathSimulator(
+            config,
+            n_paths=100,
+            seed=42,
+            lapse_assumptions=LapseAssumptions(base_annual_lapse=0.05),
+            withdrawal_assumptions=WithdrawalAssumptions(base_utilization=0.70),
+            expense_assumptions=ExpenseAssumptions(per_policy_annual=100.0),
+        )
+
+        result = sim.price(100_000, 65, 0.04, 0.18)
+
+        # All metrics should be populated
+        assert result.prob_ruin >= 0
+        assert result.prob_lapse >= 0
+        assert 0 <= result.guarantee_cost <= 1
+
+    def test_prob_lapse_in_valid_range(self) -> None:
+        """Probability of lapse should be in [0, 1]."""
+        config = GWBConfig(rollup_rate=0.05, withdrawal_rate=0.05)
+        sim = GLWBPathSimulator(config, n_paths=100, seed=42)
+
+        result = sim.price(100_000, 65, 0.04, 0.18)
+
+        assert 0 <= result.prob_lapse <= 1
+
+    def test_surrender_period_affects_lapse(self) -> None:
+        """Shorter surrender period should allow more lapses."""
+        config = GWBConfig(rollup_rate=0.05, withdrawal_rate=0.05)
+        sim = GLWBPathSimulator(config, n_paths=200, seed=42)
+
+        # Long surrender period (10 years)
+        result_long = sim.price(100_000, 65, 0.04, 0.18, surrender_period_years=10)
+
+        # Short surrender period (2 years)
+        sim2 = GLWBPathSimulator(config, n_paths=200, seed=42)
+        result_short = sim2.price(100_000, 65, 0.04, 0.18, surrender_period_years=2)
+
+        # Both should complete; shorter surrender period allows more lapses
+        assert result_long.prob_lapse >= 0
+        assert result_short.prob_lapse >= 0

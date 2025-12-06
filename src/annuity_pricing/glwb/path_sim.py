@@ -22,10 +22,19 @@ See: docs/references/L3/bauer_kling_russ_2008.md
 """
 
 from dataclasses import dataclass
-from typing import Optional, Callable
+from typing import Optional, Callable, Union
 import numpy as np
 
 from .gwb_tracker import GWBTracker, GWBConfig, GWBState
+from ..loaders.mortality import MortalityLoader, MortalityTable
+from ..behavioral import (
+    DynamicLapseModel,
+    LapseAssumptions,
+    WithdrawalModel,
+    WithdrawalAssumptions,
+    ExpenseModel,
+    ExpenseAssumptions,
+)
 
 
 @dataclass(frozen=True)
@@ -49,6 +58,10 @@ class GLWBPricingResult:
         Probability AV exhausted before death
     mean_ruin_year : float
         Average year of ruin (if ruin occurs)
+    prob_lapse : float
+        Probability of lapse before death/ruin
+    mean_lapse_year : float
+        Average year of lapse (if lapse occurs)
     n_paths : int
         Number of paths simulated
     """
@@ -60,6 +73,8 @@ class GLWBPricingResult:
     standard_error: float
     prob_ruin: float
     mean_ruin_year: float
+    prob_lapse: float
+    mean_lapse_year: float
     n_paths: int
 
 
@@ -74,8 +89,12 @@ class PathResult:
         Present value of payments from insurer (when AV exhausted)
     pv_withdrawals : float
         Present value of all withdrawals
+    pv_expenses : float
+        Present value of insurer expenses
     ruin_year : int
         Year AV exhausted (-1 if never)
+    lapse_year : int
+        Year of lapse (-1 if never)
     final_av : float
         Account value at end of simulation
     final_gwb : float
@@ -86,7 +105,9 @@ class PathResult:
 
     pv_insurer_payments: float
     pv_withdrawals: float
+    pv_expenses: float
     ruin_year: int
+    lapse_year: int
     final_av: float
     final_gwb: float
     death_year: int
@@ -114,6 +135,9 @@ class GLWBPathSimulator:
         gwb_config: GWBConfig,
         n_paths: int = 10000,
         seed: Optional[int] = None,
+        lapse_assumptions: Optional[LapseAssumptions] = None,
+        withdrawal_assumptions: Optional[WithdrawalAssumptions] = None,
+        expense_assumptions: Optional[ExpenseAssumptions] = None,
     ):
         """
         Initialize GLWB simulator.
@@ -126,11 +150,29 @@ class GLWBPathSimulator:
             Number of MC paths
         seed : int, optional
             Random seed
+        lapse_assumptions : LapseAssumptions, optional
+            Dynamic lapse parameters. If None, uses defaults.
+        withdrawal_assumptions : WithdrawalAssumptions, optional
+            Withdrawal utilization parameters. If None, uses defaults.
+        expense_assumptions : ExpenseAssumptions, optional
+            Expense parameters. If None, uses defaults.
         """
         self.gwb_config = gwb_config
         self.n_paths = n_paths
         self.seed = seed
         self._rng = np.random.default_rng(seed)
+        self._mortality_loader = MortalityLoader()
+
+        # Behavioral models with defaults
+        self._lapse_model = DynamicLapseModel(
+            lapse_assumptions or LapseAssumptions()
+        )
+        self._withdrawal_model = WithdrawalModel(
+            withdrawal_assumptions or WithdrawalAssumptions()
+        )
+        self._expense_model = ExpenseModel(
+            expense_assumptions or ExpenseAssumptions()
+        )
 
     def price(
         self,
@@ -139,8 +181,11 @@ class GLWBPathSimulator:
         r: float,
         sigma: float,
         max_age: int = 100,
-        mortality_table: Optional[Callable[[int], float]] = None,
-        utilization_rate: float = 1.0,
+        mortality_table: Optional[Union[Callable[[int], float], MortalityTable]] = None,
+        utilization_rate: Optional[float] = None,
+        gender: str = "male",
+        surrender_period_years: int = 7,
+        use_behavioral_models: bool = True,
     ) -> GLWBPricingResult:
         """
         Price GLWB guarantee using path-dependent MC.
@@ -159,10 +204,17 @@ class GLWBPathSimulator:
             Volatility
         max_age : int
             Maximum simulation age
-        mortality_table : callable, optional
-            Function age -> qx (mortality rate). If None, uses simple table.
-        utilization_rate : float
-            Fraction of max withdrawal taken (default 1.0)
+        mortality_table : callable or MortalityTable, optional
+            Function age -> qx or MortalityTable object. If None, uses SOA 2012 IAM.
+        utilization_rate : float, optional
+            Fixed utilization rate (overrides behavioral model if set).
+            If None, uses WithdrawalModel for age-dependent utilization.
+        gender : str
+            Gender for default mortality table ("male" or "female")
+        surrender_period_years : int
+            Years until surrender period ends (affects lapse rates)
+        use_behavioral_models : bool
+            If True, uses lapse/withdrawal/expense models. If False, simple mode.
 
         Returns
         -------
@@ -176,13 +228,24 @@ class GLWBPathSimulator:
         if sigma < 0:
             raise ValueError(f"Volatility cannot be negative, got {sigma}")
 
-        # Default mortality table (simplified Gompertz-like)
+        # Convert mortality table to callable
+        # [T1] Default to SOA 2012 IAM (industry-standard table)
         if mortality_table is None:
-            mortality_table = self._default_mortality
+            mortality_table = self._mortality_loader.soa_2012_iam(gender=gender)
+
+        # Convert MortalityTable to callable if needed
+        if isinstance(mortality_table, MortalityTable):
+            _table = mortality_table
+
+            def mortality_func(age: int) -> float:
+                return _table.get_qx(age)
+        else:
+            mortality_func = mortality_table
 
         n_years = max_age - age
         path_results = []
         ruin_years = []
+        lapse_years = []
 
         for _ in range(self.n_paths):
             result = self.simulate_single_path(
@@ -191,12 +254,16 @@ class GLWBPathSimulator:
                 r=r,
                 sigma=sigma,
                 n_years=n_years,
-                mortality_table=mortality_table,
+                mortality_func=mortality_func,
                 utilization_rate=utilization_rate,
+                surrender_period_years=surrender_period_years,
+                use_behavioral_models=use_behavioral_models,
             )
             path_results.append(result)
             if result.ruin_year >= 0:
                 ruin_years.append(result.ruin_year)
+            if result.lapse_year >= 0:
+                lapse_years.append(result.lapse_year)
 
         # Aggregate results
         pv_payoffs = np.array([r.pv_insurer_payments for r in path_results])
@@ -206,6 +273,8 @@ class GLWBPathSimulator:
 
         prob_ruin = len(ruin_years) / self.n_paths
         mean_ruin_year = np.mean(ruin_years) if ruin_years else -1.0
+        prob_lapse = len(lapse_years) / self.n_paths
+        mean_lapse_year = np.mean(lapse_years) if lapse_years else -1.0
 
         return GLWBPricingResult(
             price=mean_payoff,
@@ -215,6 +284,8 @@ class GLWBPathSimulator:
             standard_error=standard_error,
             prob_ruin=prob_ruin,
             mean_ruin_year=mean_ruin_year,
+            prob_lapse=prob_lapse,
+            mean_lapse_year=mean_lapse_year,
             n_paths=self.n_paths,
         )
 
@@ -225,8 +296,10 @@ class GLWBPathSimulator:
         r: float,
         sigma: float,
         n_years: int,
-        mortality_table: Callable[[int], float],
-        utilization_rate: float = 1.0,
+        mortality_func: Callable[[int], float],
+        utilization_rate: Optional[float] = None,
+        surrender_period_years: int = 7,
+        use_behavioral_models: bool = True,
     ) -> PathResult:
         """
         Simulate a single GLWB path.
@@ -243,10 +316,14 @@ class GLWBPathSimulator:
             Volatility
         n_years : int
             Maximum years to simulate
-        mortality_table : callable
-            Function age -> qx
-        utilization_rate : float
-            Fraction of max withdrawal taken
+        mortality_func : callable
+            Function age -> qx (mortality rate)
+        utilization_rate : float, optional
+            Fixed utilization rate. If None, uses WithdrawalModel.
+        surrender_period_years : int
+            Years until surrender period ends (for lapse model)
+        use_behavioral_models : bool
+            Whether to use lapse/withdrawal/expense models
 
         Returns
         -------
@@ -258,32 +335,72 @@ class GLWBPathSimulator:
 
         pv_insurer_payments = 0.0
         pv_withdrawals = 0.0
+        pv_expenses = 0.0
         ruin_year = -1
+        lapse_year = -1
         death_year = -1
         current_age = age
+        first_withdrawal_year = 0  # Assume withdrawals start immediately
 
         for t in range(n_years):
             # Check mortality
-            qx = mortality_table(current_age)
+            qx = mortality_func(current_age)
             if self._rng.random() < qx:
                 death_year = t
                 break
+
+            # Check dynamic lapse (if behavioral models enabled)
+            if use_behavioral_models and state.av > 0:
+                surrender_complete = t >= surrender_period_years
+                lapse_result = self._lapse_model.calculate_lapse(
+                    gwb=state.gwb,
+                    av=state.av,
+                    surrender_period_complete=surrender_complete,
+                )
+                if self._rng.random() < lapse_result.lapse_rate:
+                    lapse_year = t
+                    break  # Policy lapses, no further payments
 
             # Generate return (risk-neutral GBM)
             # [T1] Under risk-neutral measure: drift = r - 0.5*sigma^2
             z = self._rng.standard_normal()
             av_return = (r - 0.5 * sigma**2) + sigma * z
 
+            # Discount factor
+            df = np.exp(-r * (t + 1))
+
+            # Calculate expenses (if behavioral models enabled)
+            if use_behavioral_models and state.av > 0:
+                expense_result = self._expense_model.calculate_period_expense(
+                    av=state.av,
+                    period_years=1.0,
+                    years_from_issue=t,
+                )
+                pv_expenses += expense_result.total_expense * df
+
             # Calculate withdrawal
             max_withdrawal = tracker.calculate_max_withdrawal(state)
-            withdrawal = max_withdrawal * utilization_rate
+
+            if utilization_rate is not None:
+                # Use fixed utilization rate
+                withdrawal = max_withdrawal * utilization_rate
+            elif use_behavioral_models:
+                # Use behavioral model for withdrawal utilization
+                years_since = t - first_withdrawal_year if t >= first_withdrawal_year else 0
+                withdrawal_result = self._withdrawal_model.calculate_withdrawal(
+                    gwb=state.gwb,
+                    withdrawal_rate=self.gwb_config.withdrawal_rate,
+                    age=current_age,
+                    years_since_first_withdrawal=years_since,
+                )
+                withdrawal = withdrawal_result.withdrawal_amount
+            else:
+                # Default to 100% utilization
+                withdrawal = max_withdrawal
 
             # Step forward
             result = tracker.step(state, av_return, dt=1.0, withdrawal=withdrawal)
             state = result.new_state
-
-            # Discount factor
-            df = np.exp(-r * (t + 1))
 
             # Track withdrawals
             pv_withdrawals += result.withdrawal_taken * df
@@ -302,32 +419,13 @@ class GLWBPathSimulator:
         return PathResult(
             pv_insurer_payments=pv_insurer_payments,
             pv_withdrawals=pv_withdrawals,
+            pv_expenses=pv_expenses,
             ruin_year=ruin_year,
+            lapse_year=lapse_year,
             final_av=state.av,
             final_gwb=state.gwb,
             death_year=death_year,
         )
-
-    def _default_mortality(self, age: int) -> float:
-        """
-        Default mortality table (simplified Gompertz-like).
-
-        [T2] Approximate US life table.
-
-        Parameters
-        ----------
-        age : int
-            Current age
-
-        Returns
-        -------
-        float
-            Mortality rate qx
-        """
-        # Simple approximation: qx = 0.0001 * e^(0.08 * age)
-        # Caps at 1.0
-        qx = 0.0001 * np.exp(0.08 * age)
-        return min(qx, 1.0)
 
     def calculate_fair_fee(
         self,

@@ -20,11 +20,12 @@ See: docs/knowledge/domain/vm21_vm22.md
 """
 
 from dataclasses import dataclass
-from typing import Optional, List, Callable
+from typing import Optional, List, Callable, Union
 from enum import Enum
 import numpy as np
 
 from .scenarios import ScenarioGenerator, generate_deterministic_scenarios
+from ..loaders.yield_curve import YieldCurve, YieldCurveLoader
 
 
 class ReserveType(Enum):
@@ -166,11 +167,13 @@ class VM22Calculator:
             projection_years=projection_years,
             seed=seed,
         )
+        self._yield_curve_loader = YieldCurveLoader()
 
     def calculate_reserve(
         self,
         policy: FixedAnnuityPolicy,
-        market_rate: float = 0.04,
+        market_rate: Optional[float] = None,
+        yield_curve: Optional[YieldCurve] = None,
         lapse_rate: float = 0.05,
     ) -> VM22Result:
         """
@@ -182,8 +185,10 @@ class VM22Calculator:
         ----------
         policy : FixedAnnuityPolicy
             Policy data
-        market_rate : float
-            Current market rate for discounting
+        market_rate : float, optional
+            Current market rate for discounting. If None, derived from yield_curve.
+        yield_curve : YieldCurve, optional
+            Yield curve for rates. If None, uses flat 4% curve.
         lapse_rate : float
             Assumed annual lapse rate
 
@@ -204,6 +209,17 @@ class VM22Calculator:
             raise ValueError(f"Premium must be positive, got {policy.premium}")
         if policy.guaranteed_rate < 0:
             raise ValueError(f"Guaranteed rate cannot be negative, got {policy.guaranteed_rate}")
+
+        # Default to flat 4% yield curve if neither provided
+        if yield_curve is None and market_rate is None:
+            yield_curve = self._yield_curve_loader.flat_curve(0.04)
+            market_rate = 0.04
+        elif yield_curve is not None and market_rate is None:
+            # Derive market rate from yield curve
+            market_rate = yield_curve.get_rate(float(policy.term_years))
+        elif market_rate is not None and yield_curve is None:
+            # Use provided market_rate directly
+            pass  # market_rate already set
 
         # Calculate Net Premium Reserve (floor)
         npr = self.calculate_net_premium_reserve(policy, market_rate)

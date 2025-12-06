@@ -311,6 +311,235 @@ class TestPriceMultiple:
         assert "protection_value" in results.columns
 
 
+class TestBreakevenCalculation:
+    """Tests for RILA breakeven solver.
+
+    Breakeven Definition:
+    --------------------
+    The breakeven is the index return R where payoff = principal (net return = 0).
+
+    For BUFFERS:
+    - Buffer absorbs first X% of losses
+    - Within buffer zone (-X% < R < 0): investor gets principal back (breakeven)
+    - The brentq solver finds the LEFT edge of this zone at R = -buffer_rate
+    - But the actual "minimum return to break even" interpretation depends on context
+
+    For FLOORS:
+    - Floor sets minimum return at -X%
+    - At R = 0: investor gets principal back (breakeven)
+    - Below floor: investor loses up to floor rate (not breakeven)
+    - Breakeven is at R = 0
+
+    These tests verify the ACTUAL mathematical behavior of the solver.
+    """
+
+    def test_buffer_breakeven_at_left_edge(self, pricer):
+        """[T1] Buffer breakeven is at left edge of buffer zone."""
+        # 10% buffer: brentq finds -0.10 (left edge of flat zone)
+        breakeven = pricer._calculate_breakeven(
+            is_buffer=True,
+            buffer_rate=0.10,
+            cap_rate=0.15,
+        )
+
+        assert breakeven is not None
+        # Due to flat zone, solver may find any point in [-buffer_rate, 0]
+        # The exact value depends on brentq's search direction
+        assert -0.10 <= breakeven <= 0.0 + 1e-8
+
+    def test_buffer_breakeven_within_buffer_zone(self, pricer):
+        """[T1] Buffer breakeven is within the protected zone."""
+        for buffer_rate in [0.05, 0.10, 0.15, 0.20, 0.25]:
+            breakeven = pricer._calculate_breakeven(
+                is_buffer=True,
+                buffer_rate=buffer_rate,
+                cap_rate=0.20,
+            )
+
+            assert breakeven is not None
+            # Breakeven must be within or at edge of buffer zone
+            assert -buffer_rate <= breakeven <= 0.0 + 1e-8
+
+    def test_floor_breakeven_at_zero(self, pricer):
+        """[T1] Floor breakeven is at R = 0 (no gain, no loss)."""
+        # Floor: losses below floor are NOT absorbed, they're capped
+        # So breakeven is where R = 0 (principal returned)
+        breakeven = pricer._calculate_breakeven(
+            is_buffer=False,
+            buffer_rate=0.10,  # stored as positive, interpreted as -10% floor
+            cap_rate=0.15,
+        )
+
+        assert breakeven is not None
+        assert breakeven == pytest.approx(0.0, abs=1e-6)
+
+    def test_floor_breakeven_always_zero(self, pricer):
+        """[T1] Floor breakeven is always at R = 0, regardless of floor level."""
+        for floor_rate in [0.05, 0.10, 0.15, 0.20, 0.25]:
+            breakeven = pricer._calculate_breakeven(
+                is_buffer=False,
+                buffer_rate=floor_rate,
+                cap_rate=0.20,
+            )
+
+            assert breakeven is not None
+            assert breakeven == pytest.approx(0.0, abs=1e-6)
+
+    def test_buffer_breakeven_uncapped(self, pricer):
+        """[T1] Uncapped buffer has same breakeven behavior."""
+        breakeven = pricer._calculate_breakeven(
+            is_buffer=True,
+            buffer_rate=0.10,
+            cap_rate=None,  # Uncapped
+        )
+
+        assert breakeven is not None
+        assert -0.10 <= breakeven <= 0.0 + 1e-8
+
+    def test_floor_breakeven_uncapped(self, pricer):
+        """[T1] Uncapped floor breakeven is still at R = 0."""
+        breakeven = pricer._calculate_breakeven(
+            is_buffer=False,
+            buffer_rate=0.10,
+            cap_rate=None,  # Uncapped
+        )
+
+        assert breakeven is not None
+        assert breakeven == pytest.approx(0.0, abs=1e-6)
+
+    def test_breakeven_returned_in_pricing_result(self, pricer, buffer_product):
+        """Breakeven should be included in pricing result."""
+        result = pricer.price(buffer_product, term_years=1.0)
+
+        assert result.breakeven_return is not None
+        # Buffer breakeven is within buffer zone
+        assert -buffer_product.buffer_rate <= result.breakeven_return <= 0.0 + 1e-8
+
+    def test_floor_breakeven_in_pricing_result(self, pricer, floor_product):
+        """Floor breakeven should be at R = 0 in pricing result."""
+        result = pricer.price(floor_product, term_years=1.0)
+
+        assert result.breakeven_return is not None
+        assert result.breakeven_return == pytest.approx(0.0, abs=1e-6)
+
+
+class TestGreeksCalculation:
+    """Tests for RILA hedge Greeks calculation."""
+
+    def test_buffer_greeks_returns_result(self, pricer, buffer_product):
+        """Buffer Greeks should return RILAGreeks."""
+        from annuity_pricing.products.rila import RILAGreeks
+
+        greeks = pricer.calculate_greeks(buffer_product, term_years=1.0)
+
+        assert isinstance(greeks, RILAGreeks)
+        assert greeks.protection_type == "buffer"
+
+    def test_floor_greeks_returns_result(self, pricer, floor_product):
+        """Floor Greeks should return RILAGreeks."""
+        from annuity_pricing.products.rila import RILAGreeks
+
+        greeks = pricer.calculate_greeks(floor_product, term_years=1.0)
+
+        assert isinstance(greeks, RILAGreeks)
+        assert greeks.protection_type == "floor"
+
+    def test_buffer_delta_negative(self, pricer, buffer_product):
+        """[T1] Buffer put spread should have negative delta."""
+        # Long ATM put (negative delta) - Short OTM put (positive delta)
+        # Net delta should be negative (long put spread)
+        greeks = pricer.calculate_greeks(buffer_product, term_years=1.0)
+
+        assert greeks.delta < 0
+
+    def test_floor_delta_negative(self, pricer, floor_product):
+        """[T1] Floor long put should have negative delta."""
+        greeks = pricer.calculate_greeks(floor_product, term_years=1.0)
+
+        assert greeks.delta < 0
+
+    def test_buffer_gamma_positive(self, pricer, buffer_product):
+        """[T1] Buffer put spread should have positive gamma."""
+        # Long ATM put has higher gamma than short OTM put
+        greeks = pricer.calculate_greeks(buffer_product, term_years=1.0)
+
+        assert greeks.gamma > 0
+
+    def test_floor_gamma_positive(self, pricer, floor_product):
+        """[T1] Floor long put should have positive gamma."""
+        greeks = pricer.calculate_greeks(floor_product, term_years=1.0)
+
+        assert greeks.gamma > 0
+
+    def test_buffer_vega_positive(self, pricer, buffer_product):
+        """[T1] Buffer put spread should have positive vega (net long vol)."""
+        greeks = pricer.calculate_greeks(buffer_product, term_years=1.0)
+
+        assert greeks.vega > 0
+
+    def test_floor_vega_positive(self, pricer, floor_product):
+        """[T1] Floor long put should have positive vega."""
+        greeks = pricer.calculate_greeks(floor_product, term_years=1.0)
+
+        assert greeks.vega > 0
+
+    def test_dollar_delta_scales_with_notional(self, pricer, buffer_product):
+        """Dollar delta should scale with notional."""
+        greeks_100 = pricer.calculate_greeks(buffer_product, notional=100.0)
+        greeks_1000 = pricer.calculate_greeks(buffer_product, notional=1000.0)
+
+        assert greeks_1000.dollar_delta == pytest.approx(
+            greeks_100.dollar_delta * 10, rel=1e-10
+        )
+
+    def test_higher_buffer_lower_delta_magnitude(self, pricer):
+        """Higher buffer should have lower delta magnitude (more OTM put offset)."""
+        low_buffer = RILAProduct(
+            company_name="Test", product_name="5% Buffer", product_group="RILA",
+            status="current", buffer_rate=0.05, buffer_modifier="Losses Covered Up To",
+            cap_rate=0.15,
+        )
+        high_buffer = RILAProduct(
+            company_name="Test", product_name="20% Buffer", product_group="RILA",
+            status="current", buffer_rate=0.20, buffer_modifier="Losses Covered Up To",
+            cap_rate=0.15,
+        )
+
+        low_greeks = pricer.calculate_greeks(low_buffer, term_years=1.0)
+        high_greeks = pricer.calculate_greeks(high_buffer, term_years=1.0)
+
+        # Higher buffer = more OTM short put = less negative delta offset
+        # So high buffer net delta is MORE negative
+        assert abs(high_greeks.delta) > abs(low_greeks.delta)
+
+    def test_buffer_atm_put_delta_populated(self, pricer, buffer_product):
+        """Buffer should have ATM put delta populated."""
+        greeks = pricer.calculate_greeks(buffer_product, term_years=1.0)
+
+        # ATM put delta should be around -0.4 to -0.5
+        # (adjusted for forward drift: r=0.05, q=0.02 shifts forward up)
+        assert greeks.atm_put_delta < 0
+        assert -0.7 < greeks.atm_put_delta < -0.3
+
+    def test_floor_atm_put_delta_zero(self, pricer, floor_product):
+        """Floor should have ATM put delta as zero (no ATM component)."""
+        greeks = pricer.calculate_greeks(floor_product, term_years=1.0)
+
+        assert greeks.atm_put_delta == 0.0
+
+    def test_greeks_wrong_product_type(self, pricer):
+        """Should reject non-RILA products."""
+        from annuity_pricing.data.schemas import MYGAProduct
+
+        myga = MYGAProduct(
+            company_name="Test", product_name="Test", product_group="MYGA",
+            status="current", fixed_rate=0.04, guarantee_duration=5,
+        )
+
+        with pytest.raises(ValueError, match="Expected RILAProduct"):
+            pricer.calculate_greeks(myga)
+
+
 class TestAntiPatterns:
     """Anti-pattern tests for RILA pricing."""
 

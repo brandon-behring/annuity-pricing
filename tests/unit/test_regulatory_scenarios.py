@@ -17,9 +17,11 @@ from annuity_pricing.regulatory.scenarios import (
     AG43Scenarios,
     VasicekParams,
     EquityParams,
+    RiskNeutralEquityParams,
     generate_deterministic_scenarios,
     calculate_scenario_statistics,
 )
+from annuity_pricing.loaders.yield_curve import YieldCurveLoader
 
 
 class TestEconomicScenario:
@@ -370,3 +372,128 @@ class TestReproducibility:
 
         # Should be different
         assert not np.allclose(s1.get_rate_matrix(), s2.get_rate_matrix())
+
+
+class TestRiskNeutralEquityParams:
+    """Tests for RiskNeutralEquityParams (A.3)."""
+
+    def test_risk_neutral_drift(self) -> None:
+        """Risk-neutral drift should be r - q."""
+        params = RiskNeutralEquityParams(
+            risk_free_rate=0.04,
+            dividend_yield=0.02,
+            sigma=0.18,
+        )
+
+        # [T1] mu = r - q
+        assert params.mu == pytest.approx(0.02)  # 4% - 2% = 2%
+
+    def test_to_equity_params(self) -> None:
+        """Should convert to EquityParams correctly."""
+        rn_params = RiskNeutralEquityParams(
+            risk_free_rate=0.05,
+            dividend_yield=0.01,
+            sigma=0.20,
+        )
+
+        eq_params = rn_params.to_equity_params()
+
+        assert eq_params.mu == pytest.approx(0.04)  # 5% - 1%
+        assert eq_params.sigma == pytest.approx(0.20)
+
+    def test_default_dividend_yield(self) -> None:
+        """Default dividend yield should be 2%."""
+        params = RiskNeutralEquityParams(risk_free_rate=0.04)
+
+        assert params.dividend_yield == pytest.approx(0.02)
+        assert params.mu == pytest.approx(0.02)
+
+
+class TestRiskNeutralScenarios:
+    """Tests for risk-neutral scenario generation (A.3)."""
+
+    def test_risk_neutral_scenarios_shape(self) -> None:
+        """Should generate correct number of scenarios."""
+        gen = ScenarioGenerator(n_scenarios=100, projection_years=20, seed=42)
+        scenarios = gen.generate_risk_neutral_scenarios()
+
+        assert scenarios.n_scenarios == 100
+        assert scenarios.projection_years == 20
+
+    def test_accepts_yield_curve(self) -> None:
+        """Should accept yield curve for rate initialization."""
+        gen = ScenarioGenerator(n_scenarios=50, projection_years=10, seed=42)
+        curve = YieldCurveLoader().flat_curve(0.05)
+
+        scenarios = gen.generate_risk_neutral_scenarios(yield_curve=curve)
+
+        assert scenarios.n_scenarios == 50
+        # Initial rates should start from curve
+        rate_matrix = scenarios.get_rate_matrix()
+        # With Vasicek, first step is based on initial_rate + noise
+        # so we just check it's reasonable
+        assert np.mean(rate_matrix[:, 0]) > 0
+
+    def test_risk_neutral_drift_lower_than_real_world(self) -> None:
+        """
+        Risk-neutral equity drift should be lower than real-world.
+
+        [T1] Real-world mu ~ 7%, risk-neutral mu = r - q ~ 2%
+        """
+        gen = ScenarioGenerator(n_scenarios=500, projection_years=30, seed=42)
+
+        # Real-world scenarios (mu = 7%)
+        real_scenarios = gen.generate_ag43_scenarios()
+        real_equity = real_scenarios.get_equity_matrix()
+        real_mean = np.mean(real_equity)
+
+        # Risk-neutral scenarios (mu = r - q ~ 2%)
+        gen2 = ScenarioGenerator(n_scenarios=500, projection_years=30, seed=42)
+        rn_scenarios = gen2.generate_risk_neutral_scenarios(
+            yield_curve=YieldCurveLoader().flat_curve(0.04),
+            dividend_yield=0.02,
+        )
+        rn_equity = rn_scenarios.get_equity_matrix()
+        rn_mean = np.mean(rn_equity)
+
+        # Risk-neutral mean should be significantly lower
+        assert rn_mean < real_mean * 0.7  # Less than 70% of real-world
+
+    def test_custom_dividend_yield(self) -> None:
+        """Higher dividend yield should reduce risk-neutral drift."""
+        gen1 = ScenarioGenerator(n_scenarios=200, projection_years=20, seed=42)
+        gen2 = ScenarioGenerator(n_scenarios=200, projection_years=20, seed=42)
+
+        curve = YieldCurveLoader().flat_curve(0.04)
+
+        # Low dividend (mu = 4% - 1% = 3%)
+        low_div = gen1.generate_risk_neutral_scenarios(
+            yield_curve=curve, dividend_yield=0.01
+        )
+
+        # High dividend (mu = 4% - 4% = 0%)
+        high_div = gen2.generate_risk_neutral_scenarios(
+            yield_curve=curve, dividend_yield=0.04
+        )
+
+        low_mean = np.mean(low_div.get_equity_matrix())
+        high_mean = np.mean(high_div.get_equity_matrix())
+
+        # Lower dividend → higher mean equity return
+        assert low_mean > high_mean
+
+    def test_invalid_correlation_raises(self) -> None:
+        """Invalid correlation should raise error."""
+        gen = ScenarioGenerator(n_scenarios=10, projection_years=5, seed=42)
+
+        with pytest.raises(ValueError, match="Correlation"):
+            gen.generate_risk_neutral_scenarios(correlation=1.5)
+
+    def test_default_yield_curve(self) -> None:
+        """Should use default flat 4% curve if none provided."""
+        gen = ScenarioGenerator(n_scenarios=50, projection_years=10, seed=42)
+
+        # Should not raise
+        scenarios = gen.generate_risk_neutral_scenarios()
+
+        assert scenarios.n_scenarios == 50

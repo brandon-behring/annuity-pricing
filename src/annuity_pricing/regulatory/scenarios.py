@@ -16,8 +16,10 @@ See: docs/knowledge/domain/vm21_vm22.md
 """
 
 from dataclasses import dataclass
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Union
 import numpy as np
+
+from ..loaders.yield_curve import YieldCurve, YieldCurveLoader
 
 
 @dataclass(frozen=True)
@@ -117,20 +119,64 @@ class VasicekParams:
 @dataclass(frozen=True)
 class EquityParams:
     """
-    Equity model parameters (GBM).
+    Equity model parameters (GBM) - real-world measure.
 
     [T1] dS/S = μdt + σ dW
 
     Attributes
     ----------
     mu : float
-        Drift (expected return)
+        Drift (expected return) - real-world measure
     sigma : float
         Volatility
+
+    Note: For risk-neutral pricing, use RiskNeutralEquityParams instead.
     """
 
-    mu: float = 0.07  # 7% expected return
+    mu: float = 0.07  # 7% expected return (real-world)
     sigma: float = 0.18  # 18% volatility
+
+
+@dataclass(frozen=True)
+class RiskNeutralEquityParams:
+    """
+    Risk-neutral equity model parameters.
+
+    [T1] Under risk-neutral measure: drift = r - q (forward rate minus dividend yield)
+
+    Attributes
+    ----------
+    risk_free_rate : float
+        Risk-free rate (from yield curve)
+    dividend_yield : float
+        Continuous dividend yield
+    sigma : float
+        Volatility
+
+    Examples
+    --------
+    >>> params = RiskNeutralEquityParams(risk_free_rate=0.04, dividend_yield=0.02)
+    >>> params.mu
+    0.02  # 4% - 2% = 2% risk-neutral drift
+    """
+
+    risk_free_rate: float
+    dividend_yield: float = 0.02  # ~2% typical S&P 500 dividend yield
+    sigma: float = 0.18
+
+    @property
+    def mu(self) -> float:
+        """
+        Risk-neutral drift = r - q.
+
+        [T1] Under risk-neutral measure, expected return equals
+        risk-free rate minus dividend yield.
+        """
+        return self.risk_free_rate - self.dividend_yield
+
+    def to_equity_params(self) -> EquityParams:
+        """Convert to EquityParams for compatibility."""
+        return EquityParams(mu=self.mu, sigma=self.sigma)
 
 
 class ScenarioGenerator:
@@ -232,6 +278,97 @@ class ScenarioGenerator:
         )
         equity_paths = self._generate_gbm_returns(
             equity_params, equity_shocks
+        )
+
+        # Build scenario objects
+        scenarios = []
+        for i in range(self.n_scenarios):
+            scenario = EconomicScenario(
+                rates=rate_paths[i],
+                equity_returns=equity_paths[i],
+                scenario_id=i,
+            )
+            scenarios.append(scenario)
+
+        return AG43Scenarios(
+            scenarios=scenarios,
+            n_scenarios=self.n_scenarios,
+            projection_years=self.projection_years,
+        )
+
+    def generate_risk_neutral_scenarios(
+        self,
+        yield_curve: Optional[YieldCurve] = None,
+        dividend_yield: float = 0.02,
+        equity_sigma: float = 0.18,
+        rate_params: Optional[VasicekParams] = None,
+        correlation: float = -0.20,
+    ) -> AG43Scenarios:
+        """
+        Generate scenarios using risk-neutral equity drift.
+
+        [T1] Risk-neutral drift = r - q (forward rate - dividend yield).
+
+        This is the correct approach for pricing purposes (VM-21, GLWB valuation).
+        Use generate_ag43_scenarios() for real-world scenarios (stress testing).
+
+        Parameters
+        ----------
+        yield_curve : YieldCurve, optional
+            Yield curve for rate projection and risk-neutral drift.
+            If None, uses a flat 4% curve.
+        dividend_yield : float
+            Continuous dividend yield (default 2%)
+        equity_sigma : float
+            Equity volatility (default 18%)
+        rate_params : VasicekParams, optional
+            Interest rate model parameters
+        correlation : float
+            Correlation between rate and equity shocks
+
+        Returns
+        -------
+        AG43Scenarios
+            Collection of risk-neutral scenarios
+
+        Examples
+        --------
+        >>> from annuity_pricing.loaders.yield_curve import YieldCurveLoader
+        >>> gen = ScenarioGenerator(n_scenarios=100, seed=42)
+        >>> curve = YieldCurveLoader().flat_curve(0.04)
+        >>> scenarios = gen.generate_risk_neutral_scenarios(yield_curve=curve)
+        >>> len(scenarios.scenarios)
+        100
+        """
+        if not -1 <= correlation <= 1:
+            raise ValueError(f"Correlation must be in [-1, 1], got {correlation}")
+
+        # Default to flat 4% curve
+        if yield_curve is None:
+            yield_curve = YieldCurveLoader().flat_curve(0.04)
+
+        rate_params = rate_params or VasicekParams()
+        initial_rate = yield_curve.get_rate(1.0)
+
+        # Create risk-neutral equity params using yield curve
+        # [T1] Under risk-neutral: mu = r - q
+        rn_equity_params = RiskNeutralEquityParams(
+            risk_free_rate=initial_rate,
+            dividend_yield=dividend_yield,
+            sigma=equity_sigma,
+        )
+
+        # Generate correlated shocks
+        rate_shocks, equity_shocks = self._generate_correlated_shocks(correlation)
+
+        # Generate rate paths from Vasicek
+        rate_paths = self._generate_vasicek_paths(
+            initial_rate, rate_params, rate_shocks
+        )
+
+        # Generate equity returns using risk-neutral drift
+        equity_paths = self._generate_gbm_returns(
+            rn_equity_params.to_equity_params(), equity_shocks
         )
 
         # Build scenario objects

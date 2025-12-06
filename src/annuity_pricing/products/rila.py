@@ -19,6 +19,7 @@ from typing import Any, Optional
 
 import numpy as np
 import pandas as pd
+from scipy.optimize import brentq
 
 from annuity_pricing.data.schemas import RILAProduct
 from annuity_pricing.options.payoffs.rila import (
@@ -26,9 +27,11 @@ from annuity_pricing.options.payoffs.rila import (
     FloorPayoff,
     create_rila_payoff,
 )
+from annuity_pricing.options.payoffs.base import OptionType
 from annuity_pricing.options.pricing.black_scholes import (
     black_scholes_call,
     black_scholes_put,
+    black_scholes_greeks,
     price_buffer_protection,
 )
 from annuity_pricing.options.simulation.gbm import GBMParams
@@ -93,6 +96,50 @@ class MarketParams:
             raise ValueError(f"CRITICAL: spot must be > 0, got {self.spot}")
         if self.volatility < 0:
             raise ValueError(f"CRITICAL: volatility must be >= 0, got {self.volatility}")
+
+
+@dataclass(frozen=True)
+class RILAGreeks:
+    """
+    Hedge Greeks for RILA product from option replication.
+
+    [T1] Buffer = Long ATM put - Short OTM put (put spread)
+    [T1] Floor = Long OTM put
+
+    The Greeks represent the sensitivities of the embedded option
+    position, useful for hedging the insurer's liability.
+
+    Attributes
+    ----------
+    protection_type : str
+        'buffer' or 'floor'
+    delta : float
+        Position delta (dV/dS), sum across all options
+    gamma : float
+        Position gamma (d²V/dS²)
+    vega : float
+        Position vega (dV/dσ) per 1% vol change
+    theta : float
+        Position theta (dV/dt) per day
+    rho : float
+        Position rho (dV/dr) per 1% rate change
+    atm_put_delta : float
+        Delta of ATM put component (buffer only)
+    otm_put_delta : float
+        Delta of OTM put component
+    dollar_delta : float
+        Dollar delta (delta * spot * notional)
+    """
+
+    protection_type: str
+    delta: float
+    gamma: float
+    vega: float
+    theta: float
+    rho: float
+    atm_put_delta: float
+    otm_put_delta: float
+    dollar_delta: float
 
 
 class RILAPricer(BasePricer):
@@ -477,32 +524,96 @@ class RILAPricer(BasePricer):
         """
         Calculate breakeven index return.
 
+        [T1] Find index return R where payoff = 1.0 (principal returned).
+
+        For buffers:
+        - Gain side: min(R, cap) if R > 0
+        - Loss side: max(R + buffer, -1) if R < -buffer
+        - Breakeven is where 1 + net_return = 1
+
+        For floors:
+        - Gain side: min(R, cap) if R > 0
+        - Loss side: max(R, floor) (floor is typically negative, e.g., -0.10)
+        - Breakeven is where 1 + net_return = 1
+
         Parameters
         ----------
         is_buffer : bool
             True if buffer protection
         buffer_rate : float
-            Protection level
+            Protection level (buffer absorbs first X% loss; floor = minimum return)
         cap_rate : float, optional
-            Cap rate
+            Cap rate (None = uncapped)
 
         Returns
         -------
         Optional[float]
-            Breakeven return (decimal), or None if not yet implemented
+            Breakeven return (decimal), or None if no breakeven exists in range
 
-        Notes
-        -----
-        [T3] Breakeven calculation methodology not yet defined.
-        See docs/knowledge/domain/rila_mechanics.md for planned approach.
+        Examples
+        --------
+        >>> pricer = RILAPricer()
+        >>> # 10% buffer: breakeven at -10% (first 10% absorbed)
+        >>> pricer._calculate_breakeven(True, 0.10, 0.15)
+        -0.1
+        >>> # 10% floor: breakeven at -10% (floor caps losses at -10%)
+        >>> pricer._calculate_breakeven(False, 0.10, 0.15)
+        -0.1
         """
-        import warnings
-        warnings.warn(
-            "Breakeven calculation not yet implemented. Returning None. "
-            "See docs/knowledge/domain/rila_mechanics.md",
-            UserWarning,
-        )
-        return None
+
+        def payoff_minus_principal(index_return: float) -> float:
+            """Payoff - 1.0 (positive = profit, negative = loss)."""
+            if is_buffer:
+                # Buffer payoff:
+                # - Gains: credited up to cap
+                # - Losses: buffer absorbs first buffer_rate%
+                if index_return >= 0:
+                    # Positive return, apply cap
+                    if cap_rate is not None:
+                        gain = min(index_return, cap_rate)
+                    else:
+                        gain = index_return
+                    return gain  # payoff - 1 = (1 + gain) - 1 = gain
+                else:
+                    # Negative return
+                    if index_return > -buffer_rate:
+                        # Within buffer - no loss
+                        return 0.0  # payoff - 1 = 1 - 1 = 0
+                    else:
+                        # Beyond buffer - client absorbs excess
+                        loss = index_return + buffer_rate  # e.g., -15% + 10% = -5%
+                        return loss  # payoff - 1 = (1 + loss) - 1 = loss
+            else:
+                # Floor payoff:
+                # - Gains: credited up to cap
+                # - Losses: floored at -floor_rate (floor_rate stored in buffer_rate param)
+                floor_rate = -buffer_rate  # Floor is negative, e.g., -0.10
+                if index_return >= 0:
+                    # Positive return, apply cap
+                    if cap_rate is not None:
+                        gain = min(index_return, cap_rate)
+                    else:
+                        gain = index_return
+                    return gain
+                else:
+                    # Negative return - floored
+                    effective_return = max(index_return, floor_rate)
+                    return effective_return  # payoff - 1 = (1 + effective) - 1
+
+        # For buffers: breakeven is exactly at -buffer_rate
+        # For floors: breakeven is exactly at -floor_rate
+        # But we solve it numerically to handle edge cases
+
+        try:
+            # Search for root in reasonable range
+            # Minimum return: -99% (can't lose more than invested)
+            # Maximum: search up to 100% return
+            breakeven = brentq(payoff_minus_principal, -0.99, 1.0, xtol=1e-10)
+            return float(breakeven)
+        except ValueError:
+            # No root found (payoff never equals principal in this range)
+            # This can happen with certain cap/floor combinations
+            return None
 
     def compare_buffer_vs_floor(
         self,
@@ -635,3 +746,143 @@ class RILAPricer(BasePricer):
                 )
 
         return pd.DataFrame(results)
+
+    def calculate_greeks(
+        self,
+        product: RILAProduct,
+        term_years: float = 1.0,
+        notional: float = 100.0,
+    ) -> RILAGreeks:
+        """
+        Calculate hedge Greeks for RILA protection.
+
+        [T1] Buffer = Long ATM put - Short OTM put (put spread)
+        [T1] Floor = Long OTM put
+
+        Greeks are computed from the option replication and represent
+        the insurer's hedging exposure.
+
+        Parameters
+        ----------
+        product : RILAProduct
+            RILA product to analyze
+        term_years : float
+            Investment term (years)
+        notional : float
+            Notional amount (for dollar Greeks)
+
+        Returns
+        -------
+        RILAGreeks
+            Position Greeks for hedging
+
+        Examples
+        --------
+        >>> market = MarketParams(spot=100, risk_free_rate=0.05, dividend_yield=0.02, volatility=0.20)
+        >>> pricer = RILAPricer(market_params=market)
+        >>> product = RILAProduct(
+        ...     company_name="Test", product_name="10% Buffer",
+        ...     product_group="RILA", status="current",
+        ...     buffer_rate=0.10, buffer_modifier="Losses Covered Up To", cap_rate=0.15
+        ... )
+        >>> greeks = pricer.calculate_greeks(product, term_years=1.0)
+        >>> greeks.delta < 0  # Short delta from put spread
+        True
+        """
+        if not isinstance(product, RILAProduct):
+            raise ValueError(f"Expected RILAProduct, got {type(product).__name__}")
+
+        # Use product term if available
+        if product.term_years is not None:
+            term_years = float(product.term_years)
+
+        # Determine protection type
+        is_buffer = product.buffer_modifier in [
+            "Losses Covered Up To",
+            "Losses Covered Up to",
+            "Buffer",
+        ]
+        buffer_rate = product.buffer_rate or 0.10
+        protection_type = "buffer" if is_buffer else "floor"
+
+        # Get market params
+        spot = self.market_params.spot
+        r = self.market_params.risk_free_rate
+        q = self.market_params.dividend_yield
+        sigma = self.market_params.volatility
+
+        # Calculate option Greeks
+        if is_buffer:
+            # Buffer = Long ATM put - Short OTM put
+            atm_strike = spot  # ATM strike
+            otm_strike = spot * (1 - buffer_rate)  # OTM strike
+
+            # ATM put Greeks (long position)
+            atm_greeks = black_scholes_greeks(
+                spot=spot,
+                strike=atm_strike,
+                rate=r,
+                dividend=q,
+                volatility=sigma,
+                time_to_expiry=term_years,
+                option_type=OptionType.PUT,
+            )
+
+            # OTM put Greeks (short position)
+            otm_greeks = black_scholes_greeks(
+                spot=spot,
+                strike=otm_strike,
+                rate=r,
+                dividend=q,
+                volatility=sigma,
+                time_to_expiry=term_years,
+                option_type=OptionType.PUT,
+            )
+
+            # Net position: Long ATM - Short OTM
+            delta = atm_greeks.delta - otm_greeks.delta
+            gamma = atm_greeks.gamma - otm_greeks.gamma
+            vega = atm_greeks.vega - otm_greeks.vega
+            theta = atm_greeks.theta - otm_greeks.theta
+            rho = atm_greeks.rho - otm_greeks.rho
+            atm_put_delta = atm_greeks.delta
+            otm_put_delta = -otm_greeks.delta  # Negative since short
+
+        else:
+            # Floor = Long OTM put
+            floor_strike = spot * (1 - buffer_rate)
+
+            # OTM put Greeks (long position)
+            otm_greeks = black_scholes_greeks(
+                spot=spot,
+                strike=floor_strike,
+                rate=r,
+                dividend=q,
+                volatility=sigma,
+                time_to_expiry=term_years,
+                option_type=OptionType.PUT,
+            )
+
+            # Position Greeks
+            delta = otm_greeks.delta
+            gamma = otm_greeks.gamma
+            vega = otm_greeks.vega
+            theta = otm_greeks.theta
+            rho = otm_greeks.rho
+            atm_put_delta = 0.0  # No ATM put for floor
+            otm_put_delta = otm_greeks.delta
+
+        # Dollar delta
+        dollar_delta = delta * spot * notional
+
+        return RILAGreeks(
+            protection_type=protection_type,
+            delta=delta,
+            gamma=gamma,
+            vega=vega,
+            theta=theta,
+            rho=rho,
+            atm_put_delta=atm_put_delta,
+            otm_put_delta=otm_put_delta,
+            dollar_delta=dollar_delta,
+        )

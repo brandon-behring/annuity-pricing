@@ -17,10 +17,12 @@ See: docs/knowledge/domain/vm21_vm22.md
 """
 
 from dataclasses import dataclass
-from typing import Optional, Callable, List
+from typing import Optional, Callable, List, Union
 import numpy as np
 
 from .scenarios import ScenarioGenerator, AG43Scenarios, EconomicScenario
+from ..loaders.mortality import MortalityLoader, MortalityTable
+from ..loaders.yield_curve import YieldCurve, YieldCurveLoader
 
 
 @dataclass(frozen=True)
@@ -133,6 +135,8 @@ class VM21Calculator:
             projection_years=projection_years,
             seed=seed,
         )
+        self._mortality_loader = MortalityLoader()
+        self._yield_curve_loader = YieldCurveLoader()
 
     def calculate_cte(
         self,
@@ -208,8 +212,9 @@ class VM21Calculator:
     def calculate_ssa(
         self,
         policy: PolicyData,
-        mortality_table: Optional[Callable[[int], float]] = None,
-        r: float = 0.04,
+        mortality_table: Optional[Union[Callable[[int], float], MortalityTable]] = None,
+        yield_curve: Optional[YieldCurve] = None,
+        gender: str = "male",
     ) -> float:
         """
         Calculate Standard Scenario Amount.
@@ -220,10 +225,12 @@ class VM21Calculator:
         ----------
         policy : PolicyData
             Policy information
-        mortality_table : callable, optional
-            Function age -> qx
-        r : float
-            Discount rate
+        mortality_table : callable or MortalityTable, optional
+            Function age -> qx or MortalityTable. If None, uses SOA 2012 IAM.
+        yield_curve : YieldCurve, optional
+            Yield curve for discounting. If None, uses flat 4% curve.
+        gender : str
+            Gender for default mortality table ("male" or "female")
 
         Returns
         -------
@@ -237,8 +244,23 @@ class VM21Calculator:
         >>> calc.calculate_ssa(policy) > 0
         True
         """
+        # Default to SOA 2012 IAM mortality
         if mortality_table is None:
-            mortality_table = self._default_mortality
+            mortality_table = self._mortality_loader.soa_2012_iam(gender=gender)
+
+        # Convert MortalityTable to callable if needed
+        if isinstance(mortality_table, MortalityTable):
+            _table = mortality_table
+            def mortality_func(age: int) -> float:
+                return _table.get_qx(age)
+        else:
+            mortality_func = mortality_table
+
+        # Default to flat 4% yield curve
+        if yield_curve is None:
+            yield_curve = self._yield_curve_loader.flat_curve(0.04)
+
+        r = yield_curve.get_rate(1.0)  # Use 1-year rate for discounting
 
         # Standard scenario: equity drops 20%, no recovery for 10 years
         # Then gradual 7% return
@@ -254,7 +276,7 @@ class VM21Calculator:
             current_age = policy.age + t
 
             # Survival probability
-            qx = mortality_table(current_age)
+            qx = mortality_func(current_age)
             if np.random.random() < qx:
                 break
 
@@ -285,8 +307,9 @@ class VM21Calculator:
         self,
         policy: PolicyData,
         scenarios: Optional[AG43Scenarios] = None,
-        mortality_table: Optional[Callable[[int], float]] = None,
-        r: float = 0.04,
+        mortality_table: Optional[Union[Callable[[int], float], MortalityTable]] = None,
+        yield_curve: Optional[YieldCurve] = None,
+        gender: str = "male",
     ) -> VM21Result:
         """
         Calculate VM-21 reserve.
@@ -299,10 +322,12 @@ class VM21Calculator:
             Policy information
         scenarios : AG43Scenarios, optional
             Pre-generated scenarios. If None, generates new scenarios.
-        mortality_table : callable, optional
-            Function age -> qx
-        r : float
-            Discount rate
+        mortality_table : callable or MortalityTable, optional
+            Function age -> qx or MortalityTable. If None, uses SOA 2012 IAM.
+        yield_curve : YieldCurve, optional
+            Yield curve for discounting. If None, uses flat 4% curve.
+        gender : str
+            Gender for default mortality table ("male" or "female")
 
         Returns
         -------
@@ -322,19 +347,34 @@ class VM21Calculator:
         if policy.gwb < 0:
             raise ValueError(f"GWB cannot be negative, got {policy.gwb}")
 
+        # Default to SOA 2012 IAM mortality
         if mortality_table is None:
-            mortality_table = self._default_mortality
+            mortality_table = self._mortality_loader.soa_2012_iam(gender=gender)
+
+        # Convert MortalityTable to callable if needed
+        if isinstance(mortality_table, MortalityTable):
+            _table = mortality_table
+            def mortality_func(age: int) -> float:
+                return _table.get_qx(age)
+        else:
+            mortality_func = mortality_table
+
+        # Default to flat 4% yield curve
+        if yield_curve is None:
+            yield_curve = self._yield_curve_loader.flat_curve(0.04)
+
+        r = yield_curve.get_rate(1.0)
 
         # Generate scenarios if not provided
         if scenarios is None:
             scenarios = self._scenario_generator.generate_ag43_scenarios()
 
         # Calculate PV of liability for each scenario
-        scenario_pvs = self._run_scenarios(policy, scenarios, mortality_table, r)
+        scenario_pvs = self._run_scenarios(policy, scenarios, mortality_func, r)
 
         # Calculate components
         cte70 = self.calculate_cte70(scenario_pvs)
-        ssa = self.calculate_ssa(policy, mortality_table, r)
+        ssa = self.calculate_ssa(policy, mortality_table, yield_curve, gender)
         csv_floor = policy.csv
 
         # Reserve = max of three components
