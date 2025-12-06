@@ -411,3 +411,92 @@ class TestCurveFromFRED:
         except (ImportError, ValueError, RuntimeError, Exception):
             # Skip if pandas_datareader not installed or API issues
             pytest.skip("FRED data not available")
+
+
+class TestCurveFromFixture:
+    """Tests for fixture-based curve loading. [F.5] Deterministic validation."""
+
+    @pytest.fixture
+    def fixture_path(self) -> str:
+        """Path to Treasury fixture file."""
+        from pathlib import Path
+
+        return str(
+            Path(__file__).parent.parent / "fixtures" / "treasury_yields_2024_01_15.csv"
+        )
+
+    def test_from_fixture_loads_curve(self, fixture_path: str) -> None:
+        """Should load curve from fixture file."""
+        loader = YieldCurveLoader()
+        curve = loader.from_fixture(fixture_path)
+
+        assert isinstance(curve, YieldCurve)
+        assert len(curve.maturities) == 12  # 12 Treasury maturities
+        assert curve.curve_type == "treasury_fixture"
+
+    def test_from_fixture_extracts_date(self, fixture_path: str) -> None:
+        """Should extract date from filename."""
+        loader = YieldCurveLoader()
+        curve = loader.from_fixture(fixture_path)
+
+        assert curve.as_of_date == "2024-01-15"
+
+    def test_from_fixture_correct_rates(self, fixture_path: str) -> None:
+        """Should load correct rates from fixture."""
+        loader = YieldCurveLoader()
+        curve = loader.from_fixture(fixture_path)
+
+        # Check a few known rates from the fixture
+        # 1-year: 4.82%
+        rate_1y = curve.get_rate(1.0)
+        assert rate_1y == pytest.approx(0.0482, rel=0.001)
+
+        # 10-year: 4.14%
+        rate_10y = curve.get_rate(10.0)
+        assert rate_10y == pytest.approx(0.0414, rel=0.001)
+
+    def test_from_fixture_inverted_curve(self, fixture_path: str) -> None:
+        """Fixture represents inverted yield curve (short > long)."""
+        loader = YieldCurveLoader()
+        curve = loader.from_fixture(fixture_path)
+
+        # 2024-01-15 was inverted: short rates > long rates
+        rate_1mo = curve.get_rate(0.0833)
+        rate_10y = curve.get_rate(10.0)
+
+        assert rate_1mo > rate_10y  # Inverted curve
+
+    def test_from_fixture_discount_factors(self, fixture_path: str) -> None:
+        """Discount factors should be properly calculated."""
+        loader = YieldCurveLoader()
+        curve = loader.from_fixture(fixture_path)
+
+        # 10-year discount factor at ~4.14%
+        df_10y = curve.discount_factor(10.0)
+        expected = np.exp(-0.0414 * 10)
+        assert df_10y == pytest.approx(expected, rel=0.01)
+
+    def test_from_fixture_override_date(self, fixture_path: str) -> None:
+        """Should allow date override."""
+        loader = YieldCurveLoader()
+        curve = loader.from_fixture(fixture_path, as_of_date="2025-01-01")
+
+        assert curve.as_of_date == "2025-01-01"
+
+    def test_from_fixture_missing_file(self) -> None:
+        """Should raise FileNotFoundError for missing fixture."""
+        loader = YieldCurveLoader()
+
+        with pytest.raises(FileNotFoundError, match="Fixture file not found"):
+            loader.from_fixture("nonexistent_fixture.csv")
+
+    def test_from_fixture_forward_rates(self, fixture_path: str) -> None:
+        """Forward rates should be calculable from fixture curve."""
+        loader = YieldCurveLoader()
+        curve = loader.from_fixture(fixture_path)
+
+        # Calculate 1-year forward 1 year from now
+        fwd = curve.forward_rate(1.0, 2.0)
+
+        # Should be positive
+        assert fwd > 0

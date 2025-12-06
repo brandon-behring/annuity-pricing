@@ -52,6 +52,7 @@ def buffer_product():
         buffer_modifier="Losses Covered Up To",
         cap_rate=0.15,
         index_used="S&P 500",
+        term_years=1,  # [F.1] Required term_years
     )
 
 
@@ -67,6 +68,7 @@ def floor_product():
         buffer_modifier="Losses Covered After",
         cap_rate=0.15,
         index_used="S&P 500",
+        term_years=1,  # [F.1] Required term_years
     )
 
 
@@ -557,3 +559,224 @@ class TestAntiPatterns:
         # For normal market conditions, expected return should be above floor
         # (This is statistical, not guaranteed)
         assert result.expected_return >= -floor_product.buffer_rate - 0.05  # Some tolerance
+
+
+class TestTermYearsRequirement:
+    """
+    [F.1] Tests for term_years requirement.
+
+    RILA pricing requires explicit term_years to avoid silent defaults.
+    """
+
+    def test_rila_rejects_missing_term(self, pricer):
+        """RILA pricing should reject missing term_years.
+
+        [F.1] CRITICAL: term_years must be explicitly provided or from product.
+        """
+        product = RILAProduct(
+            company_name="Test",
+            product_name="No Term",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.10,
+            buffer_modifier="Losses Covered Up To",
+            cap_rate=0.15,
+            # term_years not set
+        )
+
+        # Should raise without term_years
+        with pytest.raises(ValueError, match="term_years required"):
+            pricer.price(product)
+
+    def test_rila_accepts_explicit_term(self, pricer, buffer_product):
+        """RILA pricing should work with explicit term_years."""
+        result = pricer.price(buffer_product, term_years=3.0)
+
+        assert result.present_value > 0
+        assert result.details["term_years"] == 3.0
+
+    def test_rila_uses_product_term(self, pricer):
+        """RILA pricing should use product.term_years if not explicitly provided."""
+        product = RILAProduct(
+            company_name="Test",
+            product_name="With Term",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.10,
+            buffer_modifier="Losses Covered Up To",
+            cap_rate=0.15,
+            term_years=5,  # 5-year term
+        )
+
+        result = pricer.price(product)  # No explicit term_years
+
+        assert result.details["term_years"] == 5.0
+
+    def test_rila_invalid_term_raises(self, pricer, buffer_product):
+        """Zero or negative term_years should raise."""
+        with pytest.raises(ValueError, match="term_years required and must be > 0"):
+            pricer.price(buffer_product, term_years=0)
+
+        with pytest.raises(ValueError, match="term_years required and must be > 0"):
+            pricer.price(buffer_product, term_years=-1.0)
+
+    def test_price_multiple_uses_product_terms(self, pricer):
+        """price_multiple should use each product's term_years when not specified."""
+        products = [
+            RILAProduct(
+                company_name="A", product_name="3Y Buffer", product_group="RILA",
+                status="current", buffer_rate=0.10, buffer_modifier="Losses Covered Up To",
+                cap_rate=0.15, term_years=3,
+            ),
+            RILAProduct(
+                company_name="B", product_name="5Y Buffer", product_group="RILA",
+                status="current", buffer_rate=0.15, buffer_modifier="Losses Covered Up To",
+                cap_rate=0.20, term_years=5,
+            ),
+        ]
+
+        # No term_years specified - should use each product's term
+        results = pricer.price_multiple(products)
+
+        assert len(results) == 2
+        assert "error" not in results.columns or results["error"].isna().all()
+
+    def test_calculate_greeks_requires_term(self, pricer):
+        """calculate_greeks should require term_years."""
+        product = RILAProduct(
+            company_name="Test",
+            product_name="No Term",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.10,
+            buffer_modifier="Losses Covered Up To",
+            cap_rate=0.15,
+            # term_years not set
+        )
+
+        with pytest.raises(ValueError, match="term_years required"):
+            pricer.calculate_greeks(product)
+
+    def test_compare_buffer_vs_floor_requires_term(self, pricer):
+        """compare_buffer_vs_floor should require term_years."""
+        with pytest.raises(ValueError, match="term_years required"):
+            pricer.compare_buffer_vs_floor(
+                buffer_rate=0.10,
+                floor_rate=0.10,
+                cap_rate=0.15,
+                term_years=0,  # Invalid
+            )
+
+
+class TestBufferModifierValidation:
+    """
+    [F.2] Tests for buffer_modifier validation.
+
+    RILA products must have valid buffer_modifier to determine protection type.
+    Missing or invalid values should fail fast.
+    """
+
+    def test_rila_rejects_missing_buffer_modifier(self):
+        """RILA should reject missing buffer_modifier.
+
+        [F.2] CRITICAL: buffer_modifier must be specified.
+        """
+        with pytest.raises(ValueError, match="buffer_modifier required"):
+            RILAProduct(
+                company_name="Test",
+                product_name="No Modifier",
+                product_group="RILA",
+                status="current",
+                buffer_rate=0.10,
+                # buffer_modifier not set
+                cap_rate=0.15,
+                term_years=1,
+            )
+
+    def test_rila_rejects_invalid_buffer_modifier(self):
+        """RILA should reject invalid buffer_modifier.
+
+        [F.2] CRITICAL: buffer_modifier must contain 'Up To' or 'After'.
+        """
+        with pytest.raises(ValueError, match="must contain 'Up To'.*or 'After'"):
+            RILAProduct(
+                company_name="Test",
+                product_name="Bad Modifier",
+                product_group="RILA",
+                status="current",
+                buffer_rate=0.10,
+                buffer_modifier="Unknown Type",  # Invalid
+                cap_rate=0.15,
+                term_years=1,
+            )
+
+    def test_rila_accepts_buffer_modifier_up_to(self):
+        """RILA should accept 'Losses Covered Up To' (buffer)."""
+        product = RILAProduct(
+            company_name="Test",
+            product_name="Buffer",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.10,
+            buffer_modifier="Losses Covered Up To",
+            cap_rate=0.15,
+            term_years=1,
+        )
+        assert product.is_buffer() is True
+        assert product.is_floor() is False
+
+    def test_rila_accepts_buffer_modifier_after(self):
+        """RILA should accept 'Losses Covered After' (floor)."""
+        product = RILAProduct(
+            company_name="Test",
+            product_name="Floor",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.10,
+            buffer_modifier="Losses Covered After",
+            cap_rate=0.15,
+            term_years=1,
+        )
+        assert product.is_buffer() is False
+        assert product.is_floor() is True
+
+    def test_rila_buffer_modifier_case_insensitive(self):
+        """Buffer modifier matching should be case insensitive."""
+        # Lowercase
+        product1 = RILAProduct(
+            company_name="Test", product_name="Test1", product_group="RILA",
+            status="current", buffer_rate=0.10,
+            buffer_modifier="losses covered up to",  # lowercase
+            cap_rate=0.15, term_years=1,
+        )
+        assert product1.is_buffer() is True
+
+        # Mixed case
+        product2 = RILAProduct(
+            company_name="Test", product_name="Test2", product_group="RILA",
+            status="current", buffer_rate=0.10,
+            buffer_modifier="Losses Covered AFTER",  # mixed case
+            cap_rate=0.15, term_years=1,
+        )
+        assert product2.is_floor() is True
+
+    def test_rila_buffer_floor_classification_exhaustive(self):
+        """Test various buffer_modifier values for correct classification."""
+        buffer_modifiers = [
+            ("Losses Covered Up To", True, False),
+            ("Losses Covered Up to", True, False),  # lowercase 'to'
+            ("up to 10%", True, False),  # partial phrase
+            ("Buffer Up To", True, False),
+            ("Losses Covered After", False, True),
+            ("After 10%", False, True),  # partial phrase
+            ("Floor After", False, True),
+        ]
+
+        for modifier, expected_buffer, expected_floor in buffer_modifiers:
+            product = RILAProduct(
+                company_name="Test", product_name="Test", product_group="RILA",
+                status="current", buffer_rate=0.10, buffer_modifier=modifier,
+                cap_rate=0.15, term_years=1,
+            )
+            assert product.is_buffer() == expected_buffer, f"Failed for modifier: {modifier}"
+            assert product.is_floor() == expected_floor, f"Failed for modifier: {modifier}"

@@ -549,6 +549,77 @@ class YieldCurveLoader:
             curve_type="flat",
         )
 
+    def from_fixture(
+        self,
+        fixture_path: str,
+        as_of_date: Optional[str] = None,
+    ) -> YieldCurve:
+        """
+        Load Treasury curve from CSV fixture file.
+
+        [F.5] For deterministic testing without FRED API dependency.
+
+        Parameters
+        ----------
+        fixture_path : str
+            Path to CSV fixture file with columns: maturity, rate, series_id
+        as_of_date : str, optional
+            Override date (default: extracted from filename)
+
+        Returns
+        -------
+        YieldCurve
+            Treasury curve from fixture
+
+        Examples
+        --------
+        >>> loader = YieldCurveLoader()
+        >>> curve = loader.from_fixture("tests/fixtures/treasury_yields_2024_01_15.csv")
+        """
+        import csv
+        from pathlib import Path
+
+        path = Path(fixture_path)
+        if not path.exists():
+            raise FileNotFoundError(f"Fixture file not found: {fixture_path}")
+
+        maturities = []
+        rates = []
+
+        with open(path, "r") as f:
+            reader = csv.DictReader(
+                filter(lambda row: not row.startswith("#"), f)
+            )
+            for row in reader:
+                maturities.append(float(row["maturity"]))
+                rates.append(float(row["rate"]))
+
+        if len(maturities) == 0:
+            raise ValueError(f"No data in fixture file: {fixture_path}")
+
+        # Extract date from filename if not provided
+        if as_of_date is None:
+            # Try to parse from filename like treasury_yields_2024_01_15.csv
+            name = path.stem
+            parts = name.split("_")
+            if len(parts) >= 3:
+                try:
+                    year = parts[-3]
+                    month = parts[-2]
+                    day = parts[-1]
+                    as_of_date = f"{year}-{month}-{day}"
+                except (ValueError, IndexError):
+                    as_of_date = "2024-01-01"
+            else:
+                as_of_date = "2024-01-01"
+
+        return YieldCurve(
+            maturities=np.array(maturities),
+            rates=np.array(rates),
+            as_of_date=as_of_date,
+            curve_type="treasury_fixture",
+        )
+
     def from_quantlib(
         self,
         as_of_date: str,

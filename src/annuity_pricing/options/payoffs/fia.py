@@ -617,8 +617,17 @@ def create_fia_payoff(
             floor_rate=floor_rate,
         )
 
+    elif method == "monthly_average":
+        # [F.3] Monthly averaging support
+        if cap_rate is None:
+            raise ValueError("CRITICAL: cap_rate required for 'monthly_average' method")
+        return MonthlyAveragePayoff(
+            cap_rate=cap_rate,
+            floor_rate=floor_rate,
+        )
+
     else:
         raise ValueError(
             f"CRITICAL: Unknown crediting method '{method}'. "
-            f"Valid methods: cap, participation, spread, trigger"
+            f"Valid methods: cap, participation, spread, trigger, monthly_average"
         )

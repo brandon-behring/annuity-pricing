@@ -146,6 +146,7 @@ class FIAProduct(BaseProduct):
     index_used: Optional[str] = None
     indexing_method: Optional[str] = None
     index_crediting_frequency: Optional[str] = None
+    term_years: Optional[int] = None  # Investment term in years
 
     def __post_init__(self) -> None:
         """Validate FIA fields."""
@@ -231,6 +232,19 @@ class RILAProduct(BaseProduct):
                 f"CRITICAL: buffer_rate must be >= 0, got {self.buffer_rate}"
             )
 
+        # [F.2] Validate buffer_modifier for protection type classification
+        if self.buffer_modifier is None:
+            raise ValueError(
+                "CRITICAL: buffer_modifier required for RILA product. "
+                "Must contain 'Up To' (buffer) or 'After' (floor)."
+            )
+        normalized = self.buffer_modifier.lower().strip()
+        if "up to" not in normalized and "after" not in normalized:
+            raise ValueError(
+                f"CRITICAL: buffer_modifier must contain 'Up To' (buffer) or 'After' (floor), "
+                f"got '{self.buffer_modifier}'"
+            )
+
     def is_buffer(self) -> bool:
         """
         Check if this product uses buffer protection. [T1]
@@ -309,6 +323,14 @@ def create_fia_from_row(row: dict) -> FIAProduct:
     FIAProduct
         Immutable FIA product
     """
+    # Extract term_years from WINK data
+    term_years = None
+    if "termYears" in row and row["termYears"] is not None:
+        try:
+            term_years = int(row["termYears"])
+        except (ValueError, TypeError):
+            pass  # Keep as None if conversion fails
+
     return FIAProduct(
         company_name=row.get("companyName", "Unknown"),
         product_name=row.get("productName", "Unknown"),
@@ -324,6 +346,7 @@ def create_fia_from_row(row: dict) -> FIAProduct:
         index_used=row.get("indexUsed"),
         indexing_method=row.get("indexingMethod"),
         index_crediting_frequency=row.get("indexCreditingFrequency"),
+        term_years=term_years,
     )
 
 

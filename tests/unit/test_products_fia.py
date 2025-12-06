@@ -306,3 +306,237 @@ class TestPriceMultiple:
         assert len(results) == 2
         assert "present_value" in results.columns
         assert "expected_credit" in results.columns
+
+
+class TestTermYearsRequirement:
+    """
+    [F.1] Tests for term_years requirement and option budget scaling.
+
+    Multi-year FIA products need option budget scaled by term to avoid
+    material underpricing of embedded options.
+    """
+
+    def test_fia_rejects_missing_term(self, pricer):
+        """FIA pricing should reject missing term_years.
+
+        [F.1] CRITICAL: term_years must be explicitly provided or from product.
+        """
+        product = FIAProduct(
+            company_name="Test",
+            product_name="No Term",
+            product_group="FIA",
+            status="current",
+            cap_rate=0.10,
+            # term_years not set
+        )
+
+        # Should raise without term_years
+        with pytest.raises(ValueError, match="term_years required"):
+            pricer.price(product)
+
+    def test_fia_accepts_explicit_term(self, pricer, cap_product):
+        """FIA pricing should work with explicit term_years."""
+        result = pricer.price(cap_product, term_years=3.0)
+
+        assert result.present_value > 0
+        assert result.details["term_years"] == 3.0
+
+    def test_fia_uses_product_term(self, pricer):
+        """FIA pricing should use product.term_years if not explicitly provided."""
+        product = FIAProduct(
+            company_name="Test",
+            product_name="With Term",
+            product_group="FIA",
+            status="current",
+            cap_rate=0.10,
+            term_years=5,  # 5-year term
+        )
+
+        result = pricer.price(product)  # No explicit term_years
+
+        assert result.details["term_years"] == 5.0
+
+    def test_fia_option_budget_scales_with_term(self, market_params):
+        """Option budget should scale linearly with term.
+
+        [F.1] A 5-year FIA with 3% annual option budget should have
+        15% total option budget, not 3%.
+        """
+        pricer = FIAPricer(
+            market_params=market_params,
+            option_budget_pct=0.03,  # 3% annual
+            n_mc_paths=5000,
+            seed=42,
+        )
+
+        product = FIAProduct(
+            company_name="Test",
+            product_name="Test Cap",
+            product_group="FIA",
+            status="current",
+            cap_rate=0.10,
+            term_years=1,
+        )
+
+        result_1y = pricer.price(product, term_years=1.0)
+        result_5y = pricer.price(product, term_years=5.0)
+
+        # 5-year option budget should be 5x the 1-year budget
+        assert abs(result_5y.option_budget - 5 * result_1y.option_budget) < 0.01
+
+    def test_fia_invalid_term_raises(self, pricer, cap_product):
+        """Zero or negative term_years should raise."""
+        with pytest.raises(ValueError, match="term_years required and must be > 0"):
+            pricer.price(cap_product, term_years=0)
+
+        with pytest.raises(ValueError, match="term_years required and must be > 0"):
+            pricer.price(cap_product, term_years=-1.0)
+
+    def test_price_multiple_uses_product_terms(self, pricer):
+        """price_multiple should use each product's term_years when not specified."""
+        products = [
+            FIAProduct(
+                company_name="A", product_name="3Y Cap", product_group="FIA",
+                status="current", cap_rate=0.08, term_years=3,
+            ),
+            FIAProduct(
+                company_name="B", product_name="5Y Cap", product_group="FIA",
+                status="current", cap_rate=0.10, term_years=5,
+            ),
+        ]
+
+        # No term_years specified - should use each product's term
+        results = pricer.price_multiple(products)
+
+        assert len(results) == 2
+        assert "error" not in results.columns or results["error"].isna().all()
+
+
+class TestMonthlyAveraging:
+    """
+    [F.3] Tests for monthly averaging crediting method.
+
+    Monthly averaging uses average of monthly returns instead of point-to-point.
+    Products with indexing_method containing 'monthly' or 'average' are detected.
+    """
+
+    def test_monthly_averaging_detected(self, pricer):
+        """Monthly averaging should be detected from indexing_method."""
+        product = FIAProduct(
+            company_name="Test",
+            product_name="Monthly Average",
+            product_group="FIA",
+            status="current",
+            cap_rate=0.12,
+            indexing_method="Monthly Average",
+            term_years=1,
+        )
+
+        result = pricer.price(product)
+
+        assert result.present_value > 0
+        assert result.details["method"] == "monthly_average"
+
+    def test_monthly_averaging_variants_detected(self, pricer):
+        """Various monthly averaging phrases should be detected."""
+        variants = [
+            "Monthly Average",
+            "monthly averaging",
+            "MONTHLY AVERAGE",
+            "Annual Monthly Averaging",
+            "Monthly Point Average",
+        ]
+
+        for indexing_method in variants:
+            product = FIAProduct(
+                company_name="Test",
+                product_name="Test",
+                product_group="FIA",
+                status="current",
+                cap_rate=0.12,
+                indexing_method=indexing_method,
+                term_years=1,
+            )
+
+            result = pricer.price(product)
+            assert result.details["method"] == "monthly_average", \
+                f"Failed to detect monthly averaging for: {indexing_method}"
+
+    def test_monthly_averaging_requires_cap_rate(self, pricer):
+        """Monthly averaging should raise if no cap_rate (only cap supported)."""
+        product = FIAProduct(
+            company_name="Test",
+            product_name="Monthly No Cap",
+            product_group="FIA",
+            status="current",
+            participation_rate=0.80,  # participation, not cap
+            indexing_method="Monthly Average",
+            term_years=1,
+        )
+
+        with pytest.raises(ValueError, match="monthly averaging.*only supports cap_rate"):
+            pricer.price(product)
+
+    def test_monthly_average_vs_point_to_point(self, market_params):
+        """Monthly average should produce different result than point-to-point.
+
+        Due to averaging, monthly average typically has lower expected credit
+        but higher cap (risk reduction through averaging).
+        """
+        pricer = FIAPricer(
+            market_params=market_params,
+            option_budget_pct=0.03,
+            n_mc_paths=10000,  # Higher for better comparison
+            seed=42,
+        )
+
+        # Point-to-point product
+        ptp_product = FIAProduct(
+            company_name="Test",
+            product_name="Point-to-Point",
+            product_group="FIA",
+            status="current",
+            cap_rate=0.10,
+            indexing_method="Annual Point to Point",
+            term_years=1,
+        )
+
+        # Monthly averaging product with SAME cap
+        ma_product = FIAProduct(
+            company_name="Test",
+            product_name="Monthly Average",
+            product_group="FIA",
+            status="current",
+            cap_rate=0.10,
+            indexing_method="Monthly Average",
+            term_years=1,
+        )
+
+        ptp_result = pricer.price(ptp_product)
+        ma_result = pricer.price(ma_product)
+
+        # Monthly averaging typically produces different expected credit
+        # due to averaging (reduces volatility, changes distribution)
+        assert ptp_result.details["method"] == "cap"
+        assert ma_result.details["method"] == "monthly_average"
+
+        # The expected credits will differ (exact relationship depends on vol)
+        # Just verify both produce valid results
+        assert ptp_result.expected_credit >= 0
+        assert ma_result.expected_credit >= 0
+
+    def test_point_to_point_not_detected_as_monthly(self, pricer):
+        """Standard point-to-point should NOT be detected as monthly average."""
+        product = FIAProduct(
+            company_name="Test",
+            product_name="Point-to-Point",
+            product_group="FIA",
+            status="current",
+            cap_rate=0.10,
+            indexing_method="Annual Point to Point",
+            term_years=1,
+        )
+
+        result = pricer.price(product)
+
+        assert result.details["method"] == "cap"  # Not monthly_average

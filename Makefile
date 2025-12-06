@@ -100,4 +100,23 @@ clean: clean-paper
 	find . -type f -name "*.pyc" -delete
 	@echo "✓ Build artifacts cleaned"
 
-.PHONY: help env-paper figures paper reproduce clean-paper clean lint format test
+clean-release: clean
+	@echo "Cleaning release artifacts..."
+	rm -rf venv/
+	rm -rf .pytest_cache/ .mypy_cache/ .ruff_cache/
+	rm -rf .tox/
+	@echo "✓ Release artifacts cleaned"
+	@echo ""
+	@echo "To rebuild:"
+	@echo "  python -m venv venv"
+	@echo "  source venv/bin/activate"
+	@echo "  pip install -e .[dev]"
+
+checksum:
+	@echo "Computing SHA256 checksums for data files..."
+	@if [ -f wink.parquet ]; then sha256sum wink.parquet; else echo "wink.parquet not found"; fi
+	@if [ -d tests/fixtures ]; then sha256sum tests/fixtures/*.csv 2>/dev/null || echo "No fixtures found"; fi
+	@echo ""
+	@echo "For verification, save these checksums and compare after data updates."
+
+.PHONY: help env-paper figures paper reproduce clean-paper clean clean-release checksum lint format test

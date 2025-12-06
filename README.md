@@ -17,6 +17,27 @@ This library provides research and pricing tooling for fixed annuity products:
 - **Rate setting**: Recommendations given market conditions
 - **Option modeling**: Black-Scholes closed-form and Monte Carlo simulation
 
+### Modeling Assumptions
+
+This library uses the following key assumptions for pricing. Users should understand these limitations:
+
+| Assumption | Description | Reference |
+|------------|-------------|-----------|
+| **Risk-neutral pricing** | Option values derived under Q-measure with μ = r - q | [T1] Black-Scholes (1973) |
+| **GBM dynamics** | Single-factor log-normal index model | [T1] Standard option theory |
+| **Constant volatility** | σ constant over term (no vol surface) | Simplification |
+| **No credit risk** | Insurer solvency assumed | Simplification |
+| **No transaction costs** | Continuous hedging assumed | [T1] BS framework |
+| **FIA 0% floor** | Principal protected, credited ≥ 0 | [T1] Product design |
+| **RILA buffer/floor** | Protection level as stated | [T1] Product design |
+| **Single-period crediting** | Point-to-point (monthly averaging supported) | [F.3] |
+
+**For research use.** Production deployment requires:
+- Stochastic volatility models (SABR, Heston)
+- Credit/counterparty risk adjustments
+- Policyholder behavior calibration to company experience
+- Regulatory capital calculations (VM-21/VM-22 are prototypes)
+
 ## Installation
 
 ```bash

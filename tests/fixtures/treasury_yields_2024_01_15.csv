@@ -1,0 +1,18 @@
+# Treasury Yield Curve Fixture - 2024-01-15
+# Source: FRED (Federal Reserve Economic Data)
+# Generated for deterministic testing (F.5)
+#
+# Maturities in years, rates as decimals (e.g., 0.0520 = 5.20%)
+maturity,rate,series_id
+0.0833,0.0538,DGS1MO
+0.1667,0.0535,DGS2MO
+0.25,0.0530,DGS3MO
+0.5,0.0512,DGS6MO
+1.0,0.0482,DGS1
+2.0,0.0436,DGS2
+3.0,0.0412,DGS3
+5.0,0.0405,DGS5
+7.0,0.0413,DGS7
+10.0,0.0414,DGS10
+20.0,0.0453,DGS20
+30.0,0.0438,DGS30

@@ -22,6 +22,7 @@ from annuity_pricing.validation.gates import (
     RILAMaxLossGate,
     RILAProtectionValueGate,
     ArbitrageBoundsGate,
+    ProductParameterSanityGate,  # [F.4]
     ValidationEngine,
     validate_pricing_result,
     ensure_valid,
@@ -186,8 +187,15 @@ class TestPresentValueBoundsGate:
         assert result.status == GateStatus.HALT
 
     def test_excessive_pv(self):
-        """PV exceeding 10x premium should halt."""
-        gate = PresentValueBoundsGate(max_pv_multiple=10.0)
+        """PV exceeding 3x premium should halt. [F.4] Default tightened from 10x."""
+        gate = PresentValueBoundsGate()  # Uses default max_pv_multiple=3.0
+        result_obj = PricingResult(present_value=400.0, duration=1.0)  # 4x premium
+        result = gate.check(result_obj, premium=100.0)
+        assert result.status == GateStatus.HALT
+
+    def test_excessive_pv_with_10x_override(self):
+        """PV check with old 10x limit (for backwards compatibility tests)."""
+        gate = PresentValueBoundsGate(max_pv_multiple=10.0)  # Explicit override
         result_obj = PricingResult(present_value=1500.0, duration=1.0)
         result = gate.check(result_obj, premium=100.0)
         assert result.status == GateStatus.HALT
@@ -227,17 +235,30 @@ class TestFIAOptionBudgetGate:
         assert result.status == GateStatus.PASS
 
     def test_exceeds_budget(self):
-        """Option value significantly exceeding budget should warn."""
-        gate = FIAOptionBudgetGate(tolerance=0.50)
+        """Option value exceeding budget by >10% should HALT. [F.4] Changed from WARN."""
+        gate = FIAOptionBudgetGate()  # Default tolerance=0.10 (10%)
         result_obj = FIAPricingResult(
             present_value=100.0,
             duration=1.0,
-            embedded_option_value=5.0,
-            option_budget=3.0,  # 67% over budget
+            embedded_option_value=3.5,
+            option_budget=3.0,  # 17% over budget
             expected_credit=0.03,
         )
         result = gate.check(result_obj)
-        assert result.status == GateStatus.WARN
+        assert result.status == GateStatus.HALT
+
+    def test_within_budget_tolerance(self):
+        """Option value within 10% tolerance should PASS."""
+        gate = FIAOptionBudgetGate()  # Default tolerance=0.10
+        result_obj = FIAPricingResult(
+            present_value=100.0,
+            duration=1.0,
+            embedded_option_value=3.25,
+            option_budget=3.0,  # 8.3% over budget - within tolerance
+            expected_credit=0.03,
+        )
+        result = gate.check(result_obj)
+        assert result.status == GateStatus.PASS
 
     def test_non_fia_skipped(self, valid_myga_result):
         """Non-FIA result should be skipped."""
@@ -387,6 +408,97 @@ class TestArbitrageBoundsGate:
         assert result.status == GateStatus.PASS
 
 
+class TestProductParameterSanityGate:
+    """Tests for ProductParameterSanityGate. [F.4]"""
+
+    def test_valid_parameters(self, valid_fia_result):
+        """Valid parameters should pass."""
+        gate = ProductParameterSanityGate()
+        result = gate.check(
+            valid_fia_result,
+            cap_rate=0.10,
+            participation_rate=0.80,
+            buffer_rate=0.10,
+            spread_rate=0.02,
+        )
+        assert result.status == GateStatus.PASS
+
+    def test_no_parameters(self, valid_myga_result):
+        """No parameters should pass (nothing to check)."""
+        gate = ProductParameterSanityGate()
+        result = gate.check(valid_myga_result)
+        assert result.status == GateStatus.PASS
+
+    def test_cap_rate_exceeds_max(self, valid_fia_result):
+        """Cap rate > 30% should halt."""
+        gate = ProductParameterSanityGate()
+        result = gate.check(valid_fia_result, cap_rate=0.35)
+        assert result.status == GateStatus.HALT
+        assert "cap_rate" in result.message
+
+    def test_cap_rate_negative(self, valid_fia_result):
+        """Negative cap rate should halt."""
+        gate = ProductParameterSanityGate()
+        result = gate.check(valid_fia_result, cap_rate=-0.05)
+        assert result.status == GateStatus.HALT
+        assert "negative" in result.message.lower()
+
+    def test_participation_rate_exceeds_max(self, valid_fia_result):
+        """Participation rate > 300% should halt."""
+        gate = ProductParameterSanityGate()
+        result = gate.check(valid_fia_result, participation_rate=3.50)
+        assert result.status == GateStatus.HALT
+        assert "participation_rate" in result.message
+
+    def test_participation_rate_zero_or_negative(self, valid_fia_result):
+        """Participation rate <= 0 should halt."""
+        gate = ProductParameterSanityGate()
+        result = gate.check(valid_fia_result, participation_rate=0.0)
+        assert result.status == GateStatus.HALT
+        assert "participation_rate" in result.message
+
+    def test_buffer_rate_exceeds_max(self, valid_rila_result):
+        """Buffer rate > 30% should halt."""
+        gate = ProductParameterSanityGate()
+        result = gate.check(valid_rila_result, buffer_rate=0.35)
+        assert result.status == GateStatus.HALT
+        assert "buffer_rate" in result.message
+
+    def test_buffer_rate_negative(self, valid_rila_result):
+        """Negative buffer rate should halt."""
+        gate = ProductParameterSanityGate()
+        result = gate.check(valid_rila_result, buffer_rate=-0.05)
+        assert result.status == GateStatus.HALT
+        assert "negative" in result.message.lower()
+
+    def test_spread_rate_exceeds_max(self, valid_fia_result):
+        """Spread rate > 10% should halt."""
+        gate = ProductParameterSanityGate()
+        result = gate.check(valid_fia_result, spread_rate=0.15)
+        assert result.status == GateStatus.HALT
+        assert "spread_rate" in result.message
+
+    def test_spread_rate_negative(self, valid_fia_result):
+        """Negative spread rate should halt."""
+        gate = ProductParameterSanityGate()
+        result = gate.check(valid_fia_result, spread_rate=-0.01)
+        assert result.status == GateStatus.HALT
+        assert "negative" in result.message.lower()
+
+    def test_multiple_violations(self, valid_fia_result):
+        """Multiple violations should all be reported."""
+        gate = ProductParameterSanityGate()
+        result = gate.check(
+            valid_fia_result,
+            cap_rate=0.50,  # Too high
+            participation_rate=-0.10,  # Negative
+        )
+        assert result.status == GateStatus.HALT
+        # Should have both issues in message
+        assert "cap_rate" in result.message
+        assert "participation_rate" in result.message
+
+
 # =============================================================================
 # Test Validation Engine
 # =============================================================================
@@ -395,9 +507,9 @@ class TestValidationEngine:
     """Tests for ValidationEngine."""
 
     def test_default_gates(self):
-        """Should create default gates."""
+        """Should create default gates. [F.4] Now includes ProductParameterSanityGate."""
         engine = ValidationEngine()
-        assert len(engine.gates) >= 5
+        assert len(engine.gates) == 8  # 7 original + ProductParameterSanityGate
 
     def test_custom_gates(self):
         """Should accept custom gates."""
@@ -430,10 +542,10 @@ class TestValidationEngine:
         assert result.present_value == valid_myga_result.present_value
 
     def test_validate_and_raise_fail(self):
-        """Should raise on invalid result."""
+        """Should raise on invalid result. [F.4] Uses 3x limit."""
         engine = ValidationEngine()
-        # PV exceeds 10x premium
-        invalid_result = PricingResult(present_value=1500.0, duration=1.0)
+        # PV exceeds 3x premium (F.4 tightened from 10x)
+        invalid_result = PricingResult(present_value=400.0, duration=1.0)
         with pytest.raises(ValueError, match="Validation failed"):
             engine.validate_and_raise(invalid_result, premium=100.0)
 
@@ -456,8 +568,8 @@ class TestConvenienceFunctions:
         assert result.present_value == valid_myga_result.present_value
 
     def test_ensure_valid_fail(self):
-        """Should raise if invalid."""
-        invalid_result = PricingResult(present_value=1500.0, duration=1.0)
+        """Should raise if invalid. [F.4] Uses 3x limit."""
+        invalid_result = PricingResult(present_value=400.0, duration=1.0)  # 4x exceeds 3x
         with pytest.raises(ValueError):
             ensure_valid(invalid_result, premium=100.0)
 
@@ -490,21 +602,25 @@ class TestFullValidationPipeline:
         assert report.passed is True
 
     def test_validate_fia_after_pricing(self):
-        """Should validate FIA result after pricing."""
+        """Should validate FIA result after pricing.
+
+        [F.4] Uses 5% cap (down from 10%) to produce option value within
+        tightened 10% budget tolerance.
+        """
         from annuity_pricing.data.schemas import FIAProduct
         from annuity_pricing.products.registry import create_default_registry
 
         registry = create_default_registry(seed=42)
         product = FIAProduct(
             company_name="Test",
-            product_name="10% Cap",
+            product_name="5% Cap",
             product_group="FIA",
             status="current",
-            cap_rate=0.10,
+            cap_rate=0.05,  # [F.4] Reduced from 0.10 to fit within option budget
         )
 
         result = registry.price(product, term_years=1.0)
-        report = validate_pricing_result(result, premium=100.0, cap_rate=0.10)
+        report = validate_pricing_result(result, premium=100.0, cap_rate=0.05)
         assert report.passed is True
 
     def test_validate_rila_after_pricing(self):

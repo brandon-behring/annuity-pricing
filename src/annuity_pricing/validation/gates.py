@@ -169,7 +169,7 @@ class PresentValueBoundsGate(ValidationGate):
     def __init__(
         self,
         min_pv: float = 0.0,
-        max_pv_multiple: float = 10.0,
+        max_pv_multiple: float = 3.0,
     ):
         """
         Parameters
@@ -177,7 +177,8 @@ class PresentValueBoundsGate(ValidationGate):
         min_pv : float
             Minimum allowed PV
         max_pv_multiple : float
-            Maximum PV as multiple of premium (default 10x)
+            Maximum PV as multiple of premium (default 3x)
+            [F.4] Reduced from 10x to catch unreasonable valuations earlier
         """
         self.min_pv = min_pv
         self.max_pv_multiple = max_pv_multiple
@@ -272,19 +273,21 @@ class FIAOptionBudgetGate(ValidationGate):
     Check FIA embedded option value against option budget.
 
     [T1] Option value should not exceed budget significantly.
+    [F.4] Changed from WARN to HALT when budget exceeded by > tolerance.
     """
 
     name = "fia_option_budget"
 
     def __init__(
         self,
-        tolerance: float = 0.50,  # 50% tolerance
+        tolerance: float = 0.10,  # 10% tolerance [F.4: tightened from 50%]
     ):
         """
         Parameters
         ----------
         tolerance : float
-            Allowed excess over budget (0.50 = 50%)
+            Allowed excess over budget (0.10 = 10%)
+            [F.4] Reduced from 50% to fail fast on budget violations
         """
         self.tolerance = tolerance
 
@@ -298,7 +301,7 @@ class FIAOptionBudgetGate(ValidationGate):
 
         if result.option_budget <= 0:
             return GateResult(
-                status=GateStatus.WARN,
+                status=GateStatus.HALT,  # [F.4] Changed from WARN
                 gate_name=self.name,
                 message="Option budget is zero or negative",
                 value=result.option_budget,
@@ -308,7 +311,7 @@ class FIAOptionBudgetGate(ValidationGate):
 
         if ratio > 1 + self.tolerance:
             return GateResult(
-                status=GateStatus.WARN,
+                status=GateStatus.HALT,  # [F.4] Changed from WARN
                 gate_name=self.name,
                 message=f"Embedded option value {result.embedded_option_value:.4f} "
                         f"exceeds budget {result.option_budget:.4f} by {(ratio-1)*100:.1f}%",
@@ -546,6 +549,91 @@ class ArbitrageBoundsGate(ValidationGate):
         )
 
 
+class ProductParameterSanityGate(ValidationGate):
+    """
+    Check product parameters are within reasonable bounds.
+
+    [F.4] Sanity checks to catch data errors or misentered products.
+    These are conservative bounds based on market observations:
+    - cap_rate: 0-30% (highest observed caps ~25%)
+    - participation_rate: 0-300% (leveraged products exist but rare)
+    - buffer_rate: 0-30% (buffers >25% uncommon)
+    - spread_rate: 0-10% (spreads >5% uncommon)
+    """
+
+    name = "product_parameter_sanity"
+
+    # Sanity bounds [F.4]
+    MAX_CAP_RATE = 0.30  # 30%
+    MAX_PARTICIPATION_RATE = 3.00  # 300%
+    MAX_BUFFER_RATE = 0.30  # 30%
+    MAX_SPREAD_RATE = 0.10  # 10%
+
+    def check(self, result: PricingResult, **context: Any) -> GateResult:
+        """
+        Check product parameters from context.
+
+        Context should include product parameters:
+        - cap_rate, participation_rate, buffer_rate, spread_rate
+        """
+        issues = []
+
+        # Check cap rate
+        cap_rate = context.get("cap_rate")
+        if cap_rate is not None:
+            if cap_rate < 0:
+                issues.append(f"cap_rate {cap_rate:.4f} is negative")
+            elif cap_rate > self.MAX_CAP_RATE:
+                issues.append(
+                    f"cap_rate {cap_rate:.4f} exceeds maximum {self.MAX_CAP_RATE:.0%}"
+                )
+
+        # Check participation rate
+        participation_rate = context.get("participation_rate")
+        if participation_rate is not None:
+            if participation_rate <= 0:
+                issues.append(f"participation_rate {participation_rate:.4f} must be > 0")
+            elif participation_rate > self.MAX_PARTICIPATION_RATE:
+                issues.append(
+                    f"participation_rate {participation_rate:.4f} exceeds maximum "
+                    f"{self.MAX_PARTICIPATION_RATE:.0%}"
+                )
+
+        # Check buffer rate (used for both buffer and floor protection levels)
+        buffer_rate = context.get("buffer_rate")
+        if buffer_rate is not None:
+            if buffer_rate < 0:
+                issues.append(f"buffer_rate {buffer_rate:.4f} is negative")
+            elif buffer_rate > self.MAX_BUFFER_RATE:
+                issues.append(
+                    f"buffer_rate {buffer_rate:.4f} exceeds maximum {self.MAX_BUFFER_RATE:.0%}"
+                )
+
+        # Check spread rate
+        spread_rate = context.get("spread_rate")
+        if spread_rate is not None:
+            if spread_rate < 0:
+                issues.append(f"spread_rate {spread_rate:.4f} is negative")
+            elif spread_rate > self.MAX_SPREAD_RATE:
+                issues.append(
+                    f"spread_rate {spread_rate:.4f} exceeds maximum {self.MAX_SPREAD_RATE:.0%}"
+                )
+
+        if issues:
+            return GateResult(
+                status=GateStatus.HALT,
+                gate_name=self.name,
+                message=f"Parameter sanity check failed: {'; '.join(issues)}",
+                value=issues,
+            )
+
+        return GateResult(
+            status=GateStatus.PASS,
+            gate_name=self.name,
+            message="Product parameters within sanity bounds",
+        )
+
+
 # =============================================================================
 # Validation Engine
 # =============================================================================
@@ -590,6 +678,7 @@ class ValidationEngine:
             RILAMaxLossGate(),
             RILAProtectionValueGate(),
             ArbitrageBoundsGate(),
+            ProductParameterSanityGate(),  # [F.4] Added sanity bounds checking
         ]
 
     def validate(

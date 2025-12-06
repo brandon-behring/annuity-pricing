@@ -186,12 +186,18 @@ class RILAPricer(BasePricer):
         self,
         product: RILAProduct,
         as_of_date: Optional[date] = None,
-        term_years: float = 1.0,
+        term_years: Optional[float] = None,
         premium: float = 100.0,
         **kwargs: Any,
     ) -> RILAPricingResult:
         """
         Price RILA product.
+
+        [T3] Modeling Assumptions:
+        - Risk-neutral pricing (no real-world drift)
+        - Single-period (no interim crediting)
+        - No fees, hedging frictions, or surrender charges
+        - Constant volatility (GBM)
 
         Parameters
         ----------
@@ -199,8 +205,9 @@ class RILAPricer(BasePricer):
             RILA product to price
         as_of_date : date, optional
             Valuation date
-        term_years : float, default 1.0
-            Investment term in years
+        term_years : float, optional
+            Investment term in years. If None, uses product.term_years.
+            CRITICAL: Must be explicitly provided or available from product.
         premium : float, default 100.0
             Premium amount for scaling
 
@@ -208,21 +215,27 @@ class RILAPricer(BasePricer):
         -------
         RILAPricingResult
             Present value and protection metrics
+
+        Raises
+        ------
+        ValueError
+            If term_years is not provided and product.term_years is None
         """
         if not isinstance(product, RILAProduct):
             raise ValueError(
                 f"CRITICAL: Expected RILAProduct, got {type(product).__name__}"
             )
 
-        # Handle term_years: use product term if caller passed default (1.0)
-        # Only raise if caller explicitly passed a different value
-        if product.term_years is not None:
-            if term_years != 1.0 and term_years != float(product.term_years):
-                raise ValueError(
-                    f"term_years parameter ({term_years}) conflicts with product.term_years "
-                    f"({product.term_years}). Remove term_years argument to use product value."
-                )
-            term_years = float(product.term_years)
+        # [F.1] Resolve term_years: require explicit value or from product
+        if term_years is None:
+            term_years = getattr(product, 'term_years', None)
+            if term_years is not None:
+                term_years = float(term_years)
+        if term_years is None or term_years <= 0:
+            raise ValueError(
+                f"CRITICAL: term_years required and must be > 0, got {term_years}. "
+                f"Specify term_years parameter or set product.term_years."
+            )
 
         # Determine protection type
         is_buffer = product.is_buffer()
@@ -620,7 +633,7 @@ class RILAPricer(BasePricer):
         buffer_rate: float,
         floor_rate: float,
         cap_rate: float,
-        term_years: float = 1.0,
+        term_years: float,
     ) -> pd.DataFrame:
         """
         Compare buffer vs floor protection for same protection level.
@@ -634,14 +647,24 @@ class RILAPricer(BasePricer):
         cap_rate : float
             Cap rate for both
         term_years : float
-            Investment term
+            Investment term (required)
 
         Returns
         -------
         pd.DataFrame
             Comparison of buffer vs floor metrics
+
+        Raises
+        ------
+        ValueError
+            If term_years is not provided or <= 0
         """
-        # Create dummy products
+        if term_years is None or term_years <= 0:
+            raise ValueError(
+                f"CRITICAL: term_years required and must be > 0, got {term_years}"
+            )
+
+        # Create dummy products with explicit term_years
         buffer_product = RILAProduct(
             company_name="Compare",
             product_name="Buffer",
@@ -650,6 +673,7 @@ class RILAPricer(BasePricer):
             buffer_rate=buffer_rate,
             buffer_modifier="Losses Covered Up To",
             cap_rate=cap_rate,
+            term_years=int(term_years),
         )
 
         floor_product = RILAProduct(
@@ -660,6 +684,7 @@ class RILAPricer(BasePricer):
             buffer_rate=floor_rate,
             buffer_modifier="Losses Covered After",
             cap_rate=cap_rate,
+            term_years=int(term_years),
         )
 
         # Price both
@@ -698,7 +723,7 @@ class RILAPricer(BasePricer):
     def price_multiple(
         self,
         products: list[RILAProduct],
-        term_years: float = 1.0,
+        term_years: Optional[float] = None,
         premium: float = 100.0,
     ) -> pd.DataFrame:
         """
@@ -708,8 +733,9 @@ class RILAPricer(BasePricer):
         ----------
         products : list[RILAProduct]
             RILA products to price
-        term_years : float
-            Investment term
+        term_years : float, optional
+            Investment term. If None, uses each product's term_years.
+            Products without term_years will raise ValueError.
         premium : float
             Premium amount
 
@@ -750,7 +776,7 @@ class RILAPricer(BasePricer):
     def calculate_greeks(
         self,
         product: RILAProduct,
-        term_years: float = 1.0,
+        term_years: Optional[float] = None,
         notional: float = 100.0,
     ) -> RILAGreeks:
         """
@@ -766,8 +792,9 @@ class RILAPricer(BasePricer):
         ----------
         product : RILAProduct
             RILA product to analyze
-        term_years : float
-            Investment term (years)
+        term_years : float, optional
+            Investment term in years. If None, uses product.term_years.
+            CRITICAL: Must be explicitly provided or available from product.
         notional : float
             Notional amount (for dollar Greeks)
 
@@ -776,6 +803,11 @@ class RILAPricer(BasePricer):
         RILAGreeks
             Position Greeks for hedging
 
+        Raises
+        ------
+        ValueError
+            If term_years is not provided and product.term_years is None
+
         Examples
         --------
         >>> market = MarketParams(spot=100, risk_free_rate=0.05, dividend_yield=0.02, volatility=0.20)
@@ -783,18 +815,26 @@ class RILAPricer(BasePricer):
         >>> product = RILAProduct(
         ...     company_name="Test", product_name="10% Buffer",
         ...     product_group="RILA", status="current",
-        ...     buffer_rate=0.10, buffer_modifier="Losses Covered Up To", cap_rate=0.15
+        ...     buffer_rate=0.10, buffer_modifier="Losses Covered Up To", cap_rate=0.15,
+        ...     term_years=1
         ... )
-        >>> greeks = pricer.calculate_greeks(product, term_years=1.0)
+        >>> greeks = pricer.calculate_greeks(product)
         >>> greeks.delta < 0  # Short delta from put spread
         True
         """
         if not isinstance(product, RILAProduct):
             raise ValueError(f"Expected RILAProduct, got {type(product).__name__}")
 
-        # Use product term if available
-        if product.term_years is not None:
-            term_years = float(product.term_years)
+        # [F.1] Resolve term_years: require explicit value or from product
+        if term_years is None:
+            term_years = getattr(product, 'term_years', None)
+            if term_years is not None:
+                term_years = float(term_years)
+        if term_years is None or term_years <= 0:
+            raise ValueError(
+                f"CRITICAL: term_years required and must be > 0, got {term_years}. "
+                f"Specify term_years parameter or set product.term_years."
+            )
 
         # Determine protection type
         is_buffer = product.buffer_modifier in [

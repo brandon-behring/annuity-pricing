@@ -148,12 +148,18 @@ class FIAPricer(BasePricer):
         self,
         product: FIAProduct,
         as_of_date: Optional[date] = None,
-        term_years: float = 1.0,
+        term_years: Optional[float] = None,
         premium: float = 100.0,
         **kwargs: Any,
     ) -> FIAPricingResult:
         """
         Price FIA product.
+
+        [T3] Modeling Assumptions:
+        - Risk-neutral pricing (no real-world drift)
+        - Single-period (no interim crediting)
+        - No fees, hedging frictions, or surrender charges
+        - Constant volatility (GBM)
 
         Parameters
         ----------
@@ -161,8 +167,9 @@ class FIAPricer(BasePricer):
             FIA product to price
         as_of_date : date, optional
             Valuation date
-        term_years : float, default 1.0
-            Investment term in years
+        term_years : float, optional
+            Investment term in years. If None, uses product.term_years.
+            CRITICAL: Must be explicitly provided or available from product.
         premium : float, default 100.0
             Premium amount for scaling
 
@@ -170,17 +177,35 @@ class FIAPricer(BasePricer):
         -------
         FIAPricingResult
             Present value and embedded option metrics
+
+        Raises
+        ------
+        ValueError
+            If term_years is not provided and product.term_years is None
         """
         if not isinstance(product, FIAProduct):
             raise ValueError(
                 f"CRITICAL: Expected FIAProduct, got {type(product).__name__}"
             )
 
+        # [F.1] Resolve term_years: require explicit value or from product
+        if term_years is None:
+            term_years = getattr(product, 'term_years', None)
+            if term_years is not None:
+                term_years = float(term_years)
+        if term_years is None or term_years <= 0:
+            raise ValueError(
+                f"CRITICAL: term_years required and must be > 0, got {term_years}. "
+                f"Specify term_years parameter or set product.term_years."
+            )
+
         # Determine crediting method
         method, params = self._determine_crediting_method(product)
 
-        # Calculate option budget
-        option_budget = premium * self.option_budget_pct
+        # [F.1] Calculate option budget SCALED BY TERM
+        # Multi-year FIA needs proportionally larger option budget
+        # e.g., 5-year term with 3% annual budget = 15% total budget
+        option_budget = premium * self.option_budget_pct * term_years
 
         # Price embedded option using Black-Scholes
         embedded_option_value = self._price_embedded_option(
@@ -296,11 +321,35 @@ class FIAPricer(BasePricer):
         """
         Determine crediting method and extract parameters.
 
+        [F.3] Detects monthly averaging from indexing_method field.
+        Monthly averaging is path-dependent and uses MonthlyAveragePayoff.
+
         Returns
         -------
         tuple[str, dict]
             (method_name, method_params)
         """
+        # [F.3] Check for monthly averaging first (orthogonal to crediting type)
+        is_monthly_avg = False
+        if product.indexing_method is not None:
+            indexing_lower = product.indexing_method.lower()
+            if "monthly" in indexing_lower or "averaging" in indexing_lower or "average" in indexing_lower:
+                is_monthly_avg = True
+
+        if is_monthly_avg:
+            # Monthly averaging currently only supports cap-style crediting
+            if product.cap_rate is not None:
+                return "monthly_average", {"cap_rate": product.cap_rate}
+            else:
+                # [NEVER FAIL SILENTLY] Monthly averaging with participation/spread not yet supported
+                raise ValueError(
+                    f"FIA product '{product.product_name}' uses monthly averaging "
+                    f"(indexing_method='{product.indexing_method}') but monthly averaging "
+                    "currently only supports cap_rate crediting. "
+                    "Specify cap_rate or use point-to-point indexing."
+                )
+
+        # Standard point-to-point crediting methods
         if product.cap_rate is not None:
             return "cap", {"cap_rate": product.cap_rate}
         elif product.participation_rate is not None:
@@ -406,6 +455,28 @@ class FIAPricer(BasePricer):
             discount_factor = np.exp(-m.risk_free_rate * term_years)
 
             return discount_factor * trigger_rate * premium * prob_itm
+
+        elif method == "monthly_average":
+            # [F.3] Monthly averaging - use capped call approximation
+            # Note: This is an upper bound; actual monthly average option
+            # value is typically lower due to averaging reducing volatility.
+            # Use MC result (expected_credit) for accurate pricing.
+            cap_rate = params["cap_rate"]
+
+            atm_call = black_scholes_call(
+                m.spot, m.spot, m.risk_free_rate, m.dividend_yield, m.volatility, term_years
+            )
+
+            if cap_rate > 0:
+                cap_strike = m.spot * (1 + cap_rate)
+                otm_call = black_scholes_call(
+                    m.spot, cap_strike, m.risk_free_rate, m.dividend_yield, m.volatility, term_years
+                )
+                capped_call_value = atm_call - otm_call
+            else:
+                capped_call_value = 0.0
+
+            return (capped_call_value / m.spot) * premium
 
         else:
             return 0.0
@@ -566,7 +637,7 @@ class FIAPricer(BasePricer):
     def price_multiple(
         self,
         products: list[FIAProduct],
-        term_years: float = 1.0,
+        term_years: Optional[float] = None,
         premium: float = 100.0,
     ) -> pd.DataFrame:
         """
@@ -576,8 +647,9 @@ class FIAPricer(BasePricer):
         ----------
         products : list[FIAProduct]
             FIA products to price
-        term_years : float
-            Investment term
+        term_years : float, optional
+            Investment term. If None, uses each product's term_years.
+            Products without term_years will raise ValueError.
         premium : float
             Premium amount
 

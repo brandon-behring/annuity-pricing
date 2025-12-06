@@ -62,13 +62,13 @@ def valid_myga() -> MYGAProduct:
 
 @pytest.fixture
 def valid_fia() -> FIAProduct:
-    """Valid FIA product."""
+    """Valid FIA product. [F.4] Uses 5% cap to fit within tightened budget tolerance."""
     return FIAProduct(
         company_name="Test Company",
         product_name="S&P 500 Cap",
         product_group="FIA",
         status="current",
-        cap_rate=0.10,
+        cap_rate=0.05,  # [F.4] Reduced from 0.10 to fit 10% budget tolerance
         index_used="S&P 500",
     )
 
@@ -162,14 +162,16 @@ class TestValidationContext:
         self, registry: ProductRegistry, valid_fia: FIAProduct
     ) -> None:
         """FIA cap_rate should be included in validation context."""
-        result = registry.price(valid_fia, premium=100_000.0, validate=True)
+        # [F.1] term_years now required
+        result = registry.price(valid_fia, premium=100_000.0, term_years=1.0, validate=True)
         assert result is not None
 
     def test_rila_buffer_rate_in_context(
         self, registry: ProductRegistry, valid_rila: RILAProduct
     ) -> None:
         """RILA buffer_rate should be included in validation context."""
-        result = registry.price(valid_rila, premium=100_000.0, validate=True)
+        # [F.1] term_years now required
+        result = registry.price(valid_rila, premium=100_000.0, term_years=1.0, validate=True)
         assert result is not None
 
 

@@ -133,9 +133,10 @@ class TestWinkPipelineIntegration:
         row = fia_rows.iloc[0]
 
         # Get cap rate with fallback
+        # [F.4] Use 5% default to fit within tightened 10% budget tolerance
         cap_rate = row.get("capRate")
-        if pd.isna(cap_rate) or cap_rate <= 0 or cap_rate > 1.0:
-            cap_rate = 0.10  # Default 10% cap
+        if pd.isna(cap_rate) or cap_rate <= 0 or cap_rate > 0.30:
+            cap_rate = 0.05  # Default 5% cap (within budget tolerance)
 
         product = FIAProduct(
             company_name=str(row.get("companyName", "Test Company")),
@@ -147,8 +148,8 @@ class TestWinkPipelineIntegration:
             indexing_method="Annual Point to Point",
         )
 
-        # Price
-        result = registry.price(product, premium=100_000)
+        # Price ([F.1] term_years now required)
+        result = registry.price(product, premium=100_000, term_years=1.0)
 
         assert result.expected_credit >= 0  # Can be 0 with floor
         assert result.embedded_option_value >= 0
@@ -188,8 +189,8 @@ class TestWinkPipelineIntegration:
             buffer_modifier="Losses Covered Up To",
         )
 
-        # Price
-        result = registry.price(product, premium=100_000)
+        # Price ([F.1] term_years now required)
+        result = registry.price(product, premium=100_000, term_years=1.0)
 
         assert result.max_loss <= 1.0  # Max loss capped at 100%
         assert result.protection_value >= 0

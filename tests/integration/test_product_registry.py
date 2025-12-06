@@ -59,13 +59,13 @@ def myga_product():
 
 @pytest.fixture
 def fia_product():
-    """Sample FIA product."""
+    """Sample FIA product. [F.4] Uses 5% cap to fit within tightened budget tolerance."""
     return FIAProduct(
         company_name="Test Life",
         product_name="S&P 500 Cap",
         product_group="FIA",
         status="current",
-        cap_rate=0.10,
+        cap_rate=0.05,  # [F.4] Reduced from 0.10 to fit 10% budget tolerance
         index_used="S&P 500",
     )
 
@@ -218,12 +218,12 @@ class TestPriceFromRow:
         assert result.present_value > 0
 
     def test_price_fia_from_row(self, registry):
-        """Should price FIA from row dict."""
+        """Should price FIA from row dict. [F.4] Uses 5% cap for budget tolerance."""
         row = {
             "companyName": "Test Life",
             "productName": "S&P Cap",
             "status": "current",
-            "capRate": 0.10,
+            "capRate": 0.05,  # [F.4] Reduced from 0.10 to fit 10% budget tolerance
             "indexUsed": "S&P 500",
         }
 

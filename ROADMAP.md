@@ -1,6 +1,6 @@
 # ROADMAP.md - Actuarial Pricing Progress
 
-**Last Updated**: 2025-12-05
+**Last Updated**: 2025-12-06
 
 ---
 
@@ -17,7 +17,7 @@ Phase 0 → Phase 1 → Phase 3 → Phase 2 → Phase 4 → Phase 5 → Phase 6 
    ✅        ✅        ✅        ✅        ✅        ✅        ✅        ✅        ✅        ✅        ✅
 ```
 
-**Status**: All phases complete. 953 tests passing.
+**Status**: All phases complete. Stream F (Code Quality Hardening) complete. 998 tests (4 skipped).
 
 ---
 
@@ -176,13 +176,18 @@ Phase 0 → Phase 1 → Phase 3 → Phase 2 → Phase 4 → Phase 5 → Phase 6 
 ## Test Summary
 
 ```
-tests/unit/                 741 tests - All modules (including adapters, behavioral, glwb, regulatory, loaders)
-tests/integration/           88 tests - End-to-end pricing pipeline + registry + gates
+tests/unit/                 773 tests - All modules (including adapters, behavioral, glwb, regulatory, loaders)
+tests/integration/          101 tests - End-to-end pricing pipeline + registry + gates
 tests/anti_patterns/         79 tests - Put-call parity, buffer/floor, no-arbitrage sweeps
 tests/validation/            45 tests - BS known-answer, MC convergence, PV discounting
 ─────────────────────────────────────
-Total:                      953 tests passing, 4 skipped (pyfeng scipy 1.12+)
+Total:                      998 tests (4 skipped for pyfeng scipy 1.12+)
 ```
+
+**Stream F Additions (2025-12-06):**
+- F.1-F.3: 24 new tests for term scaling, buffer validation, monthly averaging
+- F.4: 13 new tests for tightened validation gates
+- F.5: 8 new tests for FRED fixture loading
 
 ---
 
