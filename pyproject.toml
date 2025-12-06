@@ -1,12 +1,44 @@
 [project]
 name = "annuity-pricing"
-version = "0.1.0"
-description = "Actuarial pricing for MYGA, FIA, and RILA annuity products"
+version = "0.2.0"
+description = "Actuarial pricing for MYGA, FIA, and RILA annuity products with GLWB guarantees"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Brandon Behring"}
+]
+
+keywords = [
+    "annuity",
+    "actuarial",
+    "pricing",
+    "FIA",
+    "RILA",
+    "MYGA",
+    "GLWB",
+    "GMWB",
+    "options",
+    "black-scholes",
+    "monte-carlo",
+    "VM-21",
+    "VM-22",
+    "insurance",
+]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Typing :: Typed",
 ]
 
 dependencies = [
@@ -20,6 +52,13 @@ dependencies = [
     "yfinance>=0.2",          # Yahoo Finance (free index data)
     "fredapi>=0.5",           # FRED API (Treasury curves)
 ]
+
+[project.urls]
+Homepage = "https://github.com/bbehring/annuity-pricing"
+Repository = "https://github.com/bbehring/annuity-pricing"
+Documentation = "https://annuity-pricing.readthedocs.io"
+Issues = "https://github.com/bbehring/annuity-pricing/issues"
+Changelog = "https://github.com/bbehring/annuity-pricing/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
