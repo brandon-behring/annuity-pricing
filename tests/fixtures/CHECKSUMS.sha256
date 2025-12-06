@@ -1,0 +1,3 @@
+# SHA-256 checksums for test fixtures
+# Format: checksum  filename
+c1910138b6755fd51edb4713da74b5e7d199e8866468360035aa44f5bfe22e2a  wink_sample.parquet

@@ -1,0 +1,98 @@
+[project]
+name = "annuity-pricing"
+version = "0.1.0"
+description = "Actuarial pricing for MYGA, FIA, and RILA annuity products"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Brandon Behring"}
+]
+
+dependencies = [
+    # Core
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "scipy>=1.11",
+    "pyarrow>=14.0",
+
+    # Market Data
+    "yfinance>=0.2",          # Yahoo Finance (free index data)
+    "fredapi>=0.5",           # FRED API (Treasury curves)
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "mypy>=1.0",
+    "ruff>=0.1.0",
+]
+viz = [
+    "matplotlib>=3.5",
+    "seaborn>=0.12",
+    "plotly>=5.0",
+    "jupyter>=1.0",
+    "nbconvert>=7.0",         # For notebook execution
+]
+vol = [
+    "pysabr>=0.3",            # SABR volatility fitting (Level 3)
+]
+validation = [
+    "financepy>=0.350",       # Options pricing cross-validation
+    "QuantLib-Python>=1.31",  # Yield curves, bonds cross-validation
+    "pyfeng>=0.2",            # SABR, Heston cross-validation
+    "pycurve>=0.5",           # Nelson-Siegel cross-validation
+]
+actuarial = [
+    "actuarialmath>=1.0",     # Life contingencies (Python)
+    "lifelib>=0.8",           # Actuarial models library
+]
+all = [
+    "annuity-pricing[dev,viz,vol,validation,actuarial]",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 100
+target-version = ['py310', 'py311', 'py312']
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]  # Line length handled by black
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+minversion = "7.0"
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+    # Breakeven not yet implemented - expected until methodology defined (Step 1.4)
+    "ignore:Breakeven calculation not yet implemented:UserWarning",
+]
+markers = [
+    "anti_pattern: Bug prevention tests (MUST pass before commit)",
+    "validation: External verification tests (known answers, convergence)",
+    "unit: Standard unit tests",
+    "integration: End-to-end tests",
+    "slow: Tests that take > 10 seconds",
+]
