@@ -1,0 +1,80 @@
+{
+  "_meta": {
+    "source": "VM-22 (PBR for fixed annuities) educational implementation",
+    "generated": "2025-12-09",
+    "naic_edition": "2024 (simplified)",
+    "valuation_date": "2023-12-31",
+    "disclaimer": "EDUCATIONAL USE ONLY - NOT FOR PRODUCTION REGULATORY FILING",
+    "effective_dates": {
+      "voluntary_adoption": "2026-01-01",
+      "mandatory_compliance": "2029-01-01"
+    },
+    "notes": "Values generated with seed=42, 1000 scenarios, 30-year projection"
+  },
+  "fixed_annuity_5yr": {
+    "description": "5-year fixed annuity - typical MYGA-like product",
+    "policy_type": "FIXED_ANNUITY",
+    "parameters": {
+      "premium": 100000,
+      "guaranteed_rate": 0.04,
+      "term_years": 5,
+      "current_year": 0,
+      "surrender_charge_pct": 0.07
+    },
+    "calculation_settings": {
+      "n_scenarios": 1000,
+      "projection_years": 30,
+      "seed": 42,
+      "market_rate": 0.04,
+      "lapse_rate": 0.05
+    },
+    "expected": {
+      "reserve": 108083.41,
+      "net_premium_reserve": 99611.11,
+      "deterministic_reserve": 108083.41,
+      "stochastic_reserve": null,
+      "reserve_type": "DETERMINISTIC",
+      "set_passed": true,
+      "sst_passed": true,
+      "binding_component": "deterministic_reserve",
+      "notes": "SET passes, so deterministic reserve is used"
+    },
+    "tolerances": {
+      "reserve_relative": 0.01,
+      "npr_relative": 0.001,
+      "notes": "1% relative tolerance for reserves, 0.1% for NPR (deterministic)"
+    }
+  },
+  "fixed_annuity_10yr": {
+    "description": "10-year fixed annuity - longer duration",
+    "policy_type": "FIXED_ANNUITY",
+    "parameters": {
+      "premium": 100000,
+      "guaranteed_rate": 0.045,
+      "term_years": 10,
+      "current_year": 0,
+      "surrender_charge_pct": 0.08
+    },
+    "calculation_settings": {
+      "n_scenarios": 1000,
+      "projection_years": 30,
+      "seed": 42,
+      "market_rate": 0.04,
+      "lapse_rate": 0.05
+    },
+    "expected": {
+      "reserve": 119484.89,
+      "net_premium_reserve": 104098.65,
+      "deterministic_reserve": 119484.89,
+      "stochastic_reserve": null,
+      "reserve_type": "DETERMINISTIC",
+      "set_passed": true,
+      "sst_passed": true,
+      "notes": "Longer duration increases reserve requirement"
+    },
+    "tolerances": {
+      "reserve_relative": 0.01,
+      "notes": "1% relative tolerance"
+    }
+  }
+}

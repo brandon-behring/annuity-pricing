@@ -3,8 +3,13 @@ Integration tests for WINK data pipeline.
 
 Tests end-to-end flow: load → clean → registry pricing.
 Uses sample WINK fixture for realistic testing.
+
+**Checksum Validation**: Tests enforce fail-fast on data drift.
+If checksum mismatch occurs, regenerate fixtures via:
+    scripts/regenerate_goldens.py --wink-fixture
 """
 
+import hashlib
 from pathlib import Path
 from unittest.mock import patch
 
@@ -12,17 +17,23 @@ import pandas as pd
 import pytest
 
 from annuity_pricing.data.cleaner import clean_wink_data, get_cleaning_summary
-from annuity_pricing.data.loader import load_wink_data
+from annuity_pricing.data.loader import (
+    load_wink_data,
+    compute_sha256,
+    verify_checksum,
+    DataIntegrityError,
+)
 from annuity_pricing.data.schemas import FIAProduct, MYGAProduct, RILAProduct
 from annuity_pricing.products.registry import create_default_registry
 
 
 # =============================================================================
-# Fixtures
+# Fixtures and Constants
 # =============================================================================
 
 FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
 SAMPLE_PARQUET = FIXTURES_DIR / "wink_sample.parquet"
+# SHA-256 checksum of wink_sample.parquet - FAIL if this changes
 SAMPLE_CHECKSUM = "c1910138b6755fd51edb4713da74b5e7d199e8866468360035aa44f5bfe22e2a"
 
 
@@ -39,6 +50,95 @@ def registry():
         risk_free_rate=0.045,
         volatility=0.18,
     )
+
+
+# =============================================================================
+# Checksum Validation Tests (FAIL-FAST)
+# =============================================================================
+
+
+@pytest.mark.integration
+class TestWinkChecksumValidation:
+    """
+    Checksum validation tests that FAIL if fixture data changes.
+
+    [T1] Data integrity is critical for regression testing.
+    Any change to the fixture requires explicit checksum update.
+
+    To regenerate after intentional changes:
+        scripts/regenerate_goldens.py --wink-fixture
+    """
+
+    def test_fixture_checksum_matches(self, wink_sample_path: Path) -> None:
+        """
+        [P0] FAIL if fixture checksum changes.
+
+        This is the primary data integrity gate. Any modification to
+        wink_sample.parquet will cause this test to fail immediately.
+        """
+        if not wink_sample_path.exists():
+            pytest.fail(f"CRITICAL: Fixture not found at {wink_sample_path}")
+
+        actual_checksum = compute_sha256(wink_sample_path)
+
+        assert actual_checksum == SAMPLE_CHECKSUM, (
+            f"CHECKSUM MISMATCH - Data drift detected!\n"
+            f"Expected: {SAMPLE_CHECKSUM}\n"
+            f"Actual:   {actual_checksum}\n\n"
+            f"If intentional, update SAMPLE_CHECKSUM in this file.\n"
+            f"Run: scripts/regenerate_goldens.py --wink-fixture"
+        )
+
+    def test_loader_raises_on_checksum_mismatch(self, wink_sample_path: Path) -> None:
+        """
+        [P0] Verify loader raises DataIntegrityError on bad checksum.
+
+        The loader must NEVER silently accept corrupted data.
+        """
+        wrong_checksum = "0" * 64  # Obviously wrong
+
+        with pytest.raises(DataIntegrityError) as exc_info:
+            verify_checksum(wink_sample_path, wrong_checksum)
+
+        assert "CRITICAL" in str(exc_info.value)
+        assert "Checksum mismatch" in str(exc_info.value)
+
+    def test_loader_accepts_valid_checksum(self, wink_sample_path: Path) -> None:
+        """
+        [P0] Verify loader accepts valid checksum without error.
+        """
+        # Should not raise
+        verify_checksum(wink_sample_path, SAMPLE_CHECKSUM)
+
+    def test_fixture_row_count_stable(self, wink_sample_path: Path) -> None:
+        """
+        [P0] Verify fixture has expected row count.
+
+        Row count changes indicate data drift.
+        """
+        df = pd.read_parquet(wink_sample_path)
+
+        expected_rows = 100
+        assert len(df) == expected_rows, (
+            f"Row count changed: expected {expected_rows}, got {len(df)}. "
+            f"Update expected_rows if this is intentional."
+        )
+
+    def test_fixture_has_required_columns(self, wink_sample_path: Path) -> None:
+        """
+        [P0] Verify fixture has all required columns for pricing.
+        """
+        df = pd.read_parquet(wink_sample_path)
+
+        required_columns = {
+            "companyName",
+            "productName",
+            "productGroup",
+            "status",
+        }
+
+        missing = required_columns - set(df.columns)
+        assert not missing, f"Missing required columns: {missing}"
 
 
 # =============================================================================
@@ -113,10 +213,21 @@ class TestWinkPipelineIntegration:
         # Price
         result = registry.price(product, premium=100_000)
 
-        assert result.present_value > 0
+        assert result.present_value > 0, (
+            f"MYGA pricing failed: PV must be positive, got {result.present_value}"
+        )
         # Check details for guaranteed_value if present
         if hasattr(result, 'details') and result.details:
-            assert result.details.get('guaranteed_value', 0) >= 0 or True
+            guaranteed_value = result.details.get('guaranteed_value', 0)
+            assert guaranteed_value >= 0, (
+                f"MYGA guaranteed_value must be non-negative, got {guaranteed_value}"
+            )
+            # Golden expectation: guaranteed_value should be at least premium for MYGA
+            # (since MYGA guarantees return of principal at minimum)
+            if 'premium' in result.details:
+                assert guaranteed_value >= result.details['premium'] * 0.95, (
+                    f"MYGA guaranteed_value {guaranteed_value} should be >= 95% of premium"
+                )
 
     def test_fia_row_to_pricing(self, wink_sample_path: Path, registry) -> None:
         """Should convert FIA rows to products and price them."""

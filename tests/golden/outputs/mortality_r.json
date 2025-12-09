@@ -1,0 +1,38 @@
+{
+  "_meta": {
+    "source": "R lifecontingencies package with SOA 2012 IAM qx values",
+    "r_version": "4.5.2",
+    "lifecontingencies_version": "1.4.4",
+    "generated": "2025-12-09",
+    "notes": "Actuarial table constructed from SOA 2012 IAM Period qx values"
+  },
+  "soa_2012_iam_male": {
+    "qx": {
+      "30": 0.0007,
+      "40": 0.0009,
+      "50": 0.0021,
+      "60": 0.0051,
+      "65": 0.0081,
+      "70": 0.0114,
+      "80": 0.0332,
+      "90": 0.11
+    },
+    "ax_65_i5": 13.3723,
+    "Ax_65_i5": 0.3632,
+    "ax_65_i3": 16.1903,
+    "ax_70_i5": 11.8949
+  },
+  "soa_2012_iam_female": {
+    "qx": {
+      "30": 0.0003,
+      "40": 0.0006,
+      "50": 0.0012,
+      "60": 0.0035,
+      "65": 0.0061,
+      "70": 0.0091,
+      "80": 0.0248,
+      "90": 0.0884
+    },
+    "ax_65_i5": 13.994
+  }
+}

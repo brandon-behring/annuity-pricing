@@ -1,0 +1,170 @@
+{
+  "_meta": {
+    "source": "SEC RILA Final Rule 2024 and Investor Testing 2023",
+    "generated": "2025-12-09",
+    "tolerance_tier": "golden_relative",
+    "notes": "Buffer and floor examples from SEC disclosure requirements"
+  },
+  "buffer_10_loss_5": {
+    "description": "10% buffer absorbs 5% loss completely",
+    "reference": "SEC RILA Final Rule 2024 - Buffer Example",
+    "parameters": {
+      "index_return": -0.05,
+      "buffer_rate": 0.10
+    },
+    "expected": {
+      "credited_return": 0.0,
+      "buffer_applied": true,
+      "explanation": "5% loss within 10% buffer, fully absorbed"
+    }
+  },
+  "buffer_10_loss_15": {
+    "description": "10% buffer absorbs first 10% of 15% loss",
+    "reference": "SEC RILA Final Rule 2024 - Buffer Example",
+    "parameters": {
+      "index_return": -0.15,
+      "buffer_rate": 0.10
+    },
+    "expected": {
+      "credited_return": -0.05,
+      "buffer_applied": true,
+      "explanation": "15% loss minus 10% buffer = 5% loss to policyholder"
+    }
+  },
+  "buffer_10_loss_25": {
+    "description": "10% buffer with 25% market loss",
+    "reference": "SEC RILA Final Rule 2024",
+    "parameters": {
+      "index_return": -0.25,
+      "buffer_rate": 0.10
+    },
+    "expected": {
+      "credited_return": -0.15,
+      "buffer_applied": true,
+      "explanation": "25% loss minus 10% buffer = 15% loss to policyholder"
+    }
+  },
+  "buffer_10_gain_12": {
+    "description": "10% buffer with 12% gain (full upside)",
+    "reference": "SEC RILA Final Rule 2024",
+    "parameters": {
+      "index_return": 0.12,
+      "buffer_rate": 0.10
+    },
+    "expected": {
+      "credited_return": 0.12,
+      "buffer_applied": false,
+      "explanation": "Positive return, buffer not used, full upside"
+    }
+  },
+  "floor_10_loss_5": {
+    "description": "-10% floor with 5% loss (no protection needed)",
+    "reference": "SEC RILA Final Rule 2024 - Floor Example",
+    "parameters": {
+      "index_return": -0.05,
+      "floor_rate": -0.10
+    },
+    "expected": {
+      "credited_return": -0.05,
+      "floor_applied": false,
+      "explanation": "5% loss is above -10% floor, no protection"
+    }
+  },
+  "floor_10_loss_15": {
+    "description": "-10% floor limits 15% loss to 10%",
+    "reference": "SEC RILA Final Rule 2024 - Floor Example",
+    "parameters": {
+      "index_return": -0.15,
+      "floor_rate": -0.10
+    },
+    "expected": {
+      "credited_return": -0.10,
+      "floor_applied": true,
+      "explanation": "15% loss floored at -10%"
+    }
+  },
+  "floor_10_loss_25": {
+    "description": "-10% floor with 25% market loss",
+    "reference": "SEC RILA Final Rule 2024",
+    "parameters": {
+      "index_return": -0.25,
+      "floor_rate": -0.10
+    },
+    "expected": {
+      "credited_return": -0.10,
+      "floor_applied": true,
+      "explanation": "25% loss floored at -10%"
+    }
+  },
+  "floor_10_gain_8": {
+    "description": "-10% floor with 8% gain (full upside)",
+    "reference": "SEC RILA Final Rule 2024",
+    "parameters": {
+      "index_return": 0.08,
+      "floor_rate": -0.10
+    },
+    "expected": {
+      "credited_return": 0.08,
+      "floor_applied": false,
+      "explanation": "Positive return, floor not relevant"
+    }
+  },
+  "buffer_vs_floor_small_loss": {
+    "description": "Buffer better for small losses",
+    "reference": "SEC RILA Investor Testing 2023 - Comparison",
+    "parameters": {
+      "index_return": -0.05,
+      "buffer_rate": 0.10,
+      "floor_rate": -0.10
+    },
+    "expected": {
+      "buffer_credited": 0.0,
+      "floor_credited": -0.05,
+      "buffer_better": true,
+      "explanation": "For 5% loss: buffer gives 0%, floor gives -5%"
+    }
+  },
+  "buffer_vs_floor_large_loss": {
+    "description": "Floor better for large losses",
+    "reference": "SEC RILA Investor Testing 2023 - Comparison",
+    "parameters": {
+      "index_return": -0.25,
+      "buffer_rate": 0.10,
+      "floor_rate": -0.10
+    },
+    "expected": {
+      "buffer_credited": -0.15,
+      "floor_credited": -0.10,
+      "floor_better": true,
+      "explanation": "For 25% loss: buffer gives -15%, floor gives -10%"
+    }
+  },
+  "fia_cap_example": {
+    "description": "FIA with 10% cap, positive return",
+    "reference": "SEC RILA Final Rule 2024 - Cap Example",
+    "parameters": {
+      "index_return": 0.15,
+      "cap_rate": 0.10,
+      "floor_rate": 0.0
+    },
+    "expected": {
+      "credited_return": 0.10,
+      "cap_applied": true,
+      "explanation": "15% return capped at 10%"
+    }
+  },
+  "fia_floor_example": {
+    "description": "FIA principal protection (0% floor)",
+    "reference": "SEC RILA Final Rule 2024 - FIA Floor",
+    "parameters": {
+      "index_return": -0.12,
+      "cap_rate": 0.10,
+      "floor_rate": 0.0
+    },
+    "expected": {
+      "credited_return": 0.0,
+      "floor_applied": true,
+      "explanation": "-12% return floored at 0% (principal protection)"
+    }
+  }
+}

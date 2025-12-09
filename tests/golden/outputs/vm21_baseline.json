@@ -1,0 +1,55 @@
+{
+  "_meta": {
+    "source": "VM-21 (AG43) educational implementation",
+    "generated": "2025-12-09",
+    "naic_edition": "2024 (simplified)",
+    "valuation_date": "2023-12-31",
+    "disclaimer": "EDUCATIONAL USE ONLY - NOT FOR PRODUCTION REGULATORY FILING",
+    "notes": "Values generated with seed=42, 1000 scenarios, 30-year projection"
+  },
+  "va_sample_glwb": {
+    "description": "Variable annuity with GLWB - typical in-force policy",
+    "policy_type": "VA_GLWB",
+    "parameters": {
+      "av": 100000,
+      "gwb": 110000,
+      "age": 70,
+      "csv": 90000,
+      "withdrawal_rate": 0.05,
+      "fee_rate": 0.0125
+    },
+    "calculation_settings": {
+      "n_scenarios": 1000,
+      "projection_years": 30,
+      "seed": 42
+    },
+    "expected": {
+      "cte70": 3919.22,
+      "ssa": 11382.10,
+      "csv_floor": 90000.00,
+      "reserve": 90000.00,
+      "scenario_count": 1000,
+      "mean_pv": 1175.77,
+      "std_pv": 4670.84,
+      "binding_component": "csv_floor",
+      "notes": "CSV floor is binding due to high surrender value"
+    },
+    "tolerances": {
+      "cte_relative": 0.05,
+      "reserve_relative": 0.01,
+      "notes": "5% relative tolerance for CTE due to MC noise, 1% for reserve"
+    }
+  },
+  "cte_calculation": {
+    "description": "CTE calculation validation - known input",
+    "test_type": "unit",
+    "parameters": {
+      "scenario_results": [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000],
+      "alpha": 0.70
+    },
+    "expected": {
+      "cte70": 900.0,
+      "notes": "CTE70 of [100..1000] = average of top 3 = (800+900+1000)/3 = 900"
+    }
+  }
+}

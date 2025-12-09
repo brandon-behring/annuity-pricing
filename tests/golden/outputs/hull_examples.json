@@ -1,0 +1,158 @@
+{
+  "_meta": {
+    "source": "Hull (2021) Options, Futures, and Other Derivatives, 11th Edition",
+    "generated": "2025-12-09",
+    "tolerance_tier": "hull_example",
+    "notes": "Values calculated using our validated BS implementation"
+  },
+  "example_15_6_call": {
+    "description": "Hull Example 15.6: European call option",
+    "reference": "Hull (2021) Ch. 15, p. 335",
+    "parameters": {
+      "spot": 42.0,
+      "strike": 40.0,
+      "rate": 0.1,
+      "dividend": 0.0,
+      "volatility": 0.2,
+      "time_to_expiry": 0.5
+    },
+    "expected": {
+      "call_price": 4.76
+    }
+  },
+  "example_15_6_put": {
+    "description": "Hull Example 15.6: European put option (put-call parity)",
+    "reference": "Hull (2021) Ch. 15",
+    "parameters": {
+      "spot": 42.0,
+      "strike": 40.0,
+      "rate": 0.1,
+      "dividend": 0.0,
+      "volatility": 0.2,
+      "time_to_expiry": 0.5
+    },
+    "expected": {
+      "put_price": 0.81
+    }
+  },
+  "example_19_1_delta": {
+    "description": "Hull Example 19.1: Delta calculation",
+    "reference": "Hull (2021) Ch. 19, p. 429",
+    "parameters": {
+      "spot": 49.0,
+      "strike": 50.0,
+      "rate": 0.05,
+      "dividend": 0.0,
+      "volatility": 0.2,
+      "time_to_expiry": 0.3846
+    },
+    "expected": {
+      "delta": 0.522
+    }
+  },
+  "example_19_4_gamma": {
+    "description": "Hull Example 19.4: Gamma calculation",
+    "reference": "Hull (2021) Ch. 19, p. 435",
+    "parameters": {
+      "spot": 49.0,
+      "strike": 50.0,
+      "rate": 0.05,
+      "dividend": 0.0,
+      "volatility": 0.2,
+      "time_to_expiry": 0.3846
+    },
+    "expected": {
+      "gamma": 0.066
+    }
+  },
+  "example_19_6_vega": {
+    "description": "Hull Example 19.6: Vega calculation",
+    "reference": "Hull (2021) Ch. 19, p. 438",
+    "parameters": {
+      "spot": 49.0,
+      "strike": 50.0,
+      "rate": 0.05,
+      "dividend": 0.0,
+      "volatility": 0.2,
+      "time_to_expiry": 0.3846
+    },
+    "expected": {
+      "vega_per_pct": 12.1
+    }
+  },
+  "example_19_8_theta": {
+    "description": "Hull Example 19.8: Theta calculation",
+    "reference": "Hull (2021) Ch. 19, p. 441",
+    "parameters": {
+      "spot": 49.0,
+      "strike": 50.0,
+      "rate": 0.05,
+      "dividend": 0.0,
+      "volatility": 0.2,
+      "time_to_expiry": 0.3846
+    },
+    "expected": {
+      "theta_per_year": -4.31
+    }
+  },
+  "example_19_9_rho": {
+    "description": "Hull Example 19.9: Rho calculation",
+    "reference": "Hull (2021) Ch. 19, p. 443",
+    "parameters": {
+      "spot": 49.0,
+      "strike": 50.0,
+      "rate": 0.05,
+      "dividend": 0.0,
+      "volatility": 0.2,
+      "time_to_expiry": 0.3846
+    },
+    "expected": {
+      "rho_per_pct": 8.91
+    }
+  },
+  "atm_call_with_dividend": {
+    "description": "ATM call with continuous dividend yield",
+    "reference": "Hull (2021) Ch. 17 - Merton extension",
+    "parameters": {
+      "spot": 100.0,
+      "strike": 100.0,
+      "rate": 0.05,
+      "dividend": 0.02,
+      "volatility": 0.2,
+      "time_to_expiry": 1.0
+    },
+    "expected": {
+      "call_price": 9.23
+    }
+  },
+  "itm_call_with_dividend": {
+    "description": "ITM call with continuous dividend yield",
+    "reference": "Hull (2021) Ch. 17 - Merton extension",
+    "parameters": {
+      "spot": 100.0,
+      "strike": 95.0,
+      "rate": 0.05,
+      "dividend": 0.02,
+      "volatility": 0.2,
+      "time_to_expiry": 1.0
+    },
+    "expected": {
+      "call_price": 11.94
+    }
+  },
+  "otm_call_with_dividend": {
+    "description": "OTM call with continuous dividend yield",
+    "reference": "Hull (2021) Ch. 17 - Merton extension",
+    "parameters": {
+      "spot": 100.0,
+      "strike": 105.0,
+      "rate": 0.05,
+      "dividend": 0.02,
+      "volatility": 0.2,
+      "time_to_expiry": 1.0
+    },
+    "expected": {
+      "call_price": 6.99
+    }
+  }
+}

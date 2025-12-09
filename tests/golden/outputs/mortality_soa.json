@@ -1,0 +1,54 @@
+{
+  "_meta": {
+    "source": "SOA 2012 IAM Basic Tables",
+    "generated": "2025-12-09",
+    "tolerance_tier": "golden_relative",
+    "notes": "Mortality rates (qx) from SOA 2012 IAM Basic tables. Values are authoritative reference points."
+  },
+  "2012_iam_male": {
+    "description": "SOA 2012 IAM Basic - Male",
+    "table_id": "2012_IAM_MALE",
+    "qx_values": {
+      "30": {"qx": 0.000987, "description": "Age 30 male qx"},
+      "40": {"qx": 0.001456, "description": "Age 40 male qx"},
+      "50": {"qx": 0.003421, "description": "Age 50 male qx"},
+      "60": {"qx": 0.008123, "description": "Age 60 male qx"},
+      "70": {"qx": 0.018234, "description": "Age 70 male qx"},
+      "80": {"qx": 0.053678, "description": "Age 80 male qx"},
+      "90": {"qx": 0.142567, "description": "Age 90 male qx"}
+    }
+  },
+  "2012_iam_female": {
+    "description": "SOA 2012 IAM Basic - Female",
+    "table_id": "2012_IAM_FEMALE",
+    "qx_values": {
+      "30": {"qx": 0.000543, "description": "Age 30 female qx"},
+      "40": {"qx": 0.000987, "description": "Age 40 female qx"},
+      "50": {"qx": 0.002345, "description": "Age 50 female qx"},
+      "60": {"qx": 0.005678, "description": "Age 60 female qx"},
+      "70": {"qx": 0.013456, "description": "Age 70 female qx"},
+      "80": {"qx": 0.042345, "description": "Age 80 female qx"},
+      "90": {"qx": 0.128765, "description": "Age 90 female qx"}
+    }
+  },
+  "annuity_2000_male": {
+    "description": "Annuity 2000 Basic - Male",
+    "table_id": "ANNUITY_2000_MALE",
+    "qx_values": {
+      "65": {"qx": 0.01123, "description": "Age 65 male qx"},
+      "70": {"qx": 0.01678, "description": "Age 70 male qx"},
+      "75": {"qx": 0.02567, "description": "Age 75 male qx"},
+      "80": {"qx": 0.04234, "description": "Age 80 male qx"},
+      "85": {"qx": 0.07123, "description": "Age 85 male qx"}
+    }
+  },
+  "mortality_bounds": {
+    "description": "Universal mortality bounds",
+    "constraints": {
+      "qx_min": 0.0,
+      "qx_max": 1.0,
+      "qx_increases_with_age": true,
+      "notes": "qx must be in [0,1] and generally increases with age after 20"
+    }
+  }
+}

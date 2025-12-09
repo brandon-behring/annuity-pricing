@@ -1,0 +1,343 @@
+{
+  "_meta": {
+    "source": "WINK competitive rate data (curated selection)",
+    "generated": "2025-12-09",
+    "tolerance_tier": "integration",
+    "selection_criteria": {
+      "approach": "Balanced mix: 10 core (median market) + 8 edge cases",
+      "myga": "Duration variety (3yr, 5yr, 7yr, 10yr) plus extremes",
+      "fia": "Crediting method variety (cap, participation, spread) plus extremes",
+      "rila": "Buffer levels (10%, 15%, 20%) plus floor and extremes"
+    },
+    "notes": "Products selected from current WINK data for golden regression testing"
+  },
+  "myga_3yr_median": {
+    "description": "MYGA 3-year at median market rate",
+    "category": "core",
+    "product_type": "MYGA",
+    "source": "WINK data - 'secure term mva fixed annuity ii 3-year'",
+    "parameters": {
+      "company_name": "new york life & annuity",
+      "product_name": "secure term mva fixed annuity ii 3-year",
+      "fixed_rate": 0.044,
+      "guarantee_duration": 3,
+      "premium": 100000
+    },
+    "expected": {
+      "present_value": 98295.49,
+      "annualized_return": 0.044,
+      "notes": "PV at 5% discount rate"
+    }
+  },
+  "myga_5yr_median": {
+    "description": "MYGA 5-year at median market rate",
+    "category": "core",
+    "product_type": "MYGA",
+    "source": "WINK data - 'f&g secure myga 5'",
+    "parameters": {
+      "company_name": "fidelity and guaranty life",
+      "product_name": "f&g secure myga 5",
+      "fixed_rate": 0.0455,
+      "guarantee_duration": 5,
+      "premium": 100000
+    },
+    "expected": {
+      "present_value": 97875.43,
+      "annualized_return": 0.0455,
+      "notes": "PV at 5% discount rate"
+    }
+  },
+  "myga_7yr_median": {
+    "description": "MYGA 7-year at median market rate",
+    "category": "core",
+    "product_type": "MYGA",
+    "source": "WINK data - 'protective smart saver 7-year'",
+    "parameters": {
+      "company_name": "protective ny",
+      "product_name": "protective smart saver 7-year",
+      "fixed_rate": 0.046,
+      "guarantee_duration": 7,
+      "premium": 100000
+    },
+    "expected": {
+      "present_value": 97363.62,
+      "annualized_return": 0.046,
+      "notes": "PV at 5% discount rate"
+    }
+  },
+  "myga_10yr_median": {
+    "description": "MYGA 10-year at median market rate",
+    "category": "core",
+    "product_type": "MYGA",
+    "source": "WINK data - 'focused growth annuity 10'",
+    "parameters": {
+      "company_name": "the standard",
+      "product_name": "focused growth annuity 10",
+      "fixed_rate": 0.0475,
+      "guarantee_duration": 10,
+      "premium": 100000
+    },
+    "expected": {
+      "present_value": 97644.4,
+      "annualized_return": 0.0475,
+      "notes": "PV at 5% discount rate"
+    }
+  },
+  "myga_edge_high_rate": {
+    "description": "MYGA edge case - highest market rate",
+    "category": "edge",
+    "product_type": "MYGA",
+    "source": "WINK data - atlantic coast 20-year",
+    "parameters": {
+      "company_name": "atlantic coast",
+      "product_name": "atlantic coast 20-year",
+      "fixed_rate": 0.0875,
+      "guarantee_duration": 20,
+      "premium": 100000
+    },
+    "expected": {
+      "present_value": 201743.4,
+      "annualized_return": 0.0875,
+      "notes": "High rate, long duration edge case"
+    }
+  },
+  "fia_cap_median": {
+    "description": "FIA Annual PTP with median cap rate",
+    "category": "core",
+    "product_type": "FIA",
+    "source": "WINK data - American General",
+    "parameters": {
+      "company_name": "american general",
+      "product_name": "fia annual ptp",
+      "cap_rate": 0.09,
+      "participation_rate": 1.0,
+      "floor_rate": 0.0,
+      "indexing_method": "Annual PTP",
+      "term_years": 1,
+      "market_params": {
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02
+      }
+    },
+    "expected": {
+      "option_value_pct": 3.71,
+      "fair_cap_at_3pct_budget": 0.087,
+      "notes": "Capped call spread value"
+    }
+  },
+  "fia_high_participation": {
+    "description": "FIA with high participation rate",
+    "category": "core",
+    "product_type": "FIA",
+    "source": "WINK data - high participation product",
+    "parameters": {
+      "company_name": "major carrier",
+      "product_name": "high participation fia",
+      "cap_rate": 0.5,
+      "participation_rate": 1.5,
+      "floor_rate": 0.0,
+      "indexing_method": "Annual PTP",
+      "term_years": 1,
+      "market_params": {
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02
+      }
+    },
+    "expected": {
+      "option_value_pct": 8.95,
+      "notes": "150% participation with high cap"
+    }
+  },
+  "fia_with_spread": {
+    "description": "FIA with spread crediting method",
+    "category": "core",
+    "product_type": "FIA",
+    "source": "WINK data - spread crediting product",
+    "parameters": {
+      "company_name": "spread carrier",
+      "product_name": "spread fia",
+      "cap_rate": 1.0,
+      "participation_rate": 1.0,
+      "spread_rate": 0.02,
+      "floor_rate": 0.0,
+      "indexing_method": "Annual PTP",
+      "term_years": 1,
+      "market_params": {
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02
+      }
+    },
+    "expected": {
+      "option_value_pct": 9.22,
+      "notes": "Full participation minus 2% spread"
+    }
+  },
+  "fia_edge_low_cap": {
+    "description": "FIA edge case - very low cap",
+    "category": "edge",
+    "product_type": "FIA",
+    "source": "WINK data - low cap product",
+    "parameters": {
+      "company_name": "conservative carrier",
+      "product_name": "low cap fia",
+      "cap_rate": 0.03,
+      "participation_rate": 1.0,
+      "floor_rate": 0.0,
+      "indexing_method": "Annual PTP",
+      "term_years": 1,
+      "market_params": {
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02
+      }
+    },
+    "expected": {
+      "option_value_pct": 1.4,
+      "notes": "Very conservative capped call"
+    }
+  },
+  "rila_buffer_10": {
+    "description": "RILA with 10% buffer",
+    "category": "core",
+    "product_type": "RILA",
+    "source": "WINK data - equitable 10% buffer",
+    "parameters": {
+      "company_name": "equitable financial life insurance company",
+      "product_name": "equitable rila 10% buffer",
+      "buffer_rate": 0.1,
+      "buffer_modifier": "Losses Covered Up To",
+      "cap_rate": 0.205,
+      "term_years": 1,
+      "market_params": {
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02
+      }
+    },
+    "expected": {
+      "buffer_cost_pct": 3.62,
+      "cap_cost_pct": 6.82,
+      "net_option_cost_pct": 4.51,
+      "notes": "Put spread for buffer, call spread for cap"
+    }
+  },
+  "rila_buffer_15": {
+    "description": "RILA with 15% buffer",
+    "category": "core",
+    "product_type": "RILA",
+    "source": "WINK data - lincoln 15% buffer",
+    "parameters": {
+      "company_name": "lincoln national",
+      "product_name": "lincoln rila 15% buffer",
+      "buffer_rate": 0.15,
+      "buffer_modifier": "Losses Covered Up To",
+      "cap_rate": 0.7,
+      "term_years": 1,
+      "market_params": {
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02
+      }
+    },
+    "expected": {
+      "buffer_cost_pct": 4.74,
+      "notes": "Deeper buffer, higher cap"
+    }
+  },
+  "rila_buffer_20": {
+    "description": "RILA with 20% buffer",
+    "category": "core",
+    "product_type": "RILA",
+    "source": "WINK data - equitable 20% buffer",
+    "parameters": {
+      "company_name": "equitable financial life insurance company of america",
+      "product_name": "equitable rila 20% buffer",
+      "buffer_rate": 0.2,
+      "buffer_modifier": "Losses Covered Up To",
+      "cap_rate": 0.35,
+      "term_years": 1,
+      "market_params": {
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02
+      }
+    },
+    "expected": {
+      "buffer_cost_pct": 5.49,
+      "notes": "Deep buffer protection"
+    }
+  },
+  "rila_floor_10": {
+    "description": "RILA with 10% floor (not buffer)",
+    "category": "core",
+    "product_type": "RILA",
+    "source": "WINK data - allianz floor product",
+    "parameters": {
+      "company_name": "allianz",
+      "product_name": "allianz rila 10% floor",
+      "buffer_rate": 0.1,
+      "buffer_modifier": "Losses Covered After",
+      "cap_rate": 0.215,
+      "term_years": 1,
+      "market_params": {
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02
+      }
+    },
+    "expected": {
+      "floor_cost_pct": 2.71,
+      "notes": "Floor limits max loss to 10%"
+    }
+  },
+  "rila_edge_deep_buffer": {
+    "description": "RILA edge case - very deep buffer",
+    "category": "edge",
+    "product_type": "RILA",
+    "source": "WINK data - deep buffer product",
+    "parameters": {
+      "company_name": "deep buffer carrier",
+      "product_name": "100% buffer rila",
+      "buffer_rate": 1.0,
+      "buffer_modifier": "Losses Covered Up To",
+      "cap_rate": 0.08,
+      "term_years": 1,
+      "market_params": {
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02
+      }
+    },
+    "expected": {
+      "buffer_cost_pct": 17.04,
+      "notes": "Full downside protection - requires special handling (OTM strike=0)",
+      "skip_reason": "100% buffer requires special pricing logic"
+    }
+  },
+  "rila_edge_shallow_buffer": {
+    "description": "RILA edge case - very shallow buffer",
+    "category": "edge",
+    "product_type": "RILA",
+    "source": "WINK data - shallow buffer product",
+    "parameters": {
+      "company_name": "shallow buffer carrier",
+      "product_name": "5% buffer rila",
+      "buffer_rate": 0.05,
+      "buffer_modifier": "Losses Covered Up To",
+      "cap_rate": 0.25,
+      "term_years": 1,
+      "market_params": {
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02
+      }
+    },
+    "expected": {
+      "buffer_cost_pct": 2.04,
+      "notes": "Minimal protection, higher cap"
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "_meta": {
+    "source": "Internal baseline calculations",
+    "generated": "2025-12-09",
+    "tolerance_tier": "integration",
+    "notes": "Baseline portfolio pricing for regression detection"
+  },
+  "myga_simple": {
+    "description": "Simple MYGA present value",
+    "parameters": {
+      "principal": 100000.0,
+      "guaranteed_rate": 0.04,
+      "term_years": 5,
+      "discount_rate": 0.05
+    },
+    "expected": {
+      "present_value": 95670.52,
+      "liability_duration": 5.0
+    }
+  },
+  "fia_capped_call": {
+    "description": "FIA with cap crediting",
+    "parameters": {
+      "notional": 100000.0,
+      "cap_rate": 0.08,
+      "floor_rate": 0.0,
+      "term_years": 1,
+      "volatility": 0.20,
+      "rate": 0.05,
+      "dividend": 0.02
+    },
+    "expected": {
+      "option_value_pct": 4.89,
+      "embedded_option_cost": 4890.0
+    }
+  },
+  "rila_buffer_10": {
+    "description": "RILA with 10% buffer",
+    "parameters": {
+      "notional": 100000.0,
+      "buffer_rate": 0.10,
+      "cap_rate": 0.15,
+      "term_years": 1,
+      "volatility": 0.20,
+      "rate": 0.05,
+      "dividend": 0.02
+    },
+    "expected": {
+      "buffer_cost_pct": 2.31,
+      "cap_cost_pct": 3.85
+    }
+  },
+  "mixed_portfolio_3_products": {
+    "description": "Portfolio of 3 products",
+    "parameters": {
+      "products": [
+        {"type": "MYGA", "principal": 50000, "rate": 0.035, "term": 3},
+        {"type": "FIA", "notional": 30000, "cap": 0.07},
+        {"type": "RILA", "notional": 20000, "buffer": 0.10}
+      ],
+      "discount_rate": 0.05
+    },
+    "expected": {
+      "total_present_value": 98500.0,
+      "aggregate_duration": 2.8
+    }
+  }
+}
