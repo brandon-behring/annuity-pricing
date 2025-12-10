@@ -20,13 +20,9 @@ Phase 0 → ... → Phase 10 → Phase 11 → Phase 12 (A-I)
    ✅              ✅          ✅          ✅
 ```
 
-**Status**: All phases complete. **1686 tests** (5 skipped).
+**Status**: All phases complete. **2470+ tests** (6 skipped).
 
-**Test Distribution**:
-- unit: 1288
-- integration: 101
-- anti_patterns: 99
-- validation: 198
+**Coverage**: 85%+ (see Test Summary section below for details)
 
 ---
 
@@ -228,19 +224,22 @@ Phase 0 → ... → Phase 10 → Phase 11 → Phase 12 (A-I)
 ## Test Summary
 
 ```
-tests/unit/                1288 tests - All modules (incl. stress_testing, behavioral, glwb, regulatory, loaders)
-tests/integration/          101 tests - End-to-end pricing pipeline + registry + gates
-tests/anti_patterns/         99 tests - Put-call parity, buffer/floor, spread_rate HALT, no-arbitrage sweeps
-tests/validation/           198 tests - BS known-answer, MC convergence, Heston/SABR vs QuantLib, FIA/RILA oracles
-─────────────────────────────────────
-Total:                     1686 tests (5 skipped)
+Total: 2470+ tests (6 skipped), 85%+ coverage
+
+Test categories:
+- tests/unit/           Standard unit tests
+- tests/integration/    End-to-end pipeline tests
+- tests/anti_patterns/  Bug prevention tests (critical)
+- tests/validation/     External verification (Hull, cross-library)
+- tests/golden/         Regression tests
+- tests/properties/     Property-based tests
 ```
 
-**Recent Additions:**
-- Deep Skeptical Audit (2025-12-09): 73 new tests (FIA/RILA external oracles, spread HALT, Asian cap benchmarks)
+**Major Test Additions (2025-12):**
+- E2E Testing Remediation (P0-P3): ~900 new tests
+- Deep Skeptical Audit: 73 new tests (FIA/RILA oracles, spread HALT, Asian cap)
 - Phase 12 (Stress Testing): 272 new tests
 - Phase H (SOA Behavior Calibration): 175 new tests
-- Phase F (Code Quality): 24 new tests
 
 ---
 

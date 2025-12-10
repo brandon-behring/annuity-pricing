@@ -64,8 +64,8 @@ myga = MYGAProduct(
     company_name="Example Life",
     product_name="5-Year MYGA",
     product_group="MYGA",
-    guaranteed_rate=0.045,  # 4.5% guaranteed
-    term_years=5,
+    fixed_rate=0.045,  # 4.5% guaranteed
+    guarantee_duration=5,
 )
 
 # Price it
@@ -73,7 +73,9 @@ pricer = MYGAPricer(discount_rate=0.05)  # 5% discount rate
 result = pricer.price(myga, premium=100_000)
 
 print(f"Present Value: ${result.present_value:,.0f}")
-print(f"Spread to Insurer: {result.spread:.2%}")
+# Spread is the difference between earned rate and discount rate
+spread = result.details["fixed_rate"] - result.details["discount_rate"]
+print(f"Spread to Insurer: {spread:.2%}")
 ```
 
 ### FIA: Indexed Annuity with Cap

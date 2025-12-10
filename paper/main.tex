@@ -34,7 +34,7 @@
 
 \author{%
   Brandon Behring \\
-  \texttt{https://github.com/brandonmbehring-dev/annuity-pricing}
+  \texttt{https://github.com/bbehring/annuity-pricing}
 }
 
 \date{\today}
@@ -99,14 +99,14 @@ Existing tools for annuity pricing rely on proprietary actuarial software (Willi
 
 \subsection{Contributions}
 
-This paper introduces \texttt{annuity-pricing} (v0.2.0), a production-ready Python library addressing these requirements:
+This paper introduces \texttt{annuity-pricing} (v0.2.0), a research-grade Python library addressing these requirements:
 
 \begin{itemize}
   \item \textbf{Pricing engine}: Black-Scholes and Monte Carlo for European and path-dependent payoffs, validated against financepy and pyfeng
   \item \textbf{Product modules}: FIA, RILA (buffer/floor variants), GLWB with full payoff mechanics
   \item \textbf{Behavioral models}: Dynamic lapse, withdrawal rates, mortality (SOA 2012 IAM), integrated into path simulation
   \item \textbf{Regulatory prototypes}: VM-21 CTE$_{70}$ scenario generation, VM-22 reserve methodology (labeled as prototypes pending full NAIC scenario compliance)
-  \item \textbf{Open-source infrastructure}: 1608 unit tests (5 skipped), CI/CD, PyPI distribution, Sphinx documentation, reproducible artifacts
+  \item \textbf{Open-source infrastructure}: 2470+ unit tests (6 skipped), CI/CD, PyPI distribution, Sphinx documentation, reproducible artifacts
 \end{itemize}
 
 \subsection{Scope and Limitations}
@@ -468,7 +468,7 @@ Figure~\ref{fig:vm21_cte} illustrates how reserved amount (CTE$_{70}$) changes w
 The library is specified via \texttt{pyproject.toml} (v0.2.0) with:
 \begin{itemize}
   \item Python 3.10--3.13
-  \item Core dependencies: numpy, scipy, pandas, scikit-learn
+  \item Core dependencies: numpy, scipy, pandas, pyarrow
   \item Optional extras: \texttt{[validation]} for financepy, QuantLib, pyfeng; \texttt{[viz]} for matplotlib, seaborn
   \item Development: pytest, mypy, ruff for testing and linting
 \end{itemize}
@@ -566,7 +566,7 @@ These extensions are in active development.
 The \texttt{annuity-pricing} library is openly available under the MIT License:
 
 \begin{itemize}
-  \item \textbf{GitHub}: \url{https://github.com/brandonmbehring-dev/annuity-pricing}
+  \item \textbf{GitHub}: \url{https://github.com/bbehring/annuity-pricing}
   \item \textbf{PyPI}: \url{https://pypi.org/project/annuity-pricing/} (v0.2.0)
   \item \textbf{Documentation}: \url{https://annuity-pricing.readthedocs.io} (Sphinx + Furo theme)
   \item \textbf{Zenodo archive} (to be assigned DOI upon publication)
@@ -579,13 +579,13 @@ pip install annuity-pricing
 
 For development and validation:
 \begin{lstlisting}
-git clone https://github.com/brandonmbehring-dev/annuity-pricing
+git clone https://github.com/bbehring/annuity-pricing
 cd annuity-pricing
 pip install -e ".[validation,viz]"
 pytest tests/
 \end{lstlisting}
 
-The library includes 1608 unit tests spanning core infrastructure, cross-validation, stress testing, and regulatory prototypes, with continuous integration via GitHub Actions.
+The library includes 2470+ unit tests spanning core infrastructure, cross-validation, stress testing, and regulatory prototypes, with continuous integration via GitHub Actions.
 
 % ============================================================================
 % Bibliography

@@ -125,8 +125,6 @@ filterwarnings = [
     "error",
     "ignore::DeprecationWarning",
     "ignore::PendingDeprecationWarning",
-    # Breakeven not yet implemented - expected until methodology defined (Step 1.4)
-    "ignore:Breakeven calculation not yet implemented:UserWarning",
 ]
 markers = [
     "anti_pattern: Bug prevention tests (MUST pass before commit)",

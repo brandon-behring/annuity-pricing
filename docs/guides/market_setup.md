@@ -1,7 +1,8 @@
 # Market Setup
 
-```{todo}
-This guide is under development.
+```{note}
+This guide is under active development. Core functionality is implemented and tested.
+See the [API Reference](../api/loaders.md) for current capabilities.
 ```
 
 ## Overview

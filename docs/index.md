@@ -30,7 +30,7 @@ A research-focused Python library for pricing and analyzing annuity products:
 | **Cross-Validated** | Verified against financepy, QuantLib, and Hull textbook examples |
 | **Regulatory Prototypes** | VM-21/VM-22 reserve calculations (beta) |
 | **Behavioral Models** | Dynamic lapse, withdrawal efficiency, expense loading |
-| **Production-Ready** | Type hints, frozen dataclasses, 998 tests (993 passing, 5 skipped) |
+| **Research-Grade** | Type hints, frozen dataclasses, 2470+ tests (6 skipped) |
 
 ---
 

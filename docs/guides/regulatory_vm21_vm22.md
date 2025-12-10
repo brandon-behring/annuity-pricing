@@ -1,7 +1,8 @@
 # Regulatory: VM-21 and VM-22
 
-```{todo}
-This guide is under development. VM-21/VM-22 implementations are beta.
+```{warning}
+VM-21/VM-22 implementations are **prototypes** pending full NAIC scenario compliance.
+See the [API Reference](../api/regulatory.md) for current capabilities.
 ```
 
 ## Overview

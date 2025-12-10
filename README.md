@@ -69,24 +69,26 @@ registry = create_default_registry(
 
 # Price a MYGA product
 myga = MYGAProduct(
-    company="Example Life",
+    company_name="Example Life",
     product_name="5-Year MYGA",
+    product_group="MYGA",
     guarantee_duration=5,
-    guaranteed_rate=0.045
+    fixed_rate=0.045  # 4.5% guaranteed
 )
 result = registry.price(myga, premium=100_000)
 print(f"Present Value: ${result.present_value:,.2f}")
 
 # Price an FIA product
 fia = FIAProduct(
-    company="Example Life",
+    company_name="Example Life",
     product_name="S&P 500 Cap",
-    guarantee_duration=6,
-    index_name="S&P 500",
-    crediting_method="annual_point_to_point",
-    cap_rate=0.10
+    product_group="FIA",
+    index_used="S&P 500",
+    indexing_method="Annual Point to Point",
+    cap_rate=0.10,
+    term_years=6
 )
-result = registry.price(fia, premium=100_000)
+result = registry.price(fia, market_params=market, premium=100_000)
 print(f"Expected Credit: {result.expected_credit:.2%}")
 ```
 

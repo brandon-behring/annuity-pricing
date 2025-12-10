@@ -1,7 +1,8 @@
 # Pricing MYGA Products
 
-```{todo}
-This guide is under development.
+```{note}
+This guide is under active development. Core functionality is implemented and tested.
+See the [API Reference](../api/products.md) for current capabilities.
 ```
 
 ## Overview
@@ -29,8 +30,8 @@ myga = MYGAProduct(
     company_name="Example Life",
     product_name="5-Year MYGA",
     product_group="MYGA",
-    guaranteed_rate=0.045,
-    term_years=5,
+    fixed_rate=0.045,  # 4.5% guaranteed
+    guarantee_duration=5,
 )
 
 pricer = MYGAPricer(discount_rate=0.05)

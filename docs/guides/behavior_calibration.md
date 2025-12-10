@@ -1,7 +1,8 @@
 # Behavior Calibration
 
-```{todo}
-This guide is under development.
+```{note}
+This guide is under active development. Core functionality is implemented and tested.
+See the [API Reference](../api/behavioral.md) for current capabilities.
 ```
 
 ## Overview

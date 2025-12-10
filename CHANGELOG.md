@@ -10,44 +10,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial project structure with context engineering setup
-- WINK data dictionary (62 columns) in `wink-research-archive/`
-- 10 L3 reference summaries in `docs/knowledge/references/`:
-  - Black-Scholes 1973 (original formula)
-  - Boyle & Tian 2008 (EIA investor perspective)
-  - Bauer, Kling & Russ 2008 (universal GMxB)
-  - Hardy 2003 (investment guarantees, EIA crediting, RSLN model)
-  - Hull 2021 (BS-Merton, Greeks)
-  - NAIC Model 805 (nonforfeiture law)
-  - NAIC Model 806 (regulation, EIA option cost test)
-  - FINRA 22-08 (complex products guidance)
-  - SEC RILA 2023 (investor testing report)
-- Helper scripts:
-  - `scripts/validate.sh` - Tests + type check + lint
-  - `scripts/setup_check.py` - Environment verification
-  - `scripts/fetch_market_data.py` - FRED/Yahoo data fetch
-  - `scripts/run_notebooks.sh` - Notebook execution
-- Validation notebook scaffolds in `notebooks/validation/`
-- Domain knowledge documents in `docs/knowledge/domain/`
-- CLAUDE.md with troubleshooting section
+- E2E Testing Remediation (P0-P3): ~900 new tests
+- Oracle fallback for cross-library validation
+- Coverage gating (75% threshold)
+- Deep Skeptical Audit tests
+
+---
+
+## [0.2.0] - 2025-12-06
+
+### Added
+
+- **Technical Hardening**
+  - Wired mortality tables into GLWB via `MortalityLoader`
+  - Integrated behavioral models into `path_sim.py`
+  - Risk-neutral drift with `RiskNeutralEquityParams`
+  - RILA breakeven solver with `brentq`
+  - RILA Greeks (`RILAGreeks` dataclass)
+
+- **Stress Testing Framework** (Phase 12)
+  - Historical scenario replay (2008 crisis, COVID-19)
+  - Sensitivity analysis (Greeks-based)
+  - Reverse stress testing
+  - 272 stress testing tests
+
+- **Stochastic Volatility** (Phase 11)
+  - Heston model with COS method
+  - SABR model for vol smile
+  - Cross-validation vs QuantLib/pyfeng
+
+- **PyPI Publishability**
+  - `py.typed` marker for PEP 561
+  - `CITATION.cff` for academic citations
+  - GitHub Actions CI/CD workflows
+  - Comprehensive pyproject.toml metadata
+
+- **Validation**
+  - Adapter tests for financepy, QuantLib, pyfeng
+  - Validation notebooks executed with outputs
+  - CROSS_VALIDATION_MATRIX.md with tolerances
+
+- **Documentation**
+  - Sphinx documentation with Furo theme
+  - MyST-NB for notebook integration
+  - API autodoc for all modules
+  - ArXiv paper submission
 
 ### Changed
-- N/A (initial release)
+
+- Bumped version from 0.1.0 to 0.2.0
+- Test count increased from 911 to 2470+
+- Coverage increased to 85%+
 
 ### Fixed
-- N/A (initial release)
+
+- FIA/RILA PV formula now correctly discounts full payoff
+- Greeks vega/theta scaling conventions documented
+- 100% buffer edge case (maps to ATM put)
 
 ---
 
 ## [0.1.0] - 2025-12-05
 
 ### Added
-- Initial project setup
+
+- Initial release with Phases 0-10 complete
+- MYGA, FIA, RILA, GLWB pricers
+- Black-Scholes and Monte Carlo engines
+- VM-21/VM-22 regulatory prototypes
+- Behavioral models (lapse, withdrawal, expenses)
+- Yield curve and mortality loaders
 - CONSTITUTION.md with frozen methodology
 - ROADMAP.md with implementation phases
-- pyproject.toml with dependencies
-- Source structure under `src/annuity_pricing/`
-- Test structure under `tests/`
+- 911 passing tests
 
 ---
 
@@ -55,6 +90,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Description |
 |---------|------|-------------|
+| 0.2.0 | 2025-12-06 | Technical hardening, PyPI release, Sphinx docs |
 | 0.1.0 | 2025-12-05 | Initial project setup and context engineering |
 
 ---
@@ -64,14 +100,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Major** (X.0.0): Breaking API changes, methodology changes
 - **Minor** (0.X.0): New features, new products, new pricers
 - **Patch** (0.0.X): Bug fixes, documentation updates
-
----
-
-## Notes for Maintainers
-
-When making changes:
-
-1. **Add entry to [Unreleased]** section immediately
-2. **Group by type**: Added, Changed, Deprecated, Removed, Fixed, Security
-3. **Include references** to issues/PRs where applicable
-4. **On release**: Move [Unreleased] items to versioned section, update dates
