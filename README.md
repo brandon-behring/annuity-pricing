@@ -98,6 +98,21 @@ result = registry.price(fia, term_years=6, premium=100_000)
 print(f"Expected Credit: {result.expected_credit:.2%}")
 ```
 
+## Common Pricing Mistakes
+
+This library includes anti-pattern tests that catch common implementation errors.
+If you're implementing similar logic, watch out for these:
+
+| Mistake | Example | Why Bad | Fix |
+|---------|---------|---------|-----|
+| **Option > underlying** | `call_price > spot` | No-arbitrage violation [T1] | Check d1/d2 time scaling |
+| **Negative FIA credit** | `-0.05` when floor is 0% | FIA floor enforcement broken | Use `max(credit, 0)` |
+| **Buffer absorbs gains** | Positive index, negative payoff | Buffer mechanics inverted | Buffer absorbs LOSSES only |
+| **Put-call parity fails** | `C - P ≠ S - Ke^(-rT)` | BS implementation error | Verify d1/d2 formulas |
+| **Wrong drift** | Using μ instead of r-q | Physical vs risk-neutral measure | Use r - q for Q-measure |
+
+**Automated detection**: Run `pytest tests/anti_patterns/ -v` to verify these constraints.
+
 ## Testing
 
 ```bash

@@ -138,9 +138,28 @@ def black_scholes_call(
 
     Examples
     --------
+    Hull Example 15.6 (S=42, K=40, r=10%, σ=20%, T=0.5):
+
+    >>> price = black_scholes_call(42, 40, 0.10, 0.0, 0.20, 0.5)
+    >>> round(price, 2)
+    4.76
+
+    ATM call with dividends:
+
     >>> price = black_scholes_call(100, 100, 0.05, 0.02, 0.20, 1.0)
     >>> round(price, 2)
     9.93
+
+    See Also
+    --------
+    black_scholes_put : Price European put option
+    black_scholes_greeks : Calculate full Greeks
+    verify_put_call_parity : Verify put-call parity
+
+    References
+    ----------
+    [T1] Black, F., & Scholes, M. (1973). The Pricing of Options...
+    [T1] Hull, J. C. (2018). Options, Futures... Example 15.6
     """
     _validate_inputs(spot, strike, rate, volatility, time_to_expiry)
 
@@ -192,9 +211,28 @@ def black_scholes_put(
 
     Examples
     --------
+    Hull Example 15.6 (S=42, K=40, r=10%, σ=20%, T=0.5):
+
+    >>> price = black_scholes_put(42, 40, 0.10, 0.0, 0.20, 0.5)
+    >>> round(price, 2)
+    0.81
+
+    ATM put with dividends:
+
     >>> price = black_scholes_put(100, 100, 0.05, 0.02, 0.20, 1.0)
     >>> round(price, 2)
     7.00
+
+    See Also
+    --------
+    black_scholes_call : Price European call option
+    black_scholes_greeks : Calculate full Greeks
+    verify_put_call_parity : Verify put-call parity
+
+    References
+    ----------
+    [T1] Black, F., & Scholes, M. (1973). The Pricing of Options...
+    [T1] Hull, J. C. (2018). Options, Futures... Example 15.6
     """
     _validate_inputs(spot, strike, rate, volatility, time_to_expiry)
 

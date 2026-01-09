@@ -31,6 +31,8 @@ extensions = [
     "myst_nb",
     # Extras
     "sphinx_copybutton",
+    "sphinxcontrib.mermaid",  # Flowcharts
+    "sphinx_design",           # Cards, grids, tabs
 ]
 
 # MyST configuration

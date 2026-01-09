@@ -94,6 +94,8 @@ docs = [
     "myst-nb>=1.0",
     "sphinx-autodoc-typehints>=2.0",
     "sphinx-copybutton>=0.5",
+    "sphinxcontrib-mermaid>=0.9",   # Flowcharts
+    "sphinx-design>=0.5",            # Cards, grids, tabs
 ]
 all = [
     "annuity-pricing[dev,viz,vol,validation,actuarial,docs]",

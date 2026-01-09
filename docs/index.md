@@ -114,6 +114,8 @@ guides/behavior_calibration
 :maxdepth: 2
 :caption: Validation
 
+testing_strategy
+validation/validation_evidence
 validation/cross_validation
 validation/golden_cases
 ```
@@ -132,8 +134,16 @@ api/regulatory
 
 ```{toctree}
 :maxdepth: 1
+:caption: Model Cards
+
+model_cards/index
+```
+
+```{toctree}
+:maxdepth: 1
 :caption: Reference
 
+glossary
 reference/changelog
 reference/contributing
 ```
