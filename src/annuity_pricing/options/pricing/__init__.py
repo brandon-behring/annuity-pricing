@@ -9,7 +9,7 @@ Provides:
   - FFT (experimental): ~22% bias
 - SABR implied volatility
 
-See: CONSTITUTION.md Section 3.1
+See: METHODOLOGY.md Section 3.1
 """
 
 from annuity_pricing.options.pricing.black_scholes import (

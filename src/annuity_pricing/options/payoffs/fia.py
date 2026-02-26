@@ -7,7 +7,7 @@ Implements payoffs for FIA crediting methods:
 - Spread: Index return minus spread/margin
 - Trigger: Performance triggered bonus
 
-See: CONSTITUTION.md Section 3.2
+See: METHODOLOGY.md Section 3.2
 See: docs/knowledge/domain/crediting_methods.md
 
 [T1] All FIA payoffs have 0% floor (principal protection).

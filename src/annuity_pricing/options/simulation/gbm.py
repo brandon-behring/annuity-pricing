@@ -8,7 +8,7 @@ Implements efficient path simulation for Monte Carlo pricing:
 
 [T1] GBM SDE: dS = (r - q)S dt + σS dW
 
-See: CONSTITUTION.md Section 4
+See: METHODOLOGY.md Section 4
 See: docs/knowledge/domain/option_pricing.md
 See: Glasserman (2003) "Monte Carlo Methods in Financial Engineering"
 """

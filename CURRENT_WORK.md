@@ -95,6 +95,6 @@ Test categories:
 | Document | Purpose |
 |----------|---------|
 | [ROADMAP.md](ROADMAP.md) | Progress tracking |
-| [CONSTITUTION.md](CONSTITUTION.md) | Frozen methodology |
+| [METHODOLOGY.md](METHODOLOGY.md) | Frozen methodology |
 | [docs/TOLERANCE_JUSTIFICATION.md](docs/TOLERANCE_JUSTIFICATION.md) | Test tolerance tiers |
 | [tests/conftest.py](tests/conftest.py) | Shared fixtures + oracle fallback |

@@ -6,7 +6,7 @@ C - P = S*e^(-qT) - K*e^(-rT)
 
 HALT if parity violated by more than tolerance.
 
-See: CONSTITUTION.md Section 2.1
+See: METHODOLOGY.md Section 2.1
 See: docs/knowledge/domain/option_pricing.md
 """
 

@@ -1,6 +1,6 @@
 [project]
 name = "annuity-pricing"
-version = "0.2.0"
+version = "1.0.0"
 description = "Actuarial pricing for MYGA, FIA, and RILA annuity products with GLWB guarantees"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -27,7 +27,7 @@ keywords = [
 ]
 
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Financial and Insurance Industry",
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
@@ -54,11 +54,11 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/bbehring/annuity-pricing"
-Repository = "https://github.com/bbehring/annuity-pricing"
+Homepage = "https://github.com/brandonmbehring-dev/annuity-pricing"
+Repository = "https://github.com/brandonmbehring-dev/annuity-pricing"
 Documentation = "https://annuity-pricing.readthedocs.io"
-Issues = "https://github.com/bbehring/annuity-pricing/issues"
-Changelog = "https://github.com/bbehring/annuity-pricing/blob/main/CHANGELOG.md"
+Issues = "https://github.com/brandonmbehring-dev/annuity-pricing/issues"
+Changelog = "https://github.com/brandonmbehring-dev/annuity-pricing/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
@@ -139,22 +139,6 @@ module = [
     "pyarrow.*",
 ]
 ignore_missing_imports = true
-ignore_errors = true
-
-# Relaxed checking for prototype modules (regulatory, stress testing, GLWB)
-[[tool.mypy.overrides]]
-module = [
-    "annuity_pricing.regulatory.*",
-    "annuity_pricing.stress_testing.*",
-    "annuity_pricing.glwb.*",
-    "annuity_pricing.options.simulation.*",
-    "annuity_pricing.options.pricing.heston",
-    "annuity_pricing.options.pricing.heston_cos",
-    "annuity_pricing.behavioral.calibration",
-    "annuity_pricing.rate_setting.recommender",
-    "annuity_pricing.loaders.*",
-]
-ignore_errors = true
 
 [tool.ruff]
 line-length = 100

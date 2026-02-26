@@ -34,7 +34,7 @@ from annuity_pricing.behavioral.soa_benchmarks import (
 
 def _linear_interpolate(
     x: float,
-    x_points: dict[int, float],
+    x_points: dict[int, float] | dict[float, float],  # type: ignore[type-arg]
     extrapolate: bool = True,
 ) -> float:
     """
@@ -56,7 +56,7 @@ def _linear_interpolate(
     """
     # Sort keys for proper interpolation
     keys = sorted(x_points.keys())
-    values = [x_points[k] for k in keys]
+    values = [x_points[k] for k in keys]  # type: ignore[index]
 
     # Handle boundary cases
     if x <= keys[0]:

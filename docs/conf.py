@@ -12,8 +12,8 @@ sys.path.insert(0, os.path.abspath("../src"))
 project = "annuity-pricing"
 author = "Brandon Behring"
 copyright = f"{datetime.now().year}, {author}"
-release = "0.2.0"
-version = "0.2"
+release = "1.0.0"
+version = "1.0"
 
 # -- General configuration ---------------------------------------------------
 extensions = [
@@ -107,6 +107,7 @@ napoleon_preprocess_types = True
 html_theme = "furo"
 html_title = "annuity-pricing"
 html_static_path = ["_static"]
+html_logo = "_static/logo.svg"
 
 # Furo theme options
 html_theme_options = {
@@ -121,7 +122,7 @@ html_theme_options = {
     "sidebar_hide_name": False,
     "navigation_with_keys": True,
     "top_of_page_button": "edit",
-    "source_repository": "https://github.com/bbehring/annuity-pricing",
+    "source_repository": "https://github.com/brandonmbehring-dev/annuity-pricing",
     "source_branch": "main",
     "source_directory": "docs/",
 }

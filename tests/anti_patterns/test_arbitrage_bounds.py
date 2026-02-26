@@ -4,7 +4,7 @@ Anti-pattern test: No-arbitrage bounds for option pricing.
 [T1] Options must satisfy no-arbitrage bounds.
 HALT if any violation is detected.
 
-See: CONSTITUTION.md Section 2.2
+See: METHODOLOGY.md Section 2.2
 """
 
 import numpy as np

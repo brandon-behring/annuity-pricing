@@ -6,7 +6,7 @@ This is NOT the same as a floor.
 
 HALT if buffer/floor are confused or implemented incorrectly.
 
-See: CONSTITUTION.md Section 1.3
+See: METHODOLOGY.md Section 1.3
 See: docs/knowledge/domain/buffer_floor.md
 """
 

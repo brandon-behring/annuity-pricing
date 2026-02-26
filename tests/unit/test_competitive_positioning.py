@@ -2,7 +2,7 @@
 Unit tests for competitive positioning module.
 
 Tests PositioningAnalyzer: analyze_position(), get_distribution_stats(), etc.
-See: CONSTITUTION.md Section 5
+See: METHODOLOGY.md Section 5
 """
 
 import numpy as np

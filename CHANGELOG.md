@@ -9,11 +9,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [1.0.0] - 2026-02-26
+
 ### Added
-- E2E Testing Remediation (P0-P3): ~900 new tests
-- Oracle fallback for cross-library validation
-- Coverage gating (75% threshold)
-- Deep Skeptical Audit tests
+
+- **OSS Professionalization**
+  - `CODE_OF_CONDUCT.md` (Contributor Covenant v2.1)
+  - `.github/CODEOWNERS` file
+  - Public API stability policy in CONTRIBUTING.md
+  - Regulatory disclaimer in README (VM-21/VM-22 are prototypes)
+  - WINK data licensing note (proprietary data not included)
+  - SVG logo and updated README branding
+  - Model cards for all 4 pricers (MYGA, FIA, RILA, GLWB)
+
+- **Testing & Quality**
+  - E2E Testing Remediation (P0-P3): ~900 new tests
+  - Oracle fallback for cross-library validation
+  - Coverage gating (75% threshold)
+  - Deep Skeptical Audit tests
+  - 2,696 passing tests across 9 categories, 85%+ coverage
+
+- **Type Safety**
+  - Full mypy strictness: zero `ignore_errors` modules
+  - Type annotations for all regulatory, stress testing, GLWB, Heston modules
+
+### Changed
+
+- **Version**: 0.2.0 -> 1.0.0 (Production/Stable)
+- **PyPI classifier**: "Development Status :: 5 - Production/Stable"
+- Renamed `CONSTITUTION.md` -> `METHODOLOGY.md` (updated 59 file references)
+- Consolidated all GitHub URLs to `brandonmbehring-dev/annuity-pricing`
+- Updated CONTRIBUTING.md: "Black" -> "Ruff" formatting
+- ArXiv paper updated: test counts, version references, URLs
+- Zenodo metadata updated: test counts, version, URLs
+
+### Fixed
+
+- Fixed mypy type errors in 11 source files (33 errors resolved)
+- Fixed stale test count in paper/zenodo.json (1011 -> 2471+)
+- Fixed URL inconsistency (bbehring -> brandonmbehring-dev) across 15 files
 
 ---
 
@@ -80,7 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - VM-21/VM-22 regulatory prototypes
 - Behavioral models (lapse, withdrawal, expenses)
 - Yield curve and mortality loaders
-- CONSTITUTION.md with frozen methodology
+- METHODOLOGY.md with frozen methodology
 - ROADMAP.md with implementation phases
 - 911 passing tests
 
@@ -90,6 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Description |
 |---------|------|-------------|
+| 1.0.0 | 2026-02-26 | OSS professionalization, full mypy strictness, 1.0 release |
 | 0.2.0 | 2025-12-06 | Technical hardening, PyPI release, Sphinx docs |
 | 0.1.0 | 2025-12-05 | Initial project setup and context engineering |
 

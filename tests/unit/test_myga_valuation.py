@@ -2,7 +2,7 @@
 Unit tests for MYGA valuation module.
 
 Tests myga_pv.py: PV, duration, convexity, sensitivity analysis.
-See: CONSTITUTION.md Section 4.1
+See: METHODOLOGY.md Section 4.1
 """
 
 

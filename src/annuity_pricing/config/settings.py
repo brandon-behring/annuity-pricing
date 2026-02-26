@@ -2,7 +2,7 @@
 Frozen configuration settings for actuarial pricing.
 
 All configuration is immutable (frozen dataclasses) to ensure reproducibility.
-See: CONSTITUTION.md for methodology specifications.
+See: METHODOLOGY.md for methodology specifications.
 See: docs/TOLERANCE_JUSTIFICATION.md for tolerance derivations.
 """
 

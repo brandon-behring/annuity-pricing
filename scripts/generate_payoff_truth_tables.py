@@ -13,7 +13,7 @@ Coverage:
 - Comparisons: Buffer vs Floor at same returns (15 rows)
 
 All expected values computed using Python implementation and marked with
-[T1] tier references from CONSTITUTION.md.
+[T1] tier references from METHODOLOGY.md.
 """
 
 import csv

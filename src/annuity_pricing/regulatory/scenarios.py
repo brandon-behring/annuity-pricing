@@ -556,8 +556,8 @@ class ScenarioGenerator:
         n_scenarios, n_years = shocks.shape
         rates = np.zeros((n_scenarios, n_years))
 
-        # Initialize with first step
-        r_prev = initial_rate
+        # Initialize with first step (broadcast scalar to array for vectorized loop)
+        r_prev: np.ndarray = np.full(n_scenarios, initial_rate)
         for t in range(n_years):
             # Vasicek: r_{t+1} = r_t + κ(θ - r_t)*dt + σ*sqrt(dt)*Z
             # With dt = 1 year:

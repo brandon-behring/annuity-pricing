@@ -2,7 +2,7 @@
 Unit tests for rate recommender.
 
 Tests rate_setting/recommender.py
-See: CONSTITUTION.md Section 5
+See: METHODOLOGY.md Section 5
 """
 
 import numpy as np

@@ -215,7 +215,7 @@ class GLWBPricer(BasePricer):
     def competitive_position(
         self,
         product: GLWBProduct,
-        market_data: "pd.DataFrame",  # type: ignore  # noqa: F821
+        market_data: "pd.DataFrame",  # type: ignore[name-defined]  # noqa: F821
         **kwargs: object,
     ) -> NoReturn:
         """

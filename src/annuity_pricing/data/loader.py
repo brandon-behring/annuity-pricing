@@ -2,7 +2,7 @@
 WINK data loader with checksum verification and SyntheticProvider.
 
 NEVER fails silently - all errors are explicit. [T1: Defensive Programming]
-See: CONSTITUTION.md Section 6.3
+See: METHODOLOGY.md Section 6.3
 
 SyntheticProvider (Phase 0 of Julia port plan):
 - Library default: ERROR if WINK path not configured (never fail silently)

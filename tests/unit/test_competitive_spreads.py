@@ -2,7 +2,7 @@
 Unit tests for competitive spreads module.
 
 Tests SpreadAnalyzer: calculate_spread(), get_spread_distribution(), etc.
-See: CONSTITUTION.md Section 5
+See: METHODOLOGY.md Section 5
 """
 
 from datetime import date

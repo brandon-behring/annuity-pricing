@@ -8,7 +8,7 @@ Implements Monte Carlo simulation for option pricing:
 
 [T1] MC converges to analytical price at rate 1/√N
 
-See: CONSTITUTION.md Section 4
+See: METHODOLOGY.md Section 4
 See: docs/knowledge/domain/option_pricing.md
 See: Glasserman (2003) "Monte Carlo Methods in Financial Engineering"
 """
@@ -337,8 +337,9 @@ class MonteCarloEngine:
         for i in range(self.n_paths):
             # Create IndexPath from Heston path
             index_path = IndexPath(
-                times=path_result.times,
-                values=path_result.spot_paths[i, :],
+                times=tuple(path_result.times.tolist()),
+                values=tuple(path_result.spot_paths[i, :].tolist()),
+                initial_value=path_result.spot,
             )
             result = payoff.calculate_from_path(index_path)
             # Convert credited return to dollar payoff
@@ -611,7 +612,7 @@ def convergence_analysis(
     params: GBMParams,
     strike: float,
     analytical_price: float,
-    path_counts: list[int] = None,
+    path_counts: list[int] | None = None,
     seed: int = 42,
 ) -> dict:
     """

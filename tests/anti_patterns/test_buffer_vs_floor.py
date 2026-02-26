@@ -12,7 +12,7 @@ Floor:  Minimum credited rate (always ≥ 0%). Client NOT exposed to any loss.
 
 HALT if these mechanisms are confused or implemented incorrectly.
 
-See: CONSTITUTION.md Section 1.2 (FIA), Section 1.3 (RILA)
+See: METHODOLOGY.md Section 1.2 (FIA), Section 1.3 (RILA)
 See: docs/knowledge/domain/buffer_floor.md
 """
 

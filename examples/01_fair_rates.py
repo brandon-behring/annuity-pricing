@@ -18,7 +18,7 @@ Usage:
 
 See Also:
     - docs/guides/pricing_fia.md
-    - CONSTITUTION.md Section 3.1 (FIA Cap Replication)
+    - METHODOLOGY.md Section 3.1 (FIA Cap Replication)
 """
 
 import argparse

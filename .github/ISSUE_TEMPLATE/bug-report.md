@@ -28,7 +28,7 @@ Describe what actually happened. Include error messages if applicable.
 
 ## Additional Context
 
-- [ ] I have verified this is not a known limitation (see CONSTITUTION.md)
+- [ ] I have verified this is not a known limitation (see METHODOLOGY.md)
 - [ ] I have checked that anti-pattern tests pass (`pytest tests/anti_patterns/ -v`)
 
 Any other relevant information (screenshots, logs, related issues, etc.)

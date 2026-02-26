@@ -24,6 +24,7 @@ Validation: tests/validation/test_heston_vs_quantlib.py (8/8 tests passed, <1% M
 """
 
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 from scipy import fft
@@ -447,7 +448,7 @@ def heston_price(
     params: HestonParams,
     option_type: OptionType = OptionType.CALL,
     method: str = "cos",
-    **kwargs,
+    **kwargs: Any,
 ) -> float:
     """
     Unified Heston pricing interface.

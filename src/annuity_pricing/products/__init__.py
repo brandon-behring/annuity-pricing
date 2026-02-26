@@ -7,7 +7,7 @@ Provides:
 - RILAPricer: RILA pricing with buffer/floor protection
 - ProductRegistry: Unified dispatch for all product types
 
-See: CONSTITUTION.md Section 4
+See: METHODOLOGY.md Section 4
 """
 
 from annuity_pricing.products.base import (

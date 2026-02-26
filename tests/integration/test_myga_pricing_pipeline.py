@@ -2,7 +2,7 @@
 Integration tests for complete MYGA pricing pipeline.
 
 Tests end-to-end workflow: data → pricing → valuation → recommendations.
-See: CONSTITUTION.md Section 4
+See: METHODOLOGY.md Section 4
 """
 
 

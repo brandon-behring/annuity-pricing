@@ -23,6 +23,7 @@ See: docs/references/L3/bauer_kling_russ_2008.md
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Literal, cast
 
 import numpy as np
 
@@ -244,14 +245,19 @@ class GLWBPathSimulator:
         # Convert mortality table to callable
         # [T1] Default to SOA 2012 IAM (industry-standard table)
         if mortality_table is None:
-            mortality_table = self._mortality_loader.soa_2012_iam(gender=gender)
+            mortality_table = self._mortality_loader.soa_2012_iam(
+                gender=cast(Literal["male", "female"], gender)
+            )
 
         # Convert MortalityTable to callable if needed
+        mortality_func: Callable[[int], float]
         if isinstance(mortality_table, MortalityTable):
             _table = mortality_table
 
-            def mortality_func(age: int) -> float:
+            def _mortality_func(age: int) -> float:
                 return _table.get_qx(age)
+
+            mortality_func = _mortality_func
         else:
             mortality_func = mortality_table
 
@@ -297,9 +303,9 @@ class GLWBPathSimulator:
             std_payoff=std_payoff,
             standard_error=standard_error,
             prob_ruin=prob_ruin,
-            mean_ruin_year=mean_ruin_year,
+            mean_ruin_year=float(mean_ruin_year),
             prob_lapse=prob_lapse,
-            mean_lapse_year=mean_lapse_year,
+            mean_lapse_year=float(mean_lapse_year),
             n_paths=self.n_paths,
         )
 
@@ -421,7 +427,7 @@ class GLWBPathSimulator:
                 expense_result = self._expense_model.calculate_period_expense(
                     av=state.av,
                     period_years=dt,
-                    years_from_issue=t_years,
+                    years_from_issue=int(t_years),
                 )
                 pv_expenses += expense_result.total_expense * df
 
@@ -443,7 +449,7 @@ class GLWBPathSimulator:
                     gwb=state.gwb,
                     withdrawal_rate=self.gwb_config.withdrawal_rate,
                     age=current_age,
-                    years_since_first_withdrawal=years_since,
+                    years_since_first_withdrawal=int(years_since),
                 )
                 # Scale withdrawal to timestep
                 withdrawal = withdrawal_result.withdrawal_amount * dt

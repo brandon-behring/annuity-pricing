@@ -130,7 +130,7 @@ def check_directory_structure() -> list[CheckResult]:
     expected_files = [
         "pyproject.toml",
         "CLAUDE.md",
-        "CONSTITUTION.md",
+        "METHODOLOGY.md",
         "ROADMAP.md",
     ]
 

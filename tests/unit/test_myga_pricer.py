@@ -2,7 +2,7 @@
 Unit tests for MYGA pricer.
 
 Tests MYGAPricer: price(), competitive_position(), recommend_rate()
-See: CONSTITUTION.md Section 4
+See: METHODOLOGY.md Section 4
 """
 
 from datetime import date

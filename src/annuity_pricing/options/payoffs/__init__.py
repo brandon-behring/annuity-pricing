@@ -5,7 +5,7 @@ Provides payoff implementations for:
 - FIA: Cap, Participation, Spread, Trigger, Monthly Average
 - RILA: Buffer, Floor, Combined Buffer+Floor
 
-See: CONSTITUTION.md Section 3.2
+See: METHODOLOGY.md Section 3.2
 """
 
 from annuity_pricing.options.payoffs.base import (

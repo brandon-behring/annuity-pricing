@@ -4,7 +4,7 @@ Product Registry - Unified dispatch for all annuity product types.
 Provides a single entry point for pricing any product type (MYGA, FIA, RILA).
 Automatically detects product type and routes to appropriate pricer.
 
-See: CONSTITUTION.md Section 4
+See: METHODOLOGY.md Section 4
 """
 
 from dataclasses import dataclass

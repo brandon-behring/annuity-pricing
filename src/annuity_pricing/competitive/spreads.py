@@ -4,7 +4,7 @@ Spread analysis over Treasury for annuity products.
 Calculates spreads over duration-matched Treasury yields.
 Supports historical spread analysis and market comparison.
 
-See: CONSTITUTION.md Section 5
+See: METHODOLOGY.md Section 5
 See: docs/knowledge/domain/competitive_analysis.md
 """
 

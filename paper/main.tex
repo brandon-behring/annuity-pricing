@@ -34,7 +34,7 @@
 
 \author{%
   Brandon Behring \\
-  \texttt{https://github.com/bbehring/annuity-pricing}
+  \texttt{https://github.com/brandonmbehring-dev/annuity-pricing}
 }
 
 \date{\today}
@@ -54,7 +54,7 @@
 \begin{abstract}
 We present \texttt{annuity-pricing}, an open-source Python library for risk-neutral valuation of indexed annuity products (FIA, RILA, GLWB). The framework implements Black-Scholes and Monte Carlo pricing with integrated behavioral models (dynamic lapse, withdrawal rates) and SOA 2012 mortality tables, enabling competitive positioning analysis and regulatory capital estimation (VM-21 CTE$_{70}$, VM-22 reserves).
 
-\textbf{Validation}: Black-Scholes pricing achieves $<0.01\%$ error vs.\ financepy; Heston stochastic volatility (COS method) matches QuantLib to $<1\%$; Monte Carlo converges to analytical benchmarks with RMSE $<0.5\%$ at 100k paths. The test suite comprises 2,477 tests (484 validation, 85\% coverage).
+\textbf{Validation}: Black-Scholes pricing achieves $<0.01\%$ error vs.\ financepy; Heston stochastic volatility (COS method) matches QuantLib to $<1\%$; Monte Carlo converges to analytical benchmarks with RMSE $<0.5\%$ at 100k paths. The test suite comprises 2,703 tests (484 validation, 85\% coverage).
 
 \textbf{Scope}: VM-21/VM-22 modules are \emph{prototypes} pending NAIC AG43 scenario compliance. A stress testing framework (historical, ORSA, reverse, sensitivity) is included for risk analysis. This work provides practitioners with transparent, reproducible tooling for annuity pricing research, addressing a gap in open-source actuarial software.
 
@@ -103,7 +103,7 @@ Existing tools for annuity pricing rely on proprietary actuarial software (Willi
 
 \subsection{Contributions}
 
-This paper introduces \texttt{annuity-pricing} (v0.2.0), a research-grade Python library addressing these requirements:
+This paper introduces \texttt{annuity-pricing} (v1.0.0), a research-grade Python library addressing these requirements:
 
 \begin{itemize}
   \item \textbf{Pricing engine}: Black-Scholes and Monte Carlo for European and path-dependent payoffs, validated against financepy and pyfeng
@@ -111,7 +111,7 @@ This paper introduces \texttt{annuity-pricing} (v0.2.0), a research-grade Python
   \item \textbf{Behavioral models}: Dynamic lapse, withdrawal rates, mortality (SOA 2012 IAM), integrated into path simulation
   \item \textbf{Regulatory prototypes}: VM-21 CTE$_{70}$ scenario generation, VM-22 reserve methodology (labeled as prototypes pending full NAIC scenario compliance)
   \item \textbf{Stress testing}: Historical crisis scenarios (7), ORSA standard tests, reverse stress testing, sensitivity analysis (tornado diagrams)
-  \item \textbf{Open-source infrastructure}: 2,477 tests (85\% coverage), CI/CD, PyPI distribution, Sphinx documentation, reproducible artifacts
+  \item \textbf{Open-source infrastructure}: 2,703 tests (85\% coverage), CI/CD, PyPI distribution, Sphinx documentation, reproducible artifacts
 \end{itemize}
 
 \subsubsection*{Implementation Status}
@@ -135,7 +135,7 @@ This paper focuses on \textbf{q-fin.PR (quantitative finance: pricing)} with exp
 
 \subsection{Reproducibility}
 
-All results are reproducible via \texttt{make reproduce} from the repository root. Fixed random seeds (documented in script headers) ensure deterministic Monte Carlo output. The library is archived on Zenodo under tag \texttt{v0.2.0-paper} with the current commit hash available via \texttt{git rev-parse HEAD}. See Section~\ref{sec:reproducibility} for full reproduction instructions.
+All results are reproducible via \texttt{make reproduce} from the repository root. Fixed random seeds (documented in script headers) ensure deterministic Monte Carlo output. The library is archived on Zenodo under tag \texttt{v1.0.0-paper} with the current commit hash available via \texttt{git rev-parse HEAD}. See Section~\ref{sec:reproducibility} for full reproduction instructions.
 
 % ============================================================================
 % Section 2: Products and Payoffs
@@ -692,7 +692,7 @@ Figure~\ref{fig:vm21_cte} illustrates how reserved amount (CTE$_{70}$) changes w
 
 \subsection{Environment and Dependencies}
 
-The library is specified via \texttt{pyproject.toml} (v0.2.0) with:
+The library is specified via \texttt{pyproject.toml} (v1.0.0) with:
 \begin{itemize}
   \item Python 3.10--3.13
   \item Core dependencies: numpy, scipy, pandas, pyarrow
@@ -706,7 +706,7 @@ All figures and Monte Carlo simulations use deterministic seeds (e.g., \texttt{s
 
 \subsection{Zenodo DOI and Artifact Archive}
 
-Artifacts are archived on Zenodo under tag \texttt{v0.2.0-paper} with DOI to be assigned upon publication. The archive includes:
+Artifacts are archived on Zenodo under tag \texttt{v1.0.0-paper} with DOI to be assigned upon publication. The archive includes:
 \begin{itemize}
   \item Source code (GitHub snapshot)
   \item Compiled PDF, \LaTeX source, BibTeX
@@ -793,8 +793,8 @@ These extensions are in active development.
 The \texttt{annuity-pricing} library is openly available under the MIT License:
 
 \begin{itemize}
-  \item \textbf{GitHub}: \url{https://github.com/bbehring/annuity-pricing}
-  \item \textbf{PyPI}: \url{https://pypi.org/project/annuity-pricing/} (v0.2.0)
+  \item \textbf{GitHub}: \url{https://github.com/brandonmbehring-dev/annuity-pricing}
+  \item \textbf{PyPI}: \url{https://pypi.org/project/annuity-pricing/} (v1.0.0)
   \item \textbf{Documentation}: \url{https://annuity-pricing.readthedocs.io} (Sphinx + Furo theme)
   \item \textbf{Zenodo archive} (to be assigned DOI upon publication)
 \end{itemize}
@@ -806,13 +806,13 @@ pip install annuity-pricing
 
 For development and validation:
 \begin{lstlisting}
-git clone https://github.com/bbehring/annuity-pricing
+git clone https://github.com/brandonmbehring-dev/annuity-pricing
 cd annuity-pricing
 pip install -e ".[validation,viz]"
 pytest tests/
 \end{lstlisting}
 
-The library includes 2470+ unit tests spanning core infrastructure, cross-validation, stress testing, and regulatory prototypes, with continuous integration via GitHub Actions.
+The library includes 2,703 unit tests spanning core infrastructure, cross-validation, stress testing, and regulatory prototypes, with continuous integration via GitHub Actions.
 
 % ============================================================================
 % Bibliography

@@ -2,7 +2,7 @@
 Base pricer abstract class for all annuity products.
 
 All product pricers inherit from BasePricer and implement the common API.
-See: CONSTITUTION.md Section 4
+See: METHODOLOGY.md Section 4
 """
 
 from abc import ABC, abstractmethod

@@ -260,6 +260,11 @@ class VM22Calculator:
             # Use provided market_rate directly
             pass  # market_rate already set
 
+        # After the above logic, market_rate must be resolved to a float.
+        # Guard against any code path that leaves it as None.
+        if market_rate is None:
+            market_rate = 0.04  # Defensive default (same as flat_curve fallback)
+
         # Calculate Net Premium Reserve (floor)
         npr = self.calculate_net_premium_reserve(policy, market_rate)
 
@@ -679,19 +684,19 @@ def vm22_sensitivity(
     calc = VM22Calculator(n_scenarios=500, seed=seed)
 
     # Base case
-    base = calc.calculate_reserve(policy, market_rate, lapse_rate)
+    base = calc.calculate_reserve(policy, market_rate=market_rate, lapse_rate=lapse_rate)
 
     # Rate up +1%
-    rate_up = calc.calculate_reserve(policy, market_rate + 0.01, lapse_rate)
+    rate_up = calc.calculate_reserve(policy, market_rate=market_rate + 0.01, lapse_rate=lapse_rate)
 
     # Rate down -1%
-    rate_down = calc.calculate_reserve(policy, max(0.0, market_rate - 0.01), lapse_rate)
+    rate_down = calc.calculate_reserve(policy, market_rate=max(0.0, market_rate - 0.01), lapse_rate=lapse_rate)
 
     # Lapse up 2x
-    lapse_up = calc.calculate_reserve(policy, market_rate, lapse_rate * 2)
+    lapse_up = calc.calculate_reserve(policy, market_rate=market_rate, lapse_rate=lapse_rate * 2)
 
     # Lapse down 0.5x
-    lapse_down = calc.calculate_reserve(policy, market_rate, lapse_rate * 0.5)
+    lapse_down = calc.calculate_reserve(policy, market_rate=market_rate, lapse_rate=lapse_rate * 0.5)
 
     return {
         "base_reserve": base.reserve,

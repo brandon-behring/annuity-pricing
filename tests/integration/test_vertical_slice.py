@@ -9,7 +9,7 @@ These tests verify the entire pricing pipeline works end-to-end:
 5. Validate results
 
 References:
-    [T1] CONSTITUTION.md: Skepticism of Success - validate all outputs
+    [T1] METHODOLOGY.md: Skepticism of Success - validate all outputs
 """
 
 import pytest

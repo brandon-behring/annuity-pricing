@@ -10,12 +10,12 @@ Quick Start
 See Also
 --------
 - docs/guides/getting_started.md for full examples
-- CONSTITUTION.md for methodology
+- METHODOLOGY.md for methodology
 
-Version: 0.2.0
+Version: 1.0.0
 """
 
-__version__ = "0.2.0"
+__version__ = "1.0.0"
 
 # =============================================================================
 # Products - Primary API

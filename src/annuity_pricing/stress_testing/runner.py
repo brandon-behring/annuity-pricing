@@ -327,7 +327,7 @@ class StressTestRunner:
         # Calculate base reserve if not provided
         if base_reserve is None:
             try:
-                result = calculator.calculate_reserve(policy_data)
+                result = calculator.calculate_reserve(policy_data=policy_data)
                 # Handle different result types
                 if hasattr(result, "reserve"):
                     base_reserve = result.reserve
@@ -546,7 +546,7 @@ def quick_stress_test(
 
     # Dummy calculator that just returns base reserve
     class DummyCalculator:
-        def calculate_reserve(self, _: Any) -> float:
+        def calculate_reserve(self, **kwargs: Any) -> float:
             return base_reserve
 
     return runner.run(DummyCalculator(), None, config, base_reserve)

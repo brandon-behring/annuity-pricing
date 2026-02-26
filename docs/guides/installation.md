@@ -29,7 +29,7 @@ pip install annuity-pricing[all]
 ### From Source
 
 ```bash
-git clone https://github.com/bbehring/annuity-pricing.git
+git clone https://github.com/brandonmbehring-dev/annuity-pricing.git
 cd annuity-pricing
 pip install -e ".[dev,validation]"
 ```
@@ -38,7 +38,7 @@ pip install -e ".[dev,validation]"
 
 ```python
 import annuity_pricing
-print(annuity_pricing.__version__)  # Should print "0.2.0"
+print(annuity_pricing.__version__)  # Should print "1.0.0"
 
 # Quick test
 from annuity_pricing.options.pricing.black_scholes import black_scholes_call

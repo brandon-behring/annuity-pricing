@@ -9,7 +9,7 @@ Validates that simulated paths have correct statistical properties:
 [T1] GBM SDE: dS = (r - q)S dt + σS dW
 [T1] Log-returns: log(S(t+dt)/S(t)) ~ N((r-q-σ²/2)dt, σ²dt)
 
-See: CONSTITUTION.md Section 4
+See: METHODOLOGY.md Section 4
 See: Glasserman (2003) Ch. 3 - Generating sample paths
 """
 

@@ -10,7 +10,7 @@ Provides HALT/PASS gates for validating pricing outputs:
 - RILAProtectionValueGate: Check RILA protection value
 - ArbitrageBoundsGate: No-arbitrage checks
 
-See: CONSTITUTION.md Section 5
+See: METHODOLOGY.md Section 5
 """
 
 from annuity_pricing.validation.gates import (

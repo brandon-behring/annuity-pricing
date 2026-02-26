@@ -6,7 +6,7 @@ Provides:
 - Monte Carlo pricing engine
 - Convergence analysis tools
 
-See: CONSTITUTION.md Section 4
+See: METHODOLOGY.md Section 4
 """
 
 from annuity_pricing.options.simulation.gbm import (

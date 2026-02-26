@@ -5,7 +5,7 @@ type: software
 authors:
   - family-names: Behring
     given-names: Brandon
-repository-code: "https://github.com/bbehring/annuity-pricing"
+repository-code: "https://github.com/brandonmbehring-dev/annuity-pricing"
 url: "https://annuity-pricing.readthedocs.io"
 abstract: >-
   A Python library for pricing fixed and indexed annuity products
@@ -26,5 +26,5 @@ keywords:
   - monte-carlo
   - insurance
 license: MIT
-version: 0.2.0
-date-released: "2025-12-06"
+version: 1.0.0
+date-released: "2026-02-26"

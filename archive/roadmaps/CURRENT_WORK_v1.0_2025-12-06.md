@@ -76,5 +76,5 @@ All implementation phases complete (0-10). Project in maintenance/enhancement mo
 | Document | Purpose |
 |----------|---------|
 | [ROADMAP.md](ROADMAP.md) | Progress tracking |
-| [CONSTITUTION.md](CONSTITUTION.md) | Frozen methodology |
+| [METHODOLOGY.md](METHODOLOGY.md) | Frozen methodology |
 | [Plan file](~/.claude/plans/purrfect-wondering-rabin.md) | Full implementation plan |

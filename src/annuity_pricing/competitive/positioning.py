@@ -4,7 +4,7 @@ Competitive positioning analysis for annuity products.
 Determines where a product's rate falls within the market distribution.
 Supports filtering by product type, duration, and other attributes.
 
-See: CONSTITUTION.md Section 5
+See: METHODOLOGY.md Section 5
 See: docs/knowledge/domain/competitive_analysis.md
 """
 

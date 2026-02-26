@@ -9,7 +9,7 @@ Prices FIA products with embedded index-linked options:
 
 [T1] FIA products have 0% floor (principal protection).
 
-See: CONSTITUTION.md Section 3.2
+See: METHODOLOGY.md Section 3.2
 See: docs/knowledge/domain/crediting_methods.md
 """
 

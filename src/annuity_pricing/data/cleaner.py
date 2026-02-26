@@ -17,7 +17,7 @@ def clip_cap_rate(df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
     Clip capRate outliers to maximum value.
 
     [T2] WINK has capRate max=9999.99 which are data entry errors.
-    Clip to ≤ 10.0 (1000%) per CONSTITUTION.md Section 6.1.
+    Clip to ≤ 10.0 (1000%) per METHODOLOGY.md Section 6.1.
 
     Parameters
     ----------
@@ -47,7 +47,7 @@ def clip_performance_triggered_rate(
     Clip performanceTriggeredRate outliers to maximum value.
 
     [T2] WINK has performanceTriggeredRate max=999 which are errors.
-    Clip to ≤ 1.0 (100%) per CONSTITUTION.md Section 6.1.
+    Clip to ≤ 1.0 (100%) per METHODOLOGY.md Section 6.1.
 
     Parameters
     ----------
@@ -77,7 +77,7 @@ def clip_spread_rate(df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
     Clip spreadRate outliers to maximum value.
 
     [T2] WINK has spreadRate max=99.0 which are errors.
-    Clip to ≤ 1.0 (100%) per CONSTITUTION.md Section 6.1.
+    Clip to ≤ 1.0 (100%) per METHODOLOGY.md Section 6.1.
 
     Parameters
     ----------
@@ -109,7 +109,7 @@ def filter_valid_guarantee_duration(
     Filter out invalid guaranteeDuration values.
 
     [T2] WINK has guaranteeDuration=-1 which are invalid.
-    Filter to ≥ 0 per CONSTITUTION.md Section 6.1.
+    Filter to ≥ 0 per METHODOLOGY.md Section 6.1.
 
     Parameters
     ----------

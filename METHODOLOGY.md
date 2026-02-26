@@ -1,4 +1,4 @@
-# CONSTITUTION.md - Frozen Actuarial Pricing Methodology
+# METHODOLOGY.md - Frozen Actuarial Pricing Methodology
 
 **Purpose**: Immutable methodological decisions for actuarial pricing. NO CHANGES without documented justification and full re-evaluation.
 

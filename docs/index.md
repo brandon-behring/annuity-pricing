@@ -175,7 +175,7 @@ If you use this software in research, please cite:
   author = {Behring, Brandon},
   title = {annuity-pricing: Actuarial Pricing for Annuity Products},
   year = {2025},
-  url = {https://github.com/bbehring/annuity-pricing}
+  url = {https://github.com/brandonmbehring-dev/annuity-pricing}
 }
 ```
 
@@ -183,7 +183,7 @@ If you use this software in research, please cite:
 
 ## License
 
-MIT License. See [LICENSE](https://github.com/bbehring/annuity-pricing/blob/main/LICENSE) for details.
+MIT License. See [LICENSE](https://github.com/brandonmbehring-dev/annuity-pricing/blob/main/LICENSE) for details.
 
 ## Indices and tables
 

@@ -50,7 +50,7 @@ python scripts/setup_check.py --verbose
 
 - **Type hints required** on all function signatures
 - **NumPy-style docstrings** with knowledge tier tags [T1]/[T2]/[T3]
-- **Black formatting** (100 char line length)
+- **Ruff formatting** (100 char line length)
 - **Explicit error handling** - never fail silently
 
 ### Knowledge Tier Tags
@@ -149,6 +149,17 @@ def test_vs_hull_example_15_6():
     actual = black_scholes_call(S=42, K=40, r=0.10, q=0, sigma=0.20, T=0.5)
     assert abs(actual - expected) < 0.01
 ```
+
+## Public API Stability Policy
+
+Starting with v1.0.0, annuity-pricing follows [Semantic Versioning](https://semver.org/):
+
+- **Public API** = all symbols importable from `annuity_pricing.*` top-level modules
+- **Patch** (1.0.x): Bug fixes only, no API changes
+- **Minor** (1.x.0): New features, backward-compatible
+- **Major** (x.0.0): Breaking changes (with deprecation cycle)
+
+Internal modules (prefixed with `_` or under `annuity_pricing.internal`) are not covered by this policy.
 
 ## Questions?
 

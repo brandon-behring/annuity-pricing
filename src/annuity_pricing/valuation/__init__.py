@@ -4,7 +4,7 @@ Valuation module for annuity pricing.
 [T2] Provides present value calculations, duration, convexity,
 and risk metrics for MYGA (Multi-Year Guaranteed Annuity) products.
 
-See: CONSTITUTION.md Section 4.1
+See: METHODOLOGY.md Section 4.1
 """
 
 from .myga_pv import (

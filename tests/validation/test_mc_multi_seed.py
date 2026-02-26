@@ -8,7 +8,7 @@ have proper coverage.
 [T1] MC converges at rate 1/√N regardless of seed
 [T1] Reported SE should match cross-seed empirical SE
 
-See: CONSTITUTION.md Section 4
+See: METHODOLOGY.md Section 4
 See: Glasserman (2003) Ch. 3-4 - Monte Carlo error bounds
 """
 

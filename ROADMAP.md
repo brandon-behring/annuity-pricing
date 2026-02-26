@@ -135,7 +135,7 @@ Phase 0 → ... → Phase 10 → Phase 11 → Phase 12 (A-I)
 
 | Phase | Completion Date | Key Deliverable |
 |-------|-----------------|-----------------|
-| Phase 0 | 2025-12-04 | Context engineering setup (CLAUDE.md, CONSTITUTION.md, domain docs) |
+| Phase 0 | 2025-12-04 | Context engineering setup (CLAUDE.md, METHODOLOGY.md, domain docs) |
 | Phase 1 | 2025-12-04 | Foundation + TDD infrastructure (config, loader, cleaner, schemas, anti-pattern tests) |
 | Phase 3 | 2025-12-05 | **MYGA Pricing Complete** - MYGAPricer, valuation, recommender |
 | Phase 2 | 2025-12-05 | **Competitive Analysis Complete** - positioning, spreads, rankings |
@@ -340,5 +340,5 @@ if not report.passed:
 ## References
 
 - [Full Plan](.claude/plans/snazzy-enchanting-whistle.md)
-- [CONSTITUTION.md](CONSTITUTION.md) - Frozen methodology
+- [METHODOLOGY.md](METHODOLOGY.md) - Frozen methodology
 - [codex-pricing-resources-rila-fia-myga.md](../myga-forecasting-v3/codex-pricing-resources-rila-fia-myga.md)

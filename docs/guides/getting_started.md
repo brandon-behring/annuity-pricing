@@ -23,7 +23,7 @@ This includes `financepy`, `QuantLib-Python`, and `pyfeng` for verification.
 ### Development Installation
 
 ```bash
-git clone https://github.com/bbehring/annuity-pricing.git
+git clone https://github.com/brandonmbehring-dev/annuity-pricing.git
 cd annuity-pricing
 pip install -e ".[dev,validation]"
 ```

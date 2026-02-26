@@ -2,7 +2,7 @@
 Base classes for option payoffs.
 
 Provides abstract base for all option payoff calculations.
-See: CONSTITUTION.md Section 3
+See: METHODOLOGY.md Section 3
 See: docs/knowledge/domain/option_pricing.md
 """
 

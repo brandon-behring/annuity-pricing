@@ -411,7 +411,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 | Document | Purpose | Location |
 |----------|---------|----------|
-| CONSTITUTION.md | Frozen methodology | Project root |
+| METHODOLOGY.md | Frozen methodology | Project root |
 | CURRENT_WORK.md | 30-second context switch | Project root |
 | ROADMAP.md | Progress tracking | Project root |
 | docs/knowledge/ | Domain knowledge (tiered) | L1 quick ref, L2 derivations |

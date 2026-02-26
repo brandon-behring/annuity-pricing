@@ -6,7 +6,7 @@ Provides rate recommendations based on:
 - Treasury spread targets
 - Margin/profitability constraints
 
-See: CONSTITUTION.md Section 5
+See: METHODOLOGY.md Section 5
 See: docs/knowledge/domain/competitive_analysis.md
 """
 
@@ -387,7 +387,7 @@ class RateRecommender:
                         "spread_bps": None,
                         "margin_bps": None,
                         "comparable_count": 0,
-                        "error": str(e),
+                        "error": str(e),  # type: ignore[dict-item]
                     }
                 )
 

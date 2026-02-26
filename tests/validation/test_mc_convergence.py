@@ -5,7 +5,7 @@ Monte Carlo convergence tests.
 This validates the entire simulation pipeline.
 
 See: Glasserman (2003) "Monte Carlo Methods in Financial Engineering"
-See: CONSTITUTION.md Section 4
+See: METHODOLOGY.md Section 4
 """
 
 import numpy as np

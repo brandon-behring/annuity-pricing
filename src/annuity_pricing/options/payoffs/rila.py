@@ -5,7 +5,7 @@ Implements payoffs for RILA protection mechanisms:
 - Buffer: Absorbs first X% of losses (insurer takes first hit)
 - Floor: Limits maximum loss to X% (policyholder never loses more than X%)
 
-See: CONSTITUTION.md Section 3.2
+See: METHODOLOGY.md Section 3.2
 See: docs/knowledge/domain/buffer_floor.md
 
 [T1] Buffer and Floor are fundamentally different protection mechanisms.

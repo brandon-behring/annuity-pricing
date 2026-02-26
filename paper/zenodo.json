@@ -34,7 +34,7 @@
   "publication_date": "2025-12-06",
   "related_identifiers": [
     {
-      "identifier": "https://github.com/bbehring/annuity-pricing",
+      "identifier": "https://github.com/brandonmbehring-dev/annuity-pricing",
       "relation": "isSupplementedBy",
       "resource_type": "software",
       "scheme": "url"
@@ -74,8 +74,8 @@
       "scheme": "url"
     }
   ],
-  "notes": "This is the supplementary material (code and artifacts) for the arXiv paper 'annuity-pricing: Open-Source Actuarial Pricing for FIA, RILA, and GLWB Products'. Contains fully reproducible figures, validation notebooks, and 1011 unit tests.",
-  "version": "v0.2.0-paper",
+  "notes": "This is the supplementary material (code and artifacts) for the arXiv paper 'annuity-pricing: Open-Source Actuarial Pricing for FIA, RILA, and GLWB Products'. Contains fully reproducible figures, validation notebooks, and 2471+ tests across 9 categories.",
+  "version": "v1.0.0",
   "imprint_publisher": "Zenodo",
   "method": "Manual upload to Zenodo with arXiv linkage"
 }

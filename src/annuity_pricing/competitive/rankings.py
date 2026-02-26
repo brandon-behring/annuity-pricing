@@ -4,7 +4,7 @@ Company and product rankings for annuity market analysis.
 Provides rankings by rate, spread, and other metrics.
 Supports market share analysis and competitor tracking.
 
-See: CONSTITUTION.md Section 5
+See: METHODOLOGY.md Section 5
 See: docs/knowledge/domain/competitive_analysis.md
 """
 

@@ -324,7 +324,7 @@ def generate_heston_terminal_spots(
         S_curr = S_curr * np.exp(drift + diffusion)
 
         # Update variance
-        v_curr = v_next
+        v_curr = np.asarray(v_next).ravel()
 
     return S_curr
 

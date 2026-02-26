@@ -2,7 +2,7 @@
 Black-Scholes option pricing with Greeks.
 
 Implements analytical pricing for European options.
-See: CONSTITUTION.md Section 3.1
+See: METHODOLOGY.md Section 3.1
 See: docs/knowledge/domain/option_pricing.md
 See: docs/appendix/derivations/black_scholes.md
 See: docs/TOLERANCE_JUSTIFICATION.md for tolerance derivations

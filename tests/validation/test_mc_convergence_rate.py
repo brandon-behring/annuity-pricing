@@ -10,7 +10,7 @@ as predicted by the Central Limit Theorem.
 Note: Estimating slope from log-log regression is inherently noisy.
 Instead, we validate CLT bounds and SE scaling which are more robust.
 
-See: CONSTITUTION.md Section 4
+See: METHODOLOGY.md Section 4
 See: Glasserman (2003) Ch. 3 - Monte Carlo theory
 """
 

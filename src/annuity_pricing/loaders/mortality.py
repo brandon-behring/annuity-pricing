@@ -707,7 +707,7 @@ def compare_life_expectancy(
     if ages is None:
         ages = np.array([55, 60, 65, 70, 75, 80])
 
-    results = {}
+    results: dict[str, dict[int, float]] = {}
     for name, table in tables.items():
         results[name] = {}
         for age in ages:

@@ -6,7 +6,7 @@ Validates that:
 - Monthly averaging is consistent with daily-then-aggregated
 - Different step sizes give consistent results
 
-See: CONSTITUTION.md Section 4
+See: METHODOLOGY.md Section 4
 See: Glasserman (2003) Ch. 3 - Sample path generation
 """
 

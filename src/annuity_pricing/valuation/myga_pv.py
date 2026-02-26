@@ -2,7 +2,7 @@
 MYGA present value and risk metrics calculations.
 
 Detailed liability valuation for Multi-Year Guaranteed Annuities.
-See: CONSTITUTION.md Section 4.1
+See: METHODOLOGY.md Section 4.1
 """
 
 from dataclasses import dataclass

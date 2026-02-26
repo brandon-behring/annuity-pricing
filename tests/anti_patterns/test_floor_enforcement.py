@@ -6,7 +6,7 @@ Client can NEVER have negative credited interest.
 
 HALT if any crediting method produces negative result.
 
-See: CONSTITUTION.md Section 1.2
+See: METHODOLOGY.md Section 1.2
 See: docs/knowledge/domain/crediting_methods.md
 """
 

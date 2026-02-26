@@ -9,7 +9,7 @@ Prices RILA products with partial downside protection:
 [T1] Buffer = Long ATM put - Short OTM put (put spread)
 [T1] Floor = Long OTM put
 
-See: CONSTITUTION.md Section 3.2
+See: METHODOLOGY.md Section 3.2
 See: docs/knowledge/domain/buffer_floor.md
 """
 

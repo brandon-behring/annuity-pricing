@@ -45,6 +45,7 @@ See: docs/knowledge/domain/vm21_vm22.md
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Literal
 
 import numpy as np
 
@@ -250,7 +251,7 @@ class VM21Calculator:
         policy: PolicyData,
         mortality_table: Callable[[int], float] | MortalityTable | None = None,
         yield_curve: YieldCurve | None = None,
-        gender: str = "male",
+        gender: Literal["male", "female"] = "male",
     ) -> float:
         """
         Calculate Standard Scenario Amount.
@@ -285,10 +286,10 @@ class VM21Calculator:
             mortality_table = self._mortality_loader.soa_2012_iam(gender=gender)
 
         # Convert MortalityTable to callable if needed
+        mortality_func: Callable[[int], float]
         if isinstance(mortality_table, MortalityTable):
             _table = mortality_table
-            def mortality_func(age: int) -> float:
-                return _table.get_qx(age)
+            mortality_func = _table.get_qx
         else:
             mortality_func = mortality_table
 
@@ -345,7 +346,7 @@ class VM21Calculator:
         scenarios: AG43Scenarios | None = None,
         mortality_table: Callable[[int], float] | MortalityTable | None = None,
         yield_curve: YieldCurve | None = None,
-        gender: str = "male",
+        gender: Literal["male", "female"] = "male",
     ) -> VM21Result:
         """
         Calculate VM-21 reserve.
@@ -388,10 +389,10 @@ class VM21Calculator:
             mortality_table = self._mortality_loader.soa_2012_iam(gender=gender)
 
         # Convert MortalityTable to callable if needed
+        mortality_func: Callable[[int], float]
         if isinstance(mortality_table, MortalityTable):
             _table = mortality_table
-            def mortality_func(age: int) -> float:
-                return _table.get_qx(age)
+            mortality_func = _table.get_qx
         else:
             mortality_func = mortality_table
 

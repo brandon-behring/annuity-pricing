@@ -5,7 +5,7 @@ Implements a multi-stage validation system that checks pricing results
 for sanity before allowing them to be used. Gates can HALT (reject with
 diagnostics) or PASS (allow to proceed).
 
-See: CONSTITUTION.md Section 5
+See: METHODOLOGY.md Section 5
 See: docs/knowledge/domain/mgsv_mva.md for regulatory bounds
 """
 

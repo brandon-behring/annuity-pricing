@@ -5,7 +5,7 @@ Black-Scholes known-answer tests.
 These are the gold standard - if these fail, the implementation is wrong.
 
 See: Hull, "Options, Futures, and Other Derivatives" (10th ed.)
-See: CONSTITUTION.md Section 2.1
+See: METHODOLOGY.md Section 2.1
 """
 
 import numpy as np

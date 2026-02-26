@@ -2,7 +2,7 @@
 Unit tests for competitive rankings module.
 
 Tests RankingAnalyzer: rank_companies(), rank_products(), etc.
-See: CONSTITUTION.md Section 5
+See: METHODOLOGY.md Section 5
 """
 
 import pandas as pd
