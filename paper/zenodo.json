@@ -34,7 +34,7 @@
   "publication_date": "2025-12-06",
   "related_identifiers": [
     {
-      "identifier": "https://github.com/brandonmbehring-dev/annuity-pricing",
+      "identifier": "https://github.com/brandon-behring/annuity-pricing",
       "relation": "isSupplementedBy",
       "resource_type": "software",
       "scheme": "url"

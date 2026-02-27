@@ -279,7 +279,7 @@ To cite this paper:
   title = {annuity-pricing: Open-Source Actuarial Pricing for FIA, RILA, and GLWB Products},
   journal = {arXiv preprint arXiv:XXXX.XXXXX},
   year = {2025},
-  note = {https://github.com/brandonmbehring-dev/annuity-pricing}
+  note = {https://github.com/brandon-behring/annuity-pricing}
 }
 ```
 
@@ -303,7 +303,7 @@ To link to Zenodo: (URL to be updated after publication)
 
 For questions or issues related to:
 
-- **Paper content**: Contact author directly or open a GitHub issue at https://github.com/brandonmbehring-dev/annuity-pricing
+- **Paper content**: Contact author directly or open a GitHub issue at https://github.com/brandon-behring/annuity-pricing
 - **Reproduction**: Open a GitHub issue with reproduction steps
 - **Library features**: See https://annuity-pricing.readthedocs.io or open a GitHub issue
 

@@ -54,11 +54,11 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/brandonmbehring-dev/annuity-pricing"
-Repository = "https://github.com/brandonmbehring-dev/annuity-pricing"
+Homepage = "https://github.com/brandon-behring/annuity-pricing"
+Repository = "https://github.com/brandon-behring/annuity-pricing"
 Documentation = "https://annuity-pricing.readthedocs.io"
-Issues = "https://github.com/brandonmbehring-dev/annuity-pricing/issues"
-Changelog = "https://github.com/brandonmbehring-dev/annuity-pricing/blob/main/CHANGELOG.md"
+Issues = "https://github.com/brandon-behring/annuity-pricing/issues"
+Changelog = "https://github.com/brandon-behring/annuity-pricing/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [

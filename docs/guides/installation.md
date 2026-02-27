@@ -29,7 +29,7 @@ pip install annuity-pricing[all]
 ### From Source
 
 ```bash
-git clone https://github.com/brandonmbehring-dev/annuity-pricing.git
+git clone https://github.com/brandon-behring/annuity-pricing.git
 cd annuity-pricing
 pip install -e ".[dev,validation]"
 ```

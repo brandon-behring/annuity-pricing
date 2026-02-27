@@ -85,7 +85,7 @@
 - Mark TODO guides/notebooks as “planned” or fill with minimal runnable examples to avoid broken sections.
 
 ## ArXiv / Paper (paper/main.tex) Audit
-- Claims “production-ready” with 1608 unit tests (5 skipped) and scikit-learn as a core dependency. In reality: pyproject omits scikit-learn; coverage gate is 75%; docs show many TODO guides; ROADMAP/CURRENT_WORK cite 1686/2471 tests; `rg "def test"` finds ~2020 test functions. The repository URL in the paper (`github.com/brandonmbehring-dev/…`) differs from the repo metadata (`bbehring/annuity-pricing`).
+- Claims “production-ready” with 1608 unit tests (5 skipped) and scikit-learn as a core dependency. In reality: pyproject omits scikit-learn; coverage gate is 75%; docs show many TODO guides; ROADMAP/CURRENT_WORK cite 1686/2471 tests; `rg "def test"` finds ~2020 test functions. The repository URL in the paper (`github.com/brandon-behring/…`) differs from the repo metadata (`bbehring/annuity-pricing`).
 - Paper says “core dependencies: numpy, scipy, pandas, scikit-learn” and Python 3.10–3.13; pyproject lists numpy/pandas/scipy/pyarrow only and does not mention scikit-learn. If scikit-learn is required for figures, it should be in `pyproject.toml` or the paper should drop it.
 - “Production-ready” conflicts with prototype flags: VM-21/VM-22 are explicitly prototypes, GLWB guide is TODO, and several guides/derivations are unfinished. Either soften the claim in the paper or finish the missing docs/tests.
 - Test count in paper (1608) matches `paper/artifacts/execution.log` but not the newer counts in ROADMAP/CURRENT_WORK or the raw count of test functions. Pick one source of truth and cite the date/commit hash in the paper.

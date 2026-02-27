@@ -40,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Version**: 0.2.0 -> 1.0.0 (Production/Stable)
 - **PyPI classifier**: "Development Status :: 5 - Production/Stable"
 - Renamed `CONSTITUTION.md` -> `METHODOLOGY.md` (updated 59 file references)
-- Consolidated all GitHub URLs to `brandonmbehring-dev/annuity-pricing`
+- Consolidated all GitHub URLs to `brandon-behring/annuity-pricing`
 - Updated CONTRIBUTING.md: "Black" -> "Ruff" formatting
 - ArXiv paper updated: test counts, version references, URLs
 - Zenodo metadata updated: test counts, version, URLs
@@ -49,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed mypy type errors in 11 source files (33 errors resolved)
 - Fixed stale test count in paper/zenodo.json (1011 -> 2471+)
-- Fixed URL inconsistency (bbehring -> brandonmbehring-dev) across 15 files
+- Fixed URL inconsistency (bbehring -> brandon-behring) across 15 files
 
 ---
 

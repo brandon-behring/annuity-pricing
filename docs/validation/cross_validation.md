@@ -61,4 +61,4 @@ Tests are skipped until upstream fix is available.
 ## See Also
 
 - {doc}`golden_cases` — Golden test cases
-- [CROSS_VALIDATION_MATRIX.md](https://github.com/brandonmbehring-dev/annuity-pricing/blob/main/docs/CROSS_VALIDATION_MATRIX.md)
+- [CROSS_VALIDATION_MATRIX.md](https://github.com/brandon-behring/annuity-pricing/blob/main/docs/CROSS_VALIDATION_MATRIX.md)

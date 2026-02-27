@@ -3,9 +3,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/brandonmbehring-dev/annuity-pricing/actions"><img src="https://github.com/brandonmbehring-dev/annuity-pricing/workflows/CI/badge.svg" alt="CI"></a>
+  <a href="https://github.com/brandon-behring/annuity-pricing/actions"><img src="https://github.com/brandon-behring/annuity-pricing/workflows/CI/badge.svg" alt="CI"></a>
   <a href="https://pypi.org/project/annuity-pricing/"><img src="https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue" alt="Python versions"></a>
-  <a href="https://codecov.io/gh/brandonmbehring-dev/annuity-pricing"><img src="https://codecov.io/gh/brandonmbehring-dev/annuity-pricing/branch/main/graph/badge.svg" alt="Coverage"></a>
+  <a href="https://codecov.io/gh/brandon-behring/annuity-pricing"><img src="https://codecov.io/gh/brandon-behring/annuity-pricing/branch/main/graph/badge.svg" alt="Coverage"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="https://pypi.org/project/annuity-pricing/"><img src="https://img.shields.io/pypi/v/annuity-pricing.svg" alt="PyPI"></a>
 </p>
@@ -101,7 +101,7 @@ pip install annuity-pricing[all]         # Everything
 ### Development Install
 
 ```bash
-git clone https://github.com/brandonmbehring-dev/annuity-pricing.git
+git clone https://github.com/brandon-behring/annuity-pricing.git
 cd annuity-pricing
 pip install -e ".[dev]"
 ```

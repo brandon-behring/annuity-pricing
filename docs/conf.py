@@ -122,7 +122,7 @@ html_theme_options = {
     "sidebar_hide_name": False,
     "navigation_with_keys": True,
     "top_of_page_button": "edit",
-    "source_repository": "https://github.com/brandonmbehring-dev/annuity-pricing",
+    "source_repository": "https://github.com/brandon-behring/annuity-pricing",
     "source_branch": "main",
     "source_directory": "docs/",
 }

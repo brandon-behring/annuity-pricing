@@ -1,7 +1,7 @@
 # Feature Gap Analysis: temporalcv → annuity-pricing
 
 **Date**: 2026-01-09
-**Source**: [temporalcv](https://github.com/brandonmbehring-dev/temporalcv) analysis
+**Source**: [temporalcv](https://github.com/brandon-behring/temporalcv) analysis
 **Purpose**: Identify features/qualities temporalcv has that annuity-pricing could adopt
 
 ---

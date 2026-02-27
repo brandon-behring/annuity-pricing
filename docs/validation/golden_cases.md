@@ -89,6 +89,6 @@ assert parity_diff < 1e-10, f"Put-call parity violation: {parity_diff}"
 
 ## Validation Notebooks
 
-- [Black-Scholes vs financepy](https://github.com/brandonmbehring-dev/annuity-pricing/blob/main/notebooks/validation/options/black_scholes_vs_financepy.ipynb)
-- [Monte Carlo vs BS](https://github.com/brandonmbehring-dev/annuity-pricing/blob/main/notebooks/validation/options/monte_carlo_vs_pyfeng.ipynb)
-- [PV Correction Derivation](https://github.com/brandonmbehring-dev/annuity-pricing/blob/main/notebooks/validation/pv_correction_derivation.ipynb)
+- [Black-Scholes vs financepy](https://github.com/brandon-behring/annuity-pricing/blob/main/notebooks/validation/options/black_scholes_vs_financepy.ipynb)
+- [Monte Carlo vs BS](https://github.com/brandon-behring/annuity-pricing/blob/main/notebooks/validation/options/monte_carlo_vs_pyfeng.ipynb)
+- [PV Correction Derivation](https://github.com/brandon-behring/annuity-pricing/blob/main/notebooks/validation/pv_correction_derivation.ipynb)

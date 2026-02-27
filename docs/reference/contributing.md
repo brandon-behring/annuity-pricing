@@ -6,7 +6,7 @@ Thank you for your interest in contributing to annuity-pricing!
 
 ```bash
 # Clone the repository
-git clone https://github.com/brandonmbehring-dev/annuity-pricing.git
+git clone https://github.com/brandon-behring/annuity-pricing.git
 cd annuity-pricing
 
 # Create virtual environment
