@@ -56,3 +56,4 @@ codex_repo_audit.md
 *.pem
 *credentials*
 *.secret
+CLAUDE.md
