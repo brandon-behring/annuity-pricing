@@ -146,9 +146,11 @@ jobs:
         run: |
           # Run anti-pattern tests and report coverage
           # Note: This measures coverage OF anti-pattern tests, not threshold
+          # Override pyproject.toml fail_under=75 (anti-pattern tests are narrow)
           pytest tests/anti_patterns/ \
             --cov=src/annuity_pricing \
             --cov-report=term-missing \
+            --cov-fail-under=0 \
             -v
 
   validate:

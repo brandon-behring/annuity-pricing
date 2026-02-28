@@ -64,6 +64,7 @@ Changelog = "https://github.com/brandon-behring/annuity-pricing/blob/main/CHANGE
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
+    "hypothesis>=6.0",
     "mypy>=1.0",
     "ruff>=0.1.0",
     "nbval>=0.11.0",
@@ -81,7 +82,7 @@ vol = [
 ]
 validation = [
     "financepy>=0.350",       # Options pricing cross-validation
-    "QuantLib-Python>=1.31",  # Yield curves, bonds cross-validation
+    "QuantLib>=1.34",         # Yield curves, bonds cross-validation
     "pyfeng>=0.2",            # SABR, Heston cross-validation
     "pycurve>=0.5",           # Nelson-Siegel cross-validation
 ]
