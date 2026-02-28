@@ -5,7 +5,7 @@ type: software
 authors:
   - family-names: Behring
     given-names: Brandon
-repository-code: "https://github.com/brandonmbehring-dev/annuity-pricing"
+repository-code: "https://github.com/brandon-behring/annuity-pricing"
 url: "https://annuity-pricing.readthedocs.io"
 abstract: >-
   A Python library for pricing fixed and indexed annuity products
