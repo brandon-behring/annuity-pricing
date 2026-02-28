@@ -84,7 +84,7 @@ validation = [
     "financepy>=0.350",       # Options pricing cross-validation
     "QuantLib>=1.34",         # Yield curves, bonds cross-validation
     "pyfeng>=0.2",            # SABR, Heston cross-validation
-    "pycurve>=0.5",           # Nelson-Siegel cross-validation
+    "pycurve>=0.1",           # Nelson-Siegel cross-validation
 ]
 actuarial = [
     "actuarialmath>=1.0",     # Life contingencies (Python)
