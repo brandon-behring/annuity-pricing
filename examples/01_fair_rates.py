@@ -175,7 +175,7 @@ def print_sensitivity_table(results: list[FairRateResult]) -> None:
     for r in results:
         print(f"    {r.volatility:5.1%}      {r.fair_cap:6.2%}        {r.fair_participation:5.0%}")
 
-    print("\n★ Insight: Higher volatility → more expensive options → lower fair rates")
+    print("\n* Insight: Higher volatility -> more expensive options -> lower fair rates")
 
 
 def plot_sensitivity(results: list[FairRateResult]) -> None:

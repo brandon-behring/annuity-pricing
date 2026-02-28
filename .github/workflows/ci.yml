@@ -42,6 +42,7 @@ jobs:
     # Use synthetic data in CI (no WINK license in CI environment)
     env:
       ANNUITY_USE_SYNTHETIC: "1"
+      PYTHONIOENCODING: "utf-8"
 
     steps:
       - uses: actions/checkout@v4
