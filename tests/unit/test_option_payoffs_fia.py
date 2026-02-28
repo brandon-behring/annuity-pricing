@@ -274,9 +274,7 @@ class TestMonthlyAveragePayoff:
         values = [100, 102, 105, 103, 108, 110, 112, 115, 113, 118, 120, 122, 125]
         times = [i / 12 for i in range(13)]  # 0, 1/12, 2/12, ..., 1
 
-        path = IndexPath(
-            times=tuple(times), values=tuple(values), initial_value=initial
-        )
+        path = IndexPath(times=tuple(times), values=tuple(values), initial_value=initial)
 
         result = payoff.calculate_from_path(path)
 
@@ -351,9 +349,9 @@ class TestFIAAntiPatterns:
 
         for r in [-0.50, -0.25, -0.10, -0.01]:
             result = payoff.calculate(r)
-            assert (
-                result.credited_return >= 0
-            ), f"Negative credited return {result.credited_return} for {r}"
+            assert result.credited_return >= 0, (
+                f"Negative credited return {result.credited_return} for {r}"
+            )
 
     def test_fia_never_negative_participation(self):
         """[T1] Participation never returns negative."""
@@ -385,9 +383,9 @@ class TestFIAAntiPatterns:
 
         for r in [0.10, 0.15, 0.50, 1.00]:
             result = payoff.calculate(r)
-            assert (
-                result.credited_return <= payoff.cap_rate
-            ), f"Exceeded cap: {result.credited_return} > {payoff.cap_rate}"
+            assert result.credited_return <= payoff.cap_rate, (
+                f"Exceeded cap: {result.credited_return} > {payoff.cap_rate}"
+            )
 
     def test_participation_proportional(self):
         """[T1] Participation return proportional to index return."""

@@ -219,9 +219,9 @@ class TestConvergenceRate:
         total = len(result["results"])
 
         # At least 75% should contain (accounting for randomness)
-        assert (
-            within_ci_count / total >= 0.75
-        ), f"Only {within_ci_count}/{total} CIs contain BS price"
+        assert within_ci_count / total >= 0.75, (
+            f"Only {within_ci_count}/{total} CIs contain BS price"
+        )
 
 
 class TestAntitheticVariates:
@@ -279,10 +279,9 @@ class TestPutCallParityMC:
         put_result = engine.price_european_put(params, strike)
 
         # Expected parity value
-        expected_diff = (
-            params.spot * np.exp(-params.dividend * params.time_to_expiry)
-            - strike * np.exp(-params.rate * params.time_to_expiry)
-        )
+        expected_diff = params.spot * np.exp(
+            -params.dividend * params.time_to_expiry
+        ) - strike * np.exp(-params.rate * params.time_to_expiry)
 
         actual_diff = call_result.price - put_result.price
 
@@ -291,8 +290,7 @@ class TestPutCallParityMC:
         tolerance = 3 * combined_se  # 3 sigma
 
         assert abs(actual_diff - expected_diff) < tolerance, (
-            f"Put-call parity violation: "
-            f"C-P={actual_diff:.4f}, expected={expected_diff:.4f}"
+            f"Put-call parity violation: C-P={actual_diff:.4f}, expected={expected_diff:.4f}"
         )
 
 
@@ -304,11 +302,11 @@ class TestMCMoneynessConvergence:
     @pytest.mark.parametrize(
         "S,K,label,tolerance",
         [
-            (120, 100, "Deep ITM", 0.01),     # Deep ITM call
-            (110, 100, "ITM", 0.01),          # ITM call
-            (100, 100, "ATM", 0.01),          # ATM
-            (100, 110, "OTM", 0.02),          # OTM call (higher tolerance)
-            (100, 120, "Deep OTM", 0.03),     # Deep OTM call (even higher)
+            (120, 100, "Deep ITM", 0.01),  # Deep ITM call
+            (110, 100, "ITM", 0.01),  # ITM call
+            (100, 100, "ATM", 0.01),  # ATM
+            (100, 110, "OTM", 0.02),  # OTM call (higher tolerance)
+            (100, 120, "Deep OTM", 0.03),  # Deep OTM call (even higher)
         ],
     )
     def test_mc_convergence_by_moneyness(

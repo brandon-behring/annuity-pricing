@@ -24,11 +24,11 @@ from annuity_pricing.products.fia import FIAPricer, MarketParams
 
 #: Standard Heston parameters (typical equity index)
 STANDARD_HESTON = HestonParams(
-    v0=0.04,      # Initial variance (20% vol)
-    kappa=2.0,    # Mean reversion speed
-    theta=0.04,   # Long-run variance (20% vol)
-    sigma=0.3,    # Vol-of-vol
-    rho=-0.7,     # Negative correlation (leverage effect)
+    v0=0.04,  # Initial variance (20% vol)
+    kappa=2.0,  # Mean reversion speed
+    theta=0.04,  # Long-run variance (20% vol)
+    sigma=0.3,  # Vol-of-vol
+    rho=-0.7,  # Negative correlation (leverage effect)
 )
 
 #: Low vol-of-vol Heston (should converge to BS)
@@ -36,7 +36,7 @@ LOW_VOLVOL_HESTON = HestonParams(
     v0=0.04,
     kappa=2.0,
     theta=0.04,
-    sigma=0.01,   # Very low vol-of-vol
+    sigma=0.01,  # Very low vol-of-vol
     rho=-0.5,
 )
 
@@ -118,12 +118,14 @@ class TestHestonDispatcher:
         """Market params should report stochastic vol usage."""
         assert market_params_heston.uses_stochastic_vol()
         from annuity_pricing.options.volatility_models import VolatilityModelType
+
         assert market_params_heston.get_vol_model_type() == VolatilityModelType.HESTON
 
     def test_market_params_bs_default(self, market_params_bs):
         """Market params without vol_model should use BS."""
         assert not market_params_bs.uses_stochastic_vol()
         from annuity_pricing.options.volatility_models import VolatilityModelType
+
         assert market_params_bs.get_vol_model_type() == VolatilityModelType.BLACK_SCHOLES
 
     def test_pricer_initializes_with_heston(self, market_params_heston):
@@ -140,7 +142,9 @@ class TestHestonDispatcher:
         assert result.embedded_option_value > 0
         assert result.expected_credit >= 0
 
-    def test_participation_product_prices_with_heston(self, market_params_heston, participation_product):
+    def test_participation_product_prices_with_heston(
+        self, market_params_heston, participation_product
+    ):
         """Participation FIA should price successfully with Heston."""
         pricer = FIAPricer(market_params=market_params_heston, n_mc_paths=1000, seed=42)
         result = pricer.price(participation_product, term_years=1.0)
@@ -181,7 +185,10 @@ class TestHestonBSConvergence:
         result_bs = pricer_bs.price(cap_product, term_years=1.0)
 
         # Embedded option values should be close
-        rel_diff = abs(result_heston.embedded_option_value - result_bs.embedded_option_value) / result_bs.embedded_option_value
+        rel_diff = (
+            abs(result_heston.embedded_option_value - result_bs.embedded_option_value)
+            / result_bs.embedded_option_value
+        )
         assert rel_diff < 0.05, (
             f"Heston embedded option {result_heston.embedded_option_value:.4f} "
             f"differs from BS {result_bs.embedded_option_value:.4f} by {rel_diff:.1%}"
@@ -271,16 +278,28 @@ class TestStochasticVolEffects:
         high volatility, making OTM puts more expensive relative to BS.
         """
         # Standard negative rho
-        heston_neg = HestonVolatility(HestonParams(
-            v0=0.04, kappa=2.0, theta=0.04, sigma=0.3, rho=-0.7
-        ))
+        heston_neg = HestonVolatility(
+            HestonParams(v0=0.04, kappa=2.0, theta=0.04, sigma=0.3, rho=-0.7)
+        )
         # Zero rho (no skew)
-        heston_zero = HestonVolatility(HestonParams(
-            v0=0.04, kappa=2.0, theta=0.04, sigma=0.3, rho=0.0
-        ))
+        heston_zero = HestonVolatility(
+            HestonParams(v0=0.04, kappa=2.0, theta=0.04, sigma=0.3, rho=0.0)
+        )
 
-        market_neg = MarketParams(spot=100, risk_free_rate=0.05, dividend_yield=0.02, volatility=0.20, vol_model=heston_neg)
-        market_zero = MarketParams(spot=100, risk_free_rate=0.05, dividend_yield=0.02, volatility=0.20, vol_model=heston_zero)
+        market_neg = MarketParams(
+            spot=100,
+            risk_free_rate=0.05,
+            dividend_yield=0.02,
+            volatility=0.20,
+            vol_model=heston_neg,
+        )
+        market_zero = MarketParams(
+            spot=100,
+            risk_free_rate=0.05,
+            dividend_yield=0.02,
+            volatility=0.20,
+            vol_model=heston_zero,
+        )
 
         pricer_neg = FIAPricer(market_params=market_neg, n_mc_paths=50000, seed=42)
         pricer_zero = FIAPricer(market_params=market_zero, n_mc_paths=50000, seed=42)
@@ -299,15 +318,27 @@ class TestStochasticVolEffects:
         [T1] More volatility of volatility means more uncertainty,
         which increases option values (convexity effect).
         """
-        heston_low = HestonVolatility(HestonParams(
-            v0=0.04, kappa=2.0, theta=0.04, sigma=0.1, rho=-0.5
-        ))
-        heston_high = HestonVolatility(HestonParams(
-            v0=0.04, kappa=2.0, theta=0.04, sigma=0.5, rho=-0.5
-        ))
+        heston_low = HestonVolatility(
+            HestonParams(v0=0.04, kappa=2.0, theta=0.04, sigma=0.1, rho=-0.5)
+        )
+        heston_high = HestonVolatility(
+            HestonParams(v0=0.04, kappa=2.0, theta=0.04, sigma=0.5, rho=-0.5)
+        )
 
-        market_low = MarketParams(spot=100, risk_free_rate=0.05, dividend_yield=0.02, volatility=0.20, vol_model=heston_low)
-        market_high = MarketParams(spot=100, risk_free_rate=0.05, dividend_yield=0.02, volatility=0.20, vol_model=heston_high)
+        market_low = MarketParams(
+            spot=100,
+            risk_free_rate=0.05,
+            dividend_yield=0.02,
+            volatility=0.20,
+            vol_model=heston_low,
+        )
+        market_high = MarketParams(
+            spot=100,
+            risk_free_rate=0.05,
+            dividend_yield=0.02,
+            volatility=0.20,
+            vol_model=heston_high,
+        )
 
         pricer_low = FIAPricer(market_params=market_low, n_mc_paths=50000, seed=42)
         pricer_high = FIAPricer(market_params=market_high, n_mc_paths=50000, seed=42)

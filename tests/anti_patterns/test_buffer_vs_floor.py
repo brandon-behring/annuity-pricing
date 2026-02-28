@@ -30,6 +30,7 @@ class TestBufferVsFloor:
         Buffer (RILA): Client protected from FIRST X% loss, exposed beyond
         Floor (FIA): Client credited rate is floored at 0%, never negative
         """
+
         def buffer_payoff(index_return: float, buffer: float, cap: float) -> float:
             """RILA buffer: absorbs first X% of losses."""
             if index_return >= 0:
@@ -45,8 +46,8 @@ class TestBufferVsFloor:
             return max(credited, floor)
 
         buffer = 0.10  # 10% buffer
-        floor = 0.00   # 0% floor (standard FIA)
-        cap = 0.12     # 12% cap
+        floor = 0.00  # 0% floor (standard FIA)
+        cap = 0.12  # 12% cap
 
         # Case 1: -5% return (loss within buffer)
         # Buffer: absorbs -5% → client credited 0%
@@ -81,6 +82,7 @@ class TestBufferVsFloor:
 
         This is fundamentally different from a floor which protects from ALL loss.
         """
+
         def buffer_payoff(index_return: float, buffer: float) -> float:
             if index_return >= 0:
                 return index_return
@@ -93,8 +95,8 @@ class TestBufferVsFloor:
 
         # Test various loss levels
         test_cases = [
-            (-0.05, 0.0),    # -5%: within buffer, no loss
-            (-0.10, 0.0),    # -10%: exactly at buffer, no loss
+            (-0.05, 0.0),  # -5%: within buffer, no loss
+            (-0.10, 0.0),  # -10%: exactly at buffer, no loss
             (-0.15, -0.05),  # -15%: beyond buffer, client loses 5%
             (-0.20, -0.10),  # -20%: beyond buffer, client loses 10%
             (-0.30, -0.20),  # -30%: beyond buffer, client loses 20%
@@ -123,6 +125,7 @@ class TestBufferVsFloor:
 
         Unlike buffer, floor is an absolute minimum regardless of loss magnitude.
         """
+
         def floor_payoff(index_return: float, floor: float = 0.0) -> float:
             if index_return > 0:
                 return index_return  # No cap for simplicity
@@ -137,9 +140,7 @@ class TestBufferVsFloor:
                 f"FLOOR VIOLATION: Floor must protect from ALL loss! "
                 f"index_return={loss}, result={result}"
             )
-            assert result == 0.0, (
-                f"Floor should return exactly 0% for any loss, got {result}"
-            )
+            assert result == 0.0, f"Floor should return exactly 0% for any loss, got {result}"
 
     @pytest.mark.anti_pattern
     def test_buffer_and_floor_have_different_risk_profiles(self) -> None:
@@ -149,6 +150,7 @@ class TestBufferVsFloor:
         Buffer: Limited protection → client exposed in severe downturns
         Floor:  Unlimited protection → client never loses (but limited upside)
         """
+
         def buffer_payoff(index_return: float, buffer: float, cap: float) -> float:
             if index_return >= 0:
                 return min(index_return, cap)
@@ -177,9 +179,7 @@ class TestBufferVsFloor:
         )
 
         # Floor client loses 0%
-        assert floor_in_crash == 0.0, (
-            f"Floor crash result should be 0%, got {floor_in_crash}"
-        )
+        assert floor_in_crash == 0.0, f"Floor crash result should be 0%, got {floor_in_crash}"
 
         # Risk difference is material in tail events
         risk_difference = floor_in_crash - buffer_in_crash
@@ -206,9 +206,7 @@ class TestBufferVsFloor:
         fia_term_protection = "protects"  # Floor protects from all loss
 
         # These are semantic checks - ensuring terms are conceptually distinct
-        assert rila_term_buffer != fia_term_floor, (
-            "Buffer and floor terminology must be distinct"
-        )
+        assert rila_term_buffer != fia_term_floor, "Buffer and floor terminology must be distinct"
         assert rila_term_exposure != fia_term_protection, (
             "Exposure (buffer) and protection (floor) are different concepts"
         )
@@ -217,7 +215,7 @@ class TestBufferVsFloor:
         # Buffer: variable protection (depends on loss magnitude)
         # Floor: fixed protection (always 0% minimum)
         buffer_protection_varies = True  # -5% vs -15% gives different results
-        floor_protection_fixed = True     # Any loss gives 0%
+        floor_protection_fixed = True  # Any loss gives 0%
 
         assert buffer_protection_varies, "Buffer protection varies with loss magnitude"
         assert floor_protection_fixed, "Floor protection is fixed regardless of loss"
@@ -229,6 +227,7 @@ class TestBufferVsFloor:
 
         Once loss exceeds buffer, results diverge significantly.
         """
+
         def buffer_payoff(ret: float, buf: float) -> float:
             if ret >= 0:
                 return ret
@@ -246,9 +245,7 @@ class TestBufferVsFloor:
         for ret in within_buffer_returns:
             buf_result = buffer_payoff(ret, buffer)
             floor_result = floor_payoff(ret)
-            assert buf_result == floor_result == 0.0, (
-                f"Within buffer ({ret}), both should give 0%"
-            )
+            assert buf_result == floor_result == 0.0, f"Within buffer ({ret}), both should give 0%"
 
         # Beyond buffer: DIFFERENT results
         beyond_buffer_returns = [-0.20, -0.30, -0.50]

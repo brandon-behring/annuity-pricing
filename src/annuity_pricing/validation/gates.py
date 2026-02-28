@@ -23,6 +23,7 @@ from annuity_pricing.products.rila import RILAPricingResult
 
 class GateStatus(Enum):
     """Status of a validation gate."""
+
     PASS = "pass"
     HALT = "halt"
     WARN = "warn"
@@ -121,6 +122,7 @@ class ValidationReport:
 # =============================================================================
 # Gate Implementations
 # =============================================================================
+
 
 class ValidationGate:
     """
@@ -317,7 +319,7 @@ class FIAOptionBudgetGate(ValidationGate):
                 status=GateStatus.HALT,  # [F.4] Changed from WARN
                 gate_name=self.name,
                 message=f"Embedded option value {result.embedded_option_value:.4f} "
-                        f"exceeds budget {result.option_budget:.4f} by {(ratio-1)*100:.1f}%",
+                f"exceeds budget {result.option_budget:.4f} by {(ratio - 1) * 100:.1f}%",
                 value=ratio,
                 threshold=1 + self.tolerance,
             )
@@ -353,7 +355,7 @@ class FIAExpectedCreditGate(ValidationGate):
                 status=GateStatus.HALT,
                 gate_name=self.name,
                 message=f"Expected credit {result.expected_credit:.4f} is negative "
-                        "(violates 0% floor)",
+                "(violates 0% floor)",
                 value=result.expected_credit,
                 threshold=0.0,
             )
@@ -365,7 +367,7 @@ class FIAExpectedCreditGate(ValidationGate):
                 status=GateStatus.HALT,
                 gate_name=self.name,
                 message=f"Expected credit {result.expected_credit:.4f} exceeds "
-                        f"cap rate {cap_rate:.4f}",
+                f"cap rate {cap_rate:.4f}",
                 value=result.expected_credit,
                 threshold=cap_rate,
             )
@@ -424,7 +426,7 @@ class RILAMaxLossGate(ValidationGate):
                         status=GateStatus.WARN,
                         gate_name=self.name,
                         message=f"Buffer max loss {result.max_loss:.4f} doesn't match "
-                                f"expected {expected_max_loss:.4f}",
+                        f"expected {expected_max_loss:.4f}",
                         value=result.max_loss,
                         threshold=expected_max_loss,
                     )
@@ -434,7 +436,7 @@ class RILAMaxLossGate(ValidationGate):
                         status=GateStatus.WARN,
                         gate_name=self.name,
                         message=f"Floor max loss {result.max_loss:.4f} doesn't match "
-                                f"floor rate {buffer_rate:.4f}",
+                        f"floor rate {buffer_rate:.4f}",
                         value=result.max_loss,
                         threshold=buffer_rate,
                     )
@@ -494,7 +496,7 @@ class RILAProtectionValueGate(ValidationGate):
                 status=GateStatus.WARN,
                 gate_name=self.name,
                 message=f"Protection value {result.protection_value:.4f} exceeds "
-                        f"{self.max_protection_pct*100:.0f}% of premium",
+                f"{self.max_protection_pct * 100:.0f}% of premium",
                 value=result.protection_value,
                 threshold=max_protection,
             )
@@ -527,7 +529,7 @@ class ArbitrageBoundsGate(ValidationGate):
                     status=GateStatus.HALT,
                     gate_name=self.name,
                     message=f"Option value {result.embedded_option_value:.4f} exceeds "
-                            f"premium {premium:.4f} (arbitrage violation)",
+                    f"premium {premium:.4f} (arbitrage violation)",
                     value=result.embedded_option_value,
                     threshold=premium,
                 )
@@ -540,7 +542,7 @@ class ArbitrageBoundsGate(ValidationGate):
                     status=GateStatus.HALT,
                     gate_name=self.name,
                     message=f"Protection value {result.protection_value:.4f} exceeds "
-                            f"max loss value {max_loss_value:.4f}",
+                    f"max loss value {max_loss_value:.4f}",
                     value=result.protection_value,
                     threshold=max_loss_value,
                 )
@@ -587,9 +589,7 @@ class ProductParameterSanityGate(ValidationGate):
             if cap_rate < 0:
                 issues.append(f"cap_rate {cap_rate:.4f} is negative")
             elif cap_rate > self.MAX_CAP_RATE:
-                issues.append(
-                    f"cap_rate {cap_rate:.4f} exceeds maximum {self.MAX_CAP_RATE:.0%}"
-                )
+                issues.append(f"cap_rate {cap_rate:.4f} exceeds maximum {self.MAX_CAP_RATE:.0%}")
 
         # Check participation rate
         participation_rate = context.get("participation_rate")
@@ -640,6 +640,7 @@ class ProductParameterSanityGate(ValidationGate):
 # =============================================================================
 # Validation Engine
 # =============================================================================
+
 
 class ValidationEngine:
     """
@@ -741,8 +742,8 @@ class ValidationEngine:
         if not report.passed:
             halt_messages = [g.message for g in report.halted_gates]
             raise ValueError(
-                "CRITICAL: Validation failed. HALTs:\n" +
-                "\n".join(f"  - {m}" for m in halt_messages)
+                "CRITICAL: Validation failed. HALTs:\n"
+                + "\n".join(f"  - {m}" for m in halt_messages)
             )
 
         return result
@@ -751,6 +752,7 @@ class ValidationEngine:
 # =============================================================================
 # Convenience Functions
 # =============================================================================
+
 
 def validate_pricing_result(
     result: PricingResult,

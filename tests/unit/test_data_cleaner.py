@@ -58,6 +58,7 @@ def df_with_outliers() -> pd.DataFrame:
 # Clip Cap Rate Tests
 # =============================================================================
 
+
 class TestClipCapRate:
     """Tests for clip_cap_rate function."""
 
@@ -77,18 +78,14 @@ class TestClipCapRate:
         assert result.loc[1, "capRate"] == 0.10
         assert result.loc[4, "capRate"] == 0.08
 
-    def test_does_not_modify_original_by_default(
-        self, df_with_outliers: pd.DataFrame
-    ) -> None:
+    def test_does_not_modify_original_by_default(self, df_with_outliers: pd.DataFrame) -> None:
         """Should return copy, not modify original."""
         original_value = df_with_outliers.loc[2, "capRate"]
         clip_cap_rate(df_with_outliers)
 
         assert df_with_outliers.loc[2, "capRate"] == original_value
 
-    def test_modifies_inplace_when_requested(
-        self, df_with_outliers: pd.DataFrame
-    ) -> None:
+    def test_modifies_inplace_when_requested(self, df_with_outliers: pd.DataFrame) -> None:
         """Should modify in place when inplace=True."""
         clip_cap_rate(df_with_outliers, inplace=True)
 
@@ -106,6 +103,7 @@ class TestClipCapRate:
 # =============================================================================
 # Clip Performance Triggered Rate Tests
 # =============================================================================
+
 
 class TestClipPerformanceTriggeredRate:
     """Tests for clip_performance_triggered_rate function."""
@@ -129,6 +127,7 @@ class TestClipPerformanceTriggeredRate:
 # Clip Spread Rate Tests
 # =============================================================================
 
+
 class TestClipSpreadRate:
     """Tests for clip_spread_rate function."""
 
@@ -150,6 +149,7 @@ class TestClipSpreadRate:
 # =============================================================================
 # Filter Valid Guarantee Duration Tests
 # =============================================================================
+
 
 class TestFilterValidGuaranteeDuration:
     """Tests for filter_valid_guarantee_duration function."""
@@ -182,12 +182,11 @@ class TestFilterValidGuaranteeDuration:
 # Coerce MVA Nulls Tests
 # =============================================================================
 
+
 class TestCoerceMvaNulls:
     """Tests for coerce_mva_nulls function."""
 
-    def test_converts_none_strings_to_null(
-        self, df_with_outliers: pd.DataFrame
-    ) -> None:
+    def test_converts_none_strings_to_null(self, df_with_outliers: pd.DataFrame) -> None:
         """Should convert 'None' strings to actual null values."""
         result = coerce_mva_nulls(df_with_outliers)
 
@@ -213,6 +212,7 @@ class TestCoerceMvaNulls:
 # =============================================================================
 # Clean WINK Data Tests
 # =============================================================================
+
 
 class TestCleanWinkData:
     """Tests for clean_wink_data function."""
@@ -264,6 +264,7 @@ class TestCleanWinkData:
 # =============================================================================
 # Cleaning Summary Tests
 # =============================================================================
+
 
 class TestGetCleaningSummary:
     """Tests for get_cleaning_summary function."""

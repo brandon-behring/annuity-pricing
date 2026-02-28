@@ -106,7 +106,7 @@ class TestExpenseModel:
         result_5 = model.calculate_period_expense(av=0, years_from_issue=5)
 
         # Expected: 100 × (1.025)^5 ≈ 113.14
-        expected_year_5 = 100.0 * (1.025 ** 5)
+        expected_year_5 = 100.0 * (1.025**5)
         assert result_5.per_policy_component == pytest.approx(expected_year_5, rel=0.001)
 
     def test_av_component_scales_with_av(self, model: ExpenseModel) -> None:
@@ -251,8 +251,7 @@ class TestPVExpenses:
             av_path, survival, 0.05, dt=1.0, include_acquisition=False
         )
         pv_with = model.calculate_pv_expenses(
-            av_path, survival, 0.05, dt=1.0,
-            include_acquisition=True, premium=premium
+            av_path, survival, 0.05, dt=1.0, include_acquisition=True, premium=premium
         )
 
         # Should include $3,000 acquisition cost
@@ -265,9 +264,7 @@ class TestPVExpenses:
         survival = np.array([1.0])
 
         with pytest.raises(ValueError, match="Premium required"):
-            model.calculate_pv_expenses(
-                av_path, survival, 0.05, include_acquisition=True
-            )
+            model.calculate_pv_expenses(av_path, survival, 0.05, include_acquisition=True)
 
     def test_pv_path_length_mismatch_raises(self, model: ExpenseModel) -> None:
         """Mismatched path lengths should raise error."""

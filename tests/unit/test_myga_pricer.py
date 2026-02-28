@@ -101,9 +101,7 @@ class TestMYGAPricerPrice:
             "Duration should equal guarantee duration for single-payment MYGA"
         )
 
-    def test_convexity_formula(
-        self, pricer: MYGAPricer, sample_product: MYGAProduct
-    ) -> None:
+    def test_convexity_formula(self, pricer: MYGAPricer, sample_product: MYGAProduct) -> None:
         """
         [T1] Convexity = T(T+1)/(1+r)^2 for zero-coupon.
         """
@@ -115,9 +113,7 @@ class TestMYGAPricerPrice:
             f"Convexity should be {expected_convexity:.2f}, got {result.convexity:.2f}"
         )
 
-    def test_details_include_mgsv(
-        self, pricer: MYGAPricer, sample_product: MYGAProduct
-    ) -> None:
+    def test_details_include_mgsv(self, pricer: MYGAPricer, sample_product: MYGAProduct) -> None:
         """Should include MGSV floor in details."""
         result = pricer.price(sample_product, principal=100_000, include_mgsv=True)
 
@@ -126,9 +122,7 @@ class TestMYGAPricerPrice:
         assert result.details["mgsv"] is not None
         assert result.details["mgsv"] > 0
 
-    def test_mgsv_calculation(
-        self, pricer: MYGAPricer, sample_product: MYGAProduct
-    ) -> None:
+    def test_mgsv_calculation(self, pricer: MYGAPricer, sample_product: MYGAProduct) -> None:
         """
         [T1] MGSV = 87.5% × Principal × (1 + 1%)^years
         """
@@ -167,9 +161,7 @@ class TestMYGAPricerPrice:
         with pytest.raises(ValueError, match="CRITICAL"):
             pricer.price(invalid_product)
 
-    def test_returns_as_of_date(
-        self, pricer: MYGAPricer, sample_product: MYGAProduct
-    ) -> None:
+    def test_returns_as_of_date(self, pricer: MYGAPricer, sample_product: MYGAProduct) -> None:
         """Should return provided as_of_date."""
         test_date = date(2025, 1, 15)
         result = pricer.price(sample_product, as_of_date=test_date)
@@ -198,12 +190,14 @@ class TestMYGAPricerCompetitivePosition:
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
         """Create sample market data with known distribution."""
-        return pd.DataFrame({
-            "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050],
-            "guaranteeDuration": [5, 5, 5, 5, 5, 5],
-            "productGroup": ["MYGA"] * 6,
-            "status": ["current"] * 6,
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050],
+                "guaranteeDuration": [5, 5, 5, 5, 5, 5],
+                "productGroup": ["MYGA"] * 6,
+                "status": ["current"] * 6,
+            }
+        )
 
     def test_returns_competitive_position(
         self,
@@ -263,12 +257,14 @@ class TestMYGAPricerCompetitivePosition:
     ) -> None:
         """Should filter to similar duration products."""
         # Market data with mixed durations
-        market_data = pd.DataFrame({
-            "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050, 0.055],
-            "guaranteeDuration": [5, 5, 5, 5, 5, 3, 10],  # Last two different duration
-            "productGroup": ["MYGA"] * 7,
-            "status": ["current"] * 7,
-        })
+        market_data = pd.DataFrame(
+            {
+                "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050, 0.055],
+                "guaranteeDuration": [5, 5, 5, 5, 5, 3, 10],  # Last two different duration
+                "productGroup": ["MYGA"] * 7,
+                "status": ["current"] * 7,
+            }
+        )
 
         result = pricer.competitive_position(sample_product, market_data, duration_match=True)
 
@@ -281,12 +277,14 @@ class TestMYGAPricerCompetitivePosition:
         sample_product: MYGAProduct,
     ) -> None:
         """Should raise ValueError when no comparable products found."""
-        empty_market = pd.DataFrame({
-            "fixedRate": [],
-            "guaranteeDuration": [],
-            "productGroup": [],
-            "status": [],
-        })
+        empty_market = pd.DataFrame(
+            {
+                "fixedRate": [],
+                "guaranteeDuration": [],
+                "productGroup": [],
+                "status": [],
+            }
+        )
 
         with pytest.raises(ValueError, match="CRITICAL"):
             pricer.competitive_position(sample_product, empty_market)
@@ -302,12 +300,14 @@ class TestMYGAPricerRecommendRate:
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
         """Create sample market data."""
-        return pd.DataFrame({
-            "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050],
-            "guaranteeDuration": [5, 5, 5, 5, 5, 5],
-            "productGroup": ["MYGA"] * 6,
-            "status": ["current"] * 6,
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050],
+                "guaranteeDuration": [5, 5, 5, 5, 5, 5],
+                "productGroup": ["MYGA"] * 6,
+                "status": ["current"] * 6,
+            }
+        )
 
     def test_recommends_rate_for_percentile(
         self, pricer: MYGAPricer, market_data: pd.DataFrame
@@ -322,6 +322,7 @@ class TestMYGAPricerRecommendRate:
         # 75th percentile of [0.040, 0.042, 0.044, 0.046, 0.048, 0.050]
         # Using numpy percentile logic
         import numpy as np
+
         expected = np.percentile([0.040, 0.042, 0.044, 0.046, 0.048, 0.050], 75)
         assert abs(rate - expected) < 1e-6
 
@@ -336,16 +337,16 @@ class TestMYGAPricerRecommendRate:
                 guarantee_duration=5,
             )
 
-    def test_raises_on_no_comparables(
-        self, pricer: MYGAPricer
-    ) -> None:
+    def test_raises_on_no_comparables(self, pricer: MYGAPricer) -> None:
         """Should raise ValueError when no comparables found."""
-        empty_market = pd.DataFrame({
-            "fixedRate": [],
-            "guaranteeDuration": [],
-            "productGroup": [],
-            "status": [],
-        })
+        empty_market = pd.DataFrame(
+            {
+                "fixedRate": [],
+                "guaranteeDuration": [],
+                "productGroup": [],
+                "status": [],
+            }
+        )
 
         with pytest.raises(ValueError, match="CRITICAL"):
             pricer.recommend_rate(
@@ -373,9 +374,7 @@ class TestMYGAPricerSpreadOverTreasury:
             guarantee_duration=5,
         )
 
-    def test_spread_calculation_bps(
-        self, pricer: MYGAPricer, sample_product: MYGAProduct
-    ) -> None:
+    def test_spread_calculation_bps(self, pricer: MYGAPricer, sample_product: MYGAProduct) -> None:
         """
         [T2] Spread = (product_rate - treasury_rate) × 10000 bps.
         """
@@ -387,9 +386,7 @@ class TestMYGAPricerSpreadOverTreasury:
         # 4.5% - 4.0% = 0.5% = 50 bps
         assert abs(spread - 50.0) < 1e-6
 
-    def test_negative_spread(
-        self, pricer: MYGAPricer, sample_product: MYGAProduct
-    ) -> None:
+    def test_negative_spread(self, pricer: MYGAPricer, sample_product: MYGAProduct) -> None:
         """Spread can be negative if treasury exceeds product rate."""
         spread = pricer.calculate_spread_over_treasury(
             sample_product,

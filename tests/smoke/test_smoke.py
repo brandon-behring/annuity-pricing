@@ -14,6 +14,7 @@ import pytest
 # Import Smoke Tests
 # =============================================================================
 
+
 class TestImportSmoke:
     """Verify core modules import successfully."""
 
@@ -55,6 +56,7 @@ class TestImportSmoke:
 # =============================================================================
 # Quick Pricing Smoke Tests
 # =============================================================================
+
 
 class TestPricingSmoke:
     """Quick pricing functionality tests."""
@@ -143,6 +145,7 @@ class TestPricingSmoke:
 # Black-Scholes Smoke Tests
 # =============================================================================
 
+
 class TestBlackScholesSmoke:
     """Quick Black-Scholes functionality tests."""
 
@@ -186,6 +189,7 @@ class TestBlackScholesSmoke:
 # Payoff Smoke Tests
 # =============================================================================
 
+
 class TestPayoffSmoke:
     """Quick payoff functionality tests."""
 
@@ -221,6 +225,7 @@ class TestPayoffSmoke:
 # Configuration Smoke Tests
 # =============================================================================
 
+
 class TestConfigSmoke:
     """Quick configuration tests."""
 
@@ -245,6 +250,7 @@ class TestConfigSmoke:
 # =============================================================================
 # Quick Full Stack Smoke Test
 # =============================================================================
+
 
 class TestFullStackSmoke:
     """Complete stack test - single product through entire pipeline."""

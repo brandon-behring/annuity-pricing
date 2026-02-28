@@ -61,6 +61,7 @@ def load_r_golden() -> dict:
 # Mortality Bounds Tests
 # =============================================================================
 
+
 class TestMortalityBounds:
     """Test mortality rate bounds and monotonicity."""
 
@@ -76,9 +77,7 @@ class TestMortalityBounds:
 
             for age_str, age_data in table_data["qx_values"].items():
                 qx = age_data["qx"]
-                assert 0.0 <= qx <= 1.0, (
-                    f"Table {table_key} age {age_str}: qx={qx} outside [0,1]"
-                )
+                assert 0.0 <= qx <= 1.0, f"Table {table_key} age {age_str}: qx={qx} outside [0,1]"
 
     def test_qx_increases_with_age(self):
         """[T1] qx generally increases with age after young adulthood."""
@@ -111,6 +110,7 @@ class TestMortalityBounds:
 # =============================================================================
 # SOA Table Structure Tests
 # =============================================================================
+
 
 class TestSOATableStructure:
     """Test SOA table data structure."""
@@ -146,6 +146,7 @@ class TestSOATableStructure:
 # Life Contingencies Tests
 # =============================================================================
 
+
 class TestLifeContingencies:
     """Test life contingencies golden values."""
 
@@ -178,6 +179,7 @@ class TestLifeContingencies:
 # Actuarial Identity Tests
 # =============================================================================
 
+
 class TestActuarialIdentities:
     """Test actuarial identities hold."""
 
@@ -206,14 +208,13 @@ class TestActuarialIdentities:
 
                 # These are placeholder values, so just verify relationship direction
                 # Full validation requires regenerated goldens from Julia
-                assert ax > 0 and expected_ax > 0, (
-                    "ax and expected_ax should be positive"
-                )
+                assert ax > 0 and expected_ax > 0, "ax and expected_ax should be positive"
 
 
 # =============================================================================
 # Cross-Validation Tests: Julia vs R
 # =============================================================================
+
 
 class TestJuliaRCrossValidation:
     """Cross-validate Julia MortalityTables.jl against R lifecontingencies.
@@ -262,9 +263,7 @@ class TestJuliaRCrossValidation:
         r_ax = r["soa_2012_iam_male"]["ax_65_i5"]
 
         # ax values should match to 4 decimal places
-        assert abs(julia_ax - r_ax) < 0.01, (
-            f"ax_65_i5: Julia={julia_ax} vs R={r_ax}"
-        )
+        assert abs(julia_ax - r_ax) < 0.01, f"ax_65_i5: Julia={julia_ax} vs R={r_ax}"
 
     def test_Ax_julia_vs_r(self):
         """[T1] Whole life insurance Ax should match between Julia and R."""
@@ -275,9 +274,7 @@ class TestJuliaRCrossValidation:
         r_Ax = r["soa_2012_iam_male"]["Ax_65_i5"]
 
         # Ax values should match to 4 decimal places
-        assert abs(julia_Ax - r_Ax) < 0.01, (
-            f"Ax_65_i5: Julia={julia_Ax} vs R={r_Ax}"
-        )
+        assert abs(julia_Ax - r_Ax) < 0.01, f"Ax_65_i5: Julia={julia_Ax} vs R={r_Ax}"
 
     def test_ax_multiple_rates(self):
         """[T1] ax at different rates should match between Julia and R."""
@@ -287,16 +284,12 @@ class TestJuliaRCrossValidation:
         # ax at 3% interest
         julia_ax_3 = julia["soa_2012_iam_male"]["ax_65_i3"]
         r_ax_3 = r["soa_2012_iam_male"]["ax_65_i3"]
-        assert abs(julia_ax_3 - r_ax_3) < 0.01, (
-            f"ax_65_i3: Julia={julia_ax_3} vs R={r_ax_3}"
-        )
+        assert abs(julia_ax_3 - r_ax_3) < 0.01, f"ax_65_i3: Julia={julia_ax_3} vs R={r_ax_3}"
 
         # ax at age 70
         julia_ax_70 = julia["soa_2012_iam_male"]["ax_70_i5"]
         r_ax_70 = r["soa_2012_iam_male"]["ax_70_i5"]
-        assert abs(julia_ax_70 - r_ax_70) < 0.01, (
-            f"ax_70_i5: Julia={julia_ax_70} vs R={r_ax_70}"
-        )
+        assert abs(julia_ax_70 - r_ax_70) < 0.01, f"ax_70_i5: Julia={julia_ax_70} vs R={r_ax_70}"
 
     def test_female_ax_julia_vs_r(self):
         """[T1] Female ax values should match between Julia and R."""
@@ -306,9 +299,7 @@ class TestJuliaRCrossValidation:
         julia_ax = julia["soa_2012_iam_female"]["ax_65_i5"]
         r_ax = r["soa_2012_iam_female"]["ax_65_i5"]
 
-        assert abs(julia_ax - r_ax) < 0.01, (
-            f"Female ax_65_i5: Julia={julia_ax} vs R={r_ax}"
-        )
+        assert abs(julia_ax - r_ax) < 0.01, f"Female ax_65_i5: Julia={julia_ax} vs R={r_ax}"
 
 
 class TestMortalitySourcesAgreement:
@@ -336,14 +327,13 @@ class TestMortalitySourcesAgreement:
         julia_ages = set(julia["soa_2012_iam_male"]["qx"].keys())
         r_ages = set(r["soa_2012_iam_male"]["qx"].keys())
 
-        assert julia_ages == r_ages, (
-            f"Age mismatch: Julia has {julia_ages}, R has {r_ages}"
-        )
+        assert julia_ages == r_ages, f"Age mismatch: Julia has {julia_ages}, R has {r_ages}"
 
 
 # =============================================================================
 # Regeneration Script Check
 # =============================================================================
+
 
 class TestGoldenRegeneration:
     """Test golden file regeneration infrastructure."""

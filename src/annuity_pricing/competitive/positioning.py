@@ -45,9 +45,7 @@ class PositionResult:
     def __post_init__(self) -> None:
         """Validate position result."""
         if not 0 <= self.percentile <= 100:
-            raise ValueError(
-                f"CRITICAL: percentile must be 0-100, got {self.percentile}"
-            )
+            raise ValueError(f"CRITICAL: percentile must be 0-100, got {self.percentile}")
         if self.rank < 1:
             raise ValueError(f"CRITICAL: rank must be >= 1, got {self.rank}")
         if self.quartile not in (1, 2, 3, 4):
@@ -261,9 +259,7 @@ class PositioningAnalyzer:
         rates = comparables[self.rate_column].dropna()
 
         if rates.empty:
-            raise ValueError(
-                "CRITICAL: No comparable products found for distribution analysis."
-            )
+            raise ValueError("CRITICAL: No comparable products found for distribution analysis.")
 
         return DistributionStats(
             min=float(rates.min()),
@@ -322,9 +318,7 @@ class PositioningAnalyzer:
         rates = comparables[self.rate_column].dropna()
 
         if rates.empty:
-            raise ValueError(
-                "CRITICAL: No comparable products found for percentile calculation."
-            )
+            raise ValueError("CRITICAL: No comparable products found for percentile calculation.")
 
         return {p: float(np.percentile(rates, p)) for p in percentiles}
 
@@ -383,26 +377,30 @@ class PositioningAnalyzer:
         # Build comparison DataFrame
         results = []
         for i, (comp_name, comp_rate) in enumerate(company_rates.head(top_n).items(), 1):
-            results.append({
-                "company": comp_name,
-                "rate": comp_rate,
-                "rank": i,
-                "vs_target_bps": (comp_rate - rate) * 10000,
-                "is_target": comp_name == company,
-            })
+            results.append(
+                {
+                    "company": comp_name,
+                    "rate": comp_rate,
+                    "rank": i,
+                    "vs_target_bps": (comp_rate - rate) * 10000,
+                    "is_target": comp_name == company,
+                }
+            )
 
         # Add target company if not in top N
         if company not in company_rates.head(top_n).index:
             if company in company_rates.index:
                 target_rate = company_rates[company]
                 target_rank = (company_rates > target_rate).sum() + 1
-                results.append({
-                    "company": company,
-                    "rate": target_rate,
-                    "rank": int(target_rank),
-                    "vs_target_bps": (target_rate - rate) * 10000,
-                    "is_target": True,
-                })
+                results.append(
+                    {
+                        "company": company,
+                        "rate": target_rate,
+                        "rank": int(target_rank),
+                        "vs_target_bps": (target_rate - rate) * 10000,
+                        "is_target": True,
+                    }
+                )
 
         return pd.DataFrame(results)
 

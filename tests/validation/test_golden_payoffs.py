@@ -147,9 +147,7 @@ def test_payoff_matches_truth_table(row: dict):
 
     result = payoff.calculate(index_return)
 
-    assert result.credited_return == pytest.approx(
-        expected_payoff, abs=TOLERANCE
-    ), (
+    assert result.credited_return == pytest.approx(expected_payoff, abs=TOLERANCE), (
         f"Payoff mismatch for {row['test_id']}: "
         f"expected {expected_payoff}, got {result.credited_return}. "
         f"Edge case: {row['edge_case']}"
@@ -276,8 +274,14 @@ class TestTruthTableIntegrity:
         methods = {row["method"] for row in TRUTH_TABLE}
 
         expected_methods = {
-            "cap", "participation", "spread", "trigger",  # FIA
-            "buffer", "floor", "buffer_floor", "step_rate",  # RILA
+            "cap",
+            "participation",
+            "spread",
+            "trigger",  # FIA
+            "buffer",
+            "floor",
+            "buffer_floor",
+            "step_rate",  # RILA
             "buffer_vs_floor",  # Comparison
         }
 
@@ -287,7 +291,8 @@ class TestTruthTableIntegrity:
     def test_100_percent_buffer_in_table(self):
         """100% buffer edge case should be in truth table."""
         buffer_100_cases = [
-            row for row in TRUTH_TABLE
+            row
+            for row in TRUTH_TABLE
             if row["method"] == "buffer" and parse_float(row.get("buffer_rate", "0")) == 1.0
         ]
         assert len(buffer_100_cases) >= 1, "Missing 100% buffer edge case"
@@ -299,11 +304,23 @@ class TestCrossValidationReadiness:
     def test_csv_format_valid(self):
         """CSV should have consistent column structure."""
         expected_columns = {
-            "test_id", "category", "method", "index_return",
-            "cap_rate", "participation_rate", "spread_rate",
-            "trigger_rate", "trigger_threshold", "buffer_rate", "floor_rate",
-            "expected_payoff", "cap_applied", "floor_applied",
-            "edge_case", "formula", "reference",
+            "test_id",
+            "category",
+            "method",
+            "index_return",
+            "cap_rate",
+            "participation_rate",
+            "spread_rate",
+            "trigger_rate",
+            "trigger_threshold",
+            "buffer_rate",
+            "floor_rate",
+            "expected_payoff",
+            "cap_applied",
+            "floor_applied",
+            "edge_case",
+            "formula",
+            "reference",
         }
 
         if TRUTH_TABLE:
@@ -334,15 +351,19 @@ class TestCrossValidationReadiness:
                 result = payoff.calculate(index_return)
 
                 if abs(result.credited_return - expected) > TOLERANCE:
-                    mismatches.append({
-                        "test_id": row["test_id"],
-                        "expected": expected,
-                        "actual": result.credited_return,
-                    })
+                    mismatches.append(
+                        {
+                            "test_id": row["test_id"],
+                            "expected": expected,
+                            "actual": result.credited_return,
+                        }
+                    )
             except Exception as e:
-                mismatches.append({
-                    "test_id": row.get("test_id", "unknown"),
-                    "error": str(e),
-                })
+                mismatches.append(
+                    {
+                        "test_id": row.get("test_id", "unknown"),
+                        "error": str(e),
+                    }
+                )
 
         assert not mismatches, f"Reproducibility failures: {mismatches[:5]}"

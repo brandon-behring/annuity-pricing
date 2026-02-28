@@ -149,9 +149,7 @@ class TornadoData:
         """Calculate derived fields."""
         self.n_parameters = len(self.results)
         # Ensure sorted by sensitivity_width descending
-        self.results = sorted(
-            self.results, key=lambda r: r.sensitivity_width, reverse=True
-        )
+        self.results = sorted(self.results, key=lambda r: r.sensitivity_width, reverse=True)
 
     @property
     def most_sensitive_parameter(self) -> str | None:
@@ -316,13 +314,7 @@ class SensitivityAnalyzer:
         # Withdrawal impact: Higher withdrawals increase reserve
         withdrawal_impact = (withdrawal_multiplier - 1.0) * 0.16
 
-        total_impact = (
-            equity_impact
-            + rate_impact
-            + vol_impact
-            + lapse_impact
-            + withdrawal_impact
-        )
+        total_impact = equity_impact + rate_impact + vol_impact + lapse_impact + withdrawal_impact
 
         stressed_reserve = base_reserve * (1.0 + total_impact)
         return max(stressed_reserve, 0.01)
@@ -530,9 +522,9 @@ def format_sensitivity_result(result: SensitivityResult) -> str:
     """
     return (
         f"| {result.display_name:<25} | "
-        f"{result.down_delta_pct*100:>+7.1f}% | "
-        f"{result.up_delta_pct*100:>+7.1f}% | "
-        f"{result.sensitivity_width*100:>6.1f}% |"
+        f"{result.down_delta_pct * 100:>+7.1f}% | "
+        f"{result.up_delta_pct * 100:>+7.1f}% | "
+        f"{result.sensitivity_width * 100:>6.1f}% |"
     )
 
 
@@ -565,7 +557,7 @@ def format_tornado_table(tornado: TornadoData) -> str:
         lines.append("")
         lines.append(
             f"**Most sensitive**: {tornado.most_sensitive_parameter} "
-            f"(width: {tornado.results[0].sensitivity_width*100:.1f}%)"
+            f"(width: {tornado.results[0].sensitivity_width * 100:.1f}%)"
         )
 
     return "\n".join(lines)
@@ -594,9 +586,9 @@ def format_tornado_summary(tornado: TornadoData) -> str:
     return (
         f"Sensitivity analysis of {tornado.n_parameters} parameters "
         f"shows {most.display_name} is most impactful "
-        f"(width: {most.sensitivity_width*100:.1f}%), "
+        f"(width: {most.sensitivity_width * 100:.1f}%), "
         f"while {least.display_name} is least impactful "
-        f"(width: {least.sensitivity_width*100:.1f}%)."
+        f"(width: {least.sensitivity_width * 100:.1f}%)."
     )
 
 

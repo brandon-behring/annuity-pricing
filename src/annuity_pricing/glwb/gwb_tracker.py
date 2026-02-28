@@ -30,6 +30,7 @@ from .rollup import CompoundRollup, RatchetMechanic, SimpleRollup
 
 class RollupType(Enum):
     """Type of rollup applied to GWB."""
+
     SIMPLE = "simple"
     COMPOUND = "compound"
     NONE = "none"
@@ -267,8 +268,8 @@ class GWBTracker:
         if self._ratchet is not None:
             # Check if we're on a ratchet anniversary
             is_anniversary = (
-                int(years) > int(state.years_since_issue) and
-                int(years) % self.config.ratchet_frequency == 0
+                int(years) > int(state.years_since_issue)
+                and int(years) % self.config.ratchet_frequency == 0
             )
             if is_anniversary:
                 new_gwb = self._ratchet.apply_ratchet(gwb, av)

@@ -24,6 +24,7 @@ from annuity_pricing.products.registry import (
 # Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def market_env():
     """Standard market environment."""
@@ -78,6 +79,7 @@ def rila_product():
 # Delta Hedging Tests
 # =============================================================================
 
+
 class TestDeltaHedging:
     """Test delta hedging reduces spot risk."""
 
@@ -131,7 +133,9 @@ class TestDeltaHedging:
         up_result = up_registry.price(rila_product, term_years=1.0, premium=100_000.0)
 
         # Delta estimate
-        delta = (up_result.protection_value - base_result.protection_value) / (market_env.spot * 0.01)
+        delta = (up_result.protection_value - base_result.protection_value) / (
+            market_env.spot * 0.01
+        )
 
         # Delta should be finite and reasonable
         assert np.isfinite(delta), "Delta should be finite"
@@ -142,6 +146,7 @@ class TestDeltaHedging:
 # =============================================================================
 # Vega Hedging Tests
 # =============================================================================
+
 
 class TestVegaHedging:
     """Test vega hedging reduces volatility risk."""
@@ -194,6 +199,7 @@ class TestVegaHedging:
 # Gamma Hedging Tests
 # =============================================================================
 
+
 class TestGammaExposure:
     """Test gamma exposure estimation."""
 
@@ -219,7 +225,7 @@ class TestGammaExposure:
 
         # Second derivative estimate
         h = market_env.spot * 0.01
-        gamma = (option_values[2] - 2 * option_values[1] + option_values[0]) / (h ** 2)
+        gamma = (option_values[2] - 2 * option_values[1] + option_values[0]) / (h**2)
 
         # Gamma should be finite
         assert np.isfinite(gamma), "Gamma should be finite"
@@ -250,6 +256,7 @@ class TestGammaExposure:
 # =============================================================================
 # Hedging Strategy Tests
 # =============================================================================
+
 
 class TestHedgingStrategy:
     """Test hedging strategy effectiveness."""
@@ -289,4 +296,6 @@ class TestHedgingStrategy:
         # (otherwise product is uneconomical)
         if result.embedded_option_value > 0:
             hedge_cost_ratio = annual_hedge_cost / result.embedded_option_value
-            assert hedge_cost_ratio < 0.50, "Hedge cost should be manageable fraction of option value"
+            assert hedge_cost_ratio < 0.50, (
+                "Hedge cost should be manageable fraction of option value"
+            )

@@ -45,6 +45,7 @@ time_strategy = st.floats(min_value=0.25, max_value=2.0, allow_nan=False, allow_
 # MC Bound Properties
 # =============================================================================
 
+
 class TestMCBoundsProperty:
     """[T1] MC prices should satisfy no-arbitrage bounds."""
 
@@ -58,8 +59,7 @@ class TestMCBoundsProperty:
     )
     @settings(max_examples=50)  # Fewer examples due to MC cost
     def test_mc_call_upper_bound(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """[T1] MC call bounded: 0 <= C <= S."""
         mc_price = monte_carlo_price(
@@ -75,9 +75,7 @@ class TestMCBoundsProperty:
         )
 
         assert mc_price >= -MC_10K_TOLERANCE, f"MC call negative: {mc_price}"
-        assert mc_price <= spot + MC_10K_TOLERANCE, (
-            f"MC call > S: {mc_price} > {spot}"
-        )
+        assert mc_price <= spot + MC_10K_TOLERANCE, f"MC call > S: {mc_price} > {spot}"
 
     @given(
         spot=spot_strategy,
@@ -89,8 +87,7 @@ class TestMCBoundsProperty:
     )
     @settings(max_examples=50)
     def test_mc_put_upper_bound(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """[T1] MC put bounded: 0 <= P <= K*exp(-rT)."""
         mc_price = monte_carlo_price(
@@ -117,6 +114,7 @@ class TestMCBoundsProperty:
 # MC Convergence Property
 # =============================================================================
 
+
 class TestMCConvergenceProperty:
     """[T1] MC converges to BS for vanilla options."""
 
@@ -130,8 +128,7 @@ class TestMCConvergenceProperty:
     )
     @settings(max_examples=30)  # Expensive tests
     def test_mc_converges_to_bs_call(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """[T1] MC call converges to BS call within CLT bounds."""
         bs_price = black_scholes_call(spot, strike, rate, dividend, vol, time)
@@ -166,8 +163,7 @@ class TestMCConvergenceProperty:
     )
     @settings(max_examples=30)
     def test_mc_converges_to_bs_put(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """[T1] MC put converges to BS put within CLT bounds."""
         bs_price = black_scholes_put(spot, strike, rate, dividend, vol, time)
@@ -195,6 +191,7 @@ class TestMCConvergenceProperty:
 # MC Parity Property
 # =============================================================================
 
+
 class TestMCParityProperty:
     """[T1] MC prices approximately satisfy put-call parity."""
 
@@ -208,8 +205,7 @@ class TestMCParityProperty:
     )
     @settings(max_examples=30)
     def test_mc_parity_approximate(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """[T1] MC C - P ≈ S*exp(-qT) - K*exp(-rT) within MC tolerance."""
         # Use same seed for both to reduce variance in comparison
@@ -237,9 +233,7 @@ class TestMCParityProperty:
         )
 
         actual_diff = mc_call - mc_put
-        expected_diff = (
-            spot * np.exp(-dividend * time) - strike * np.exp(-rate * time)
-        )
+        expected_diff = spot * np.exp(-dividend * time) - strike * np.exp(-rate * time)
 
         # MC parity tolerance is looser due to independent simulations
         tolerance = max(MC_10K_TOLERANCE * spot * 2, 0.50)
@@ -254,6 +248,7 @@ class TestMCParityProperty:
 # MC Reproducibility Property
 # =============================================================================
 
+
 class TestMCReproducibility:
     """MC with same seed produces same result."""
 
@@ -267,8 +262,7 @@ class TestMCReproducibility:
     )
     @settings(max_examples=20)
     def test_mc_deterministic_with_seed(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """Same seed produces identical MC prices."""
         price1 = monte_carlo_price(
@@ -294,6 +288,4 @@ class TestMCReproducibility:
             seed=12345,
         )
 
-        assert price1 == price2, (
-            f"MC not deterministic with same seed: {price1} != {price2}"
-        )
+        assert price1 == price2, f"MC not deterministic with same seed: {price1} != {price2}"

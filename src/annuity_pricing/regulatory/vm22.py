@@ -578,11 +578,13 @@ class VM22Calculator:
             av = av * (1 + policy.guaranteed_rate)
 
             # Lapse (surrender)
-            lapse_benefit = av * (1 - policy.surrender_charge_pct * max(0, 1 - t / policy.term_years))
+            lapse_benefit = av * (
+                1 - policy.surrender_charge_pct * max(0, 1 - t / policy.term_years)
+            )
             pv_lapse = lapse_rate * survival * lapse_benefit * np.exp(-discount_rate * (t + 1))
 
             # Update survival
-            survival *= (1 - lapse_rate)
+            survival *= 1 - lapse_rate
 
             # Add to PV
             pv_liability += pv_lapse
@@ -690,13 +692,17 @@ def vm22_sensitivity(
     rate_up = calc.calculate_reserve(policy, market_rate=market_rate + 0.01, lapse_rate=lapse_rate)
 
     # Rate down -1%
-    rate_down = calc.calculate_reserve(policy, market_rate=max(0.0, market_rate - 0.01), lapse_rate=lapse_rate)
+    rate_down = calc.calculate_reserve(
+        policy, market_rate=max(0.0, market_rate - 0.01), lapse_rate=lapse_rate
+    )
 
     # Lapse up 2x
     lapse_up = calc.calculate_reserve(policy, market_rate=market_rate, lapse_rate=lapse_rate * 2)
 
     # Lapse down 0.5x
-    lapse_down = calc.calculate_reserve(policy, market_rate=market_rate, lapse_rate=lapse_rate * 0.5)
+    lapse_down = calc.calculate_reserve(
+        policy, market_rate=market_rate, lapse_rate=lapse_rate * 0.5
+    )
 
     return {
         "base_reserve": base.reserve,

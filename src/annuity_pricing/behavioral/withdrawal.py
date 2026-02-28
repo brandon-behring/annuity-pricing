@@ -31,8 +31,9 @@ import numpy as np
 
 class UtilizationCalibration(Enum):
     """Source of utilization calibration data."""
+
     HARDCODED = "hardcoded"  # Original fixed parameters
-    SOA_2018 = "soa_2018"    # SOA 2018 VA GLB Utilization Study
+    SOA_2018 = "soa_2018"  # SOA 2018 VA GLB Utilization Study
 
 
 @dataclass(frozen=True)
@@ -223,9 +224,7 @@ class WithdrawalModel:
             Withdrawal amounts at each time step (shape: [n_steps])
         """
         if len(gwb_path) != len(ages):
-            raise ValueError(
-                f"Path lengths must match: gwb={len(gwb_path)}, ages={len(ages)}"
-            )
+            raise ValueError(f"Path lengths must match: gwb={len(gwb_path)}, ages={len(ages)}")
 
         n_steps = len(gwb_path)
         withdrawals = np.zeros(n_steps)
@@ -318,7 +317,7 @@ class SOAWithdrawalAssumptions:
     use_age_curve: bool = True
     use_itm_sensitivity: bool = True
     use_continuous_itm: bool = True
-    combination_method: str = 'multiplicative'
+    combination_method: str = "multiplicative"
     min_utilization: float = 0.03  # 3% floor (even young ages take some)
     max_utilization: float = 1.00  # 100% cap
 
@@ -475,14 +474,16 @@ class SOAWithdrawalModel:
             itm_factor = 1.0
 
         # 4. Combine factors
-        if self.assumptions.combination_method == 'multiplicative':
+        if self.assumptions.combination_method == "multiplicative":
             # Use duration as base, adjust by age and ITM
             # Reference: age 67 is "average" mature holder
-            base_age_util = interpolate_utilization_by_age(67) if self.assumptions.use_age_curve else 0.32
+            base_age_util = (
+                interpolate_utilization_by_age(67) if self.assumptions.use_age_curve else 0.32
+            )
             age_adjustment = age_util / base_age_util if base_age_util > 0 else 1.0
             utilization = duration_util * age_adjustment * itm_factor
 
-        elif self.assumptions.combination_method == 'additive':
+        elif self.assumptions.combination_method == "additive":
             # Simple average of duration and age effects, scaled by ITM
             utilization = ((duration_util + age_util) / 2) * itm_factor
 
@@ -548,13 +549,9 @@ class SOAWithdrawalModel:
             Withdrawal amounts at each time step (shape: [n_steps])
         """
         if len(gwb_path) != len(av_path):
-            raise ValueError(
-                f"Path lengths must match: gwb={len(gwb_path)}, av={len(av_path)}"
-            )
+            raise ValueError(f"Path lengths must match: gwb={len(gwb_path)}, av={len(av_path)}")
         if len(gwb_path) != len(ages):
-            raise ValueError(
-                f"Path lengths must match: gwb={len(gwb_path)}, ages={len(ages)}"
-            )
+            raise ValueError(f"Path lengths must match: gwb={len(gwb_path)}, ages={len(ages)}")
 
         n_steps = len(gwb_path)
         withdrawals = np.zeros(n_steps)

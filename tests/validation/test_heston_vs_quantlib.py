@@ -20,6 +20,7 @@ import pytest
 # Check if QuantLib is available
 try:
     import QuantLib as ql
+
     QUANTLIB_AVAILABLE = True
 except ImportError:
     QUANTLIB_AVAILABLE = False
@@ -73,14 +74,10 @@ def quantlib_heston_price(
     spot_handle = ql.QuoteHandle(ql.SimpleQuote(spot))
 
     # Risk-free rate term structure
-    rate_ts = ql.YieldTermStructureHandle(
-        ql.FlatForward(today, rate, day_count)
-    )
+    rate_ts = ql.YieldTermStructureHandle(ql.FlatForward(today, rate, day_count))
 
     # Dividend yield term structure
-    dividend_ts = ql.YieldTermStructureHandle(
-        ql.FlatForward(today, dividend, day_count)
-    )
+    dividend_ts = ql.YieldTermStructureHandle(ql.FlatForward(today, dividend, day_count))
 
     # Heston process
     heston_process = ql.HestonProcess(
@@ -149,9 +146,17 @@ class TestHestonMCvsQuantLib:
 
         # QuantLib reference price
         ql_price = quantlib_heston_price(
-            self.SPOT, strike, self.RATE, self.DIVIDEND, self.TIME,
-            self.V0, self.KAPPA, self.THETA, self.SIGMA, self.RHO,
-            option_type="call"
+            self.SPOT,
+            strike,
+            self.RATE,
+            self.DIVIDEND,
+            self.TIME,
+            self.V0,
+            self.KAPPA,
+            self.THETA,
+            self.SIGMA,
+            self.RHO,
+            option_type="call",
         )
 
         # Skip if compact repo not available
@@ -172,27 +177,42 @@ class TestHestonMCvsQuantLib:
         )
 
         mc_price = heston_price_call_mc(
-            self.SPOT, strike, self.RATE, self.DIVIDEND, self.TIME,
-            params, paths=self.MC_PATHS, steps=self.MC_STEPS, seed=self.MC_SEED
+            self.SPOT,
+            strike,
+            self.RATE,
+            self.DIVIDEND,
+            self.TIME,
+            params,
+            paths=self.MC_PATHS,
+            steps=self.MC_STEPS,
+            seed=self.MC_SEED,
         )
 
         rel_error = abs(mc_price - ql_price) / ql_price
 
         assert rel_error < self.TOLERANCE, (
             f"ATM call: MC={mc_price:.4f}, QL={ql_price:.4f}, "
-            f"error={rel_error*100:.2f}% (tolerance={self.TOLERANCE*100}%)"
+            f"error={rel_error * 100:.2f}% (tolerance={self.TOLERANCE * 100}%)"
         )
 
-        print(f"ATM Call: MC={mc_price:.4f}, QL={ql_price:.4f}, error={rel_error*100:.2f}%")
+        print(f"ATM Call: MC={mc_price:.4f}, QL={ql_price:.4f}, error={rel_error * 100:.2f}%")
 
     def test_call_itm(self):
         """ITM call option validation (K < S)."""
         strike = 90.0
 
         ql_price = quantlib_heston_price(
-            self.SPOT, strike, self.RATE, self.DIVIDEND, self.TIME,
-            self.V0, self.KAPPA, self.THETA, self.SIGMA, self.RHO,
-            option_type="call"
+            self.SPOT,
+            strike,
+            self.RATE,
+            self.DIVIDEND,
+            self.TIME,
+            self.V0,
+            self.KAPPA,
+            self.THETA,
+            self.SIGMA,
+            self.RHO,
+            option_type="call",
         )
 
         try:
@@ -204,32 +224,45 @@ class TestHestonMCvsQuantLib:
             pytest.skip("Heston module not available")
 
         params = HestonParams(
-            v0=self.V0, kappa=self.KAPPA, theta=self.THETA,
-            sigma=self.SIGMA, rho=self.RHO
+            v0=self.V0, kappa=self.KAPPA, theta=self.THETA, sigma=self.SIGMA, rho=self.RHO
         )
 
         mc_price = heston_price_call_mc(
-            self.SPOT, strike, self.RATE, self.DIVIDEND, self.TIME,
-            params, paths=self.MC_PATHS, steps=self.MC_STEPS, seed=self.MC_SEED
+            self.SPOT,
+            strike,
+            self.RATE,
+            self.DIVIDEND,
+            self.TIME,
+            params,
+            paths=self.MC_PATHS,
+            steps=self.MC_STEPS,
+            seed=self.MC_SEED,
         )
 
         rel_error = abs(mc_price - ql_price) / ql_price
 
         assert rel_error < self.TOLERANCE, (
-            f"ITM call: MC={mc_price:.4f}, QL={ql_price:.4f}, "
-            f"error={rel_error*100:.2f}%"
+            f"ITM call: MC={mc_price:.4f}, QL={ql_price:.4f}, error={rel_error * 100:.2f}%"
         )
 
-        print(f"ITM Call: MC={mc_price:.4f}, QL={ql_price:.4f}, error={rel_error*100:.2f}%")
+        print(f"ITM Call: MC={mc_price:.4f}, QL={ql_price:.4f}, error={rel_error * 100:.2f}%")
 
     def test_call_otm(self):
         """OTM call option validation (K > S)."""
         strike = 110.0
 
         ql_price = quantlib_heston_price(
-            self.SPOT, strike, self.RATE, self.DIVIDEND, self.TIME,
-            self.V0, self.KAPPA, self.THETA, self.SIGMA, self.RHO,
-            option_type="call"
+            self.SPOT,
+            strike,
+            self.RATE,
+            self.DIVIDEND,
+            self.TIME,
+            self.V0,
+            self.KAPPA,
+            self.THETA,
+            self.SIGMA,
+            self.RHO,
+            option_type="call",
         )
 
         try:
@@ -241,32 +274,45 @@ class TestHestonMCvsQuantLib:
             pytest.skip("Heston module not available")
 
         params = HestonParams(
-            v0=self.V0, kappa=self.KAPPA, theta=self.THETA,
-            sigma=self.SIGMA, rho=self.RHO
+            v0=self.V0, kappa=self.KAPPA, theta=self.THETA, sigma=self.SIGMA, rho=self.RHO
         )
 
         mc_price = heston_price_call_mc(
-            self.SPOT, strike, self.RATE, self.DIVIDEND, self.TIME,
-            params, paths=self.MC_PATHS, steps=self.MC_STEPS, seed=self.MC_SEED
+            self.SPOT,
+            strike,
+            self.RATE,
+            self.DIVIDEND,
+            self.TIME,
+            params,
+            paths=self.MC_PATHS,
+            steps=self.MC_STEPS,
+            seed=self.MC_SEED,
         )
 
         rel_error = abs(mc_price - ql_price) / ql_price
 
         assert rel_error < self.TOLERANCE, (
-            f"OTM call: MC={mc_price:.4f}, QL={ql_price:.4f}, "
-            f"error={rel_error*100:.2f}%"
+            f"OTM call: MC={mc_price:.4f}, QL={ql_price:.4f}, error={rel_error * 100:.2f}%"
         )
 
-        print(f"OTM Call: MC={mc_price:.4f}, QL={ql_price:.4f}, error={rel_error*100:.2f}%")
+        print(f"OTM Call: MC={mc_price:.4f}, QL={ql_price:.4f}, error={rel_error * 100:.2f}%")
 
     def test_put_atm(self):
         """ATM put option validation."""
         strike = self.SPOT
 
         ql_price = quantlib_heston_price(
-            self.SPOT, strike, self.RATE, self.DIVIDEND, self.TIME,
-            self.V0, self.KAPPA, self.THETA, self.SIGMA, self.RHO,
-            option_type="put"
+            self.SPOT,
+            strike,
+            self.RATE,
+            self.DIVIDEND,
+            self.TIME,
+            self.V0,
+            self.KAPPA,
+            self.THETA,
+            self.SIGMA,
+            self.RHO,
+            option_type="put",
         )
 
         try:
@@ -278,23 +324,28 @@ class TestHestonMCvsQuantLib:
             pytest.skip("Heston module not available")
 
         params = HestonParams(
-            v0=self.V0, kappa=self.KAPPA, theta=self.THETA,
-            sigma=self.SIGMA, rho=self.RHO
+            v0=self.V0, kappa=self.KAPPA, theta=self.THETA, sigma=self.SIGMA, rho=self.RHO
         )
 
         mc_price = heston_price_put_mc(
-            self.SPOT, strike, self.RATE, self.DIVIDEND, self.TIME,
-            params, paths=self.MC_PATHS, steps=self.MC_STEPS, seed=self.MC_SEED
+            self.SPOT,
+            strike,
+            self.RATE,
+            self.DIVIDEND,
+            self.TIME,
+            params,
+            paths=self.MC_PATHS,
+            steps=self.MC_STEPS,
+            seed=self.MC_SEED,
         )
 
         rel_error = abs(mc_price - ql_price) / ql_price
 
         assert rel_error < self.TOLERANCE, (
-            f"ATM put: MC={mc_price:.4f}, QL={ql_price:.4f}, "
-            f"error={rel_error*100:.2f}%"
+            f"ATM put: MC={mc_price:.4f}, QL={ql_price:.4f}, error={rel_error * 100:.2f}%"
         )
 
-        print(f"ATM Put: MC={mc_price:.4f}, QL={ql_price:.4f}, error={rel_error*100:.2f}%")
+        print(f"ATM Put: MC={mc_price:.4f}, QL={ql_price:.4f}, error={rel_error * 100:.2f}%")
 
     def test_put_call_parity(self):
         """
@@ -314,18 +365,31 @@ class TestHestonMCvsQuantLib:
             pytest.skip("Heston module not available")
 
         params = HestonParams(
-            v0=self.V0, kappa=self.KAPPA, theta=self.THETA,
-            sigma=self.SIGMA, rho=self.RHO
+            v0=self.V0, kappa=self.KAPPA, theta=self.THETA, sigma=self.SIGMA, rho=self.RHO
         )
 
         # Use same seed for both to reduce MC noise
         call_price = heston_price_call_mc(
-            self.SPOT, strike, self.RATE, self.DIVIDEND, self.TIME,
-            params, paths=self.MC_PATHS, steps=self.MC_STEPS, seed=self.MC_SEED
+            self.SPOT,
+            strike,
+            self.RATE,
+            self.DIVIDEND,
+            self.TIME,
+            params,
+            paths=self.MC_PATHS,
+            steps=self.MC_STEPS,
+            seed=self.MC_SEED,
         )
         put_price = heston_price_put_mc(
-            self.SPOT, strike, self.RATE, self.DIVIDEND, self.TIME,
-            params, paths=self.MC_PATHS, steps=self.MC_STEPS, seed=self.MC_SEED
+            self.SPOT,
+            strike,
+            self.RATE,
+            self.DIVIDEND,
+            self.TIME,
+            params,
+            paths=self.MC_PATHS,
+            steps=self.MC_STEPS,
+            seed=self.MC_SEED,
         )
 
         # Put-call parity [T1]
@@ -337,8 +401,8 @@ class TestHestonMCvsQuantLib:
         max_error = 0.02 * max(call_price, put_price)
 
         assert abs(parity_diff) < max_error, (
-            f"Put-call parity violated: C-P={call_price-put_price:.4f}, "
-            f"(F-K)*DF={(forward-strike)*discount:.4f}, "
+            f"Put-call parity violated: C-P={call_price - put_price:.4f}, "
+            f"(F-K)*DF={(forward - strike) * discount:.4f}, "
             f"diff={parity_diff:.4f}"
         )
 
@@ -361,21 +425,35 @@ class TestHestonMCvsQuantLib:
             pytest.skip("Heston module not available")
 
         params = HestonParams(
-            v0=self.V0, kappa=self.KAPPA, theta=self.THETA,
-            sigma=self.SIGMA, rho=self.RHO
+            v0=self.V0, kappa=self.KAPPA, theta=self.THETA, sigma=self.SIGMA, rho=self.RHO
         )
 
         results = []
         for strike in strikes:
             ql_price = quantlib_heston_price(
-                self.SPOT, strike, self.RATE, self.DIVIDEND, self.TIME,
-                self.V0, self.KAPPA, self.THETA, self.SIGMA, self.RHO,
-                option_type="call"
+                self.SPOT,
+                strike,
+                self.RATE,
+                self.DIVIDEND,
+                self.TIME,
+                self.V0,
+                self.KAPPA,
+                self.THETA,
+                self.SIGMA,
+                self.RHO,
+                option_type="call",
             )
 
             mc_price = heston_price_call_mc(
-                self.SPOT, strike, self.RATE, self.DIVIDEND, self.TIME,
-                params, paths=self.MC_PATHS, steps=self.MC_STEPS, seed=self.MC_SEED
+                self.SPOT,
+                strike,
+                self.RATE,
+                self.DIVIDEND,
+                self.TIME,
+                params,
+                paths=self.MC_PATHS,
+                steps=self.MC_STEPS,
+                seed=self.MC_SEED,
             )
 
             rel_error = abs(mc_price - ql_price) / ql_price if ql_price > 0.01 else 0
@@ -388,12 +466,12 @@ class TestHestonMCvsQuantLib:
         print("-" * 60)
         for strike, mc, ql, err in results:
             status = "✓" if err < self.TOLERANCE else "✗"
-            print(f"{strike:>8} {mc:>12.4f} {ql:>12.4f} {err*100:>9.2f}% {status}")
+            print(f"{strike:>8} {mc:>12.4f} {ql:>12.4f} {err * 100:>9.2f}% {status}")
 
         # All should pass
         max_error = max(r[3] for r in results)
         assert max_error < self.TOLERANCE, (
-            f"Max error {max_error*100:.2f}% exceeds tolerance {self.TOLERANCE*100}%"
+            f"Max error {max_error * 100:.2f}% exceeds tolerance {self.TOLERANCE * 100}%"
         )
 
     def test_high_vol_of_vol(self):
@@ -412,9 +490,17 @@ class TestHestonMCvsQuantLib:
         strike = self.SPOT
 
         ql_price = quantlib_heston_price(
-            self.SPOT, strike, self.RATE, self.DIVIDEND, self.TIME,
-            v0, kappa, theta, sigma, rho,
-            option_type="call"
+            self.SPOT,
+            strike,
+            self.RATE,
+            self.DIVIDEND,
+            self.TIME,
+            v0,
+            kappa,
+            theta,
+            sigma,
+            rho,
+            option_type="call",
         )
 
         try:
@@ -428,19 +514,25 @@ class TestHestonMCvsQuantLib:
         params = HestonParams(v0=v0, kappa=kappa, theta=theta, sigma=sigma, rho=rho)
 
         mc_price = heston_price_call_mc(
-            self.SPOT, strike, self.RATE, self.DIVIDEND, self.TIME,
-            params, paths=self.MC_PATHS, steps=self.MC_STEPS, seed=self.MC_SEED
+            self.SPOT,
+            strike,
+            self.RATE,
+            self.DIVIDEND,
+            self.TIME,
+            params,
+            paths=self.MC_PATHS,
+            steps=self.MC_STEPS,
+            seed=self.MC_SEED,
         )
 
         rel_error = abs(mc_price - ql_price) / ql_price
 
         # Slightly higher tolerance for high vol-of-vol
         assert rel_error < self.TOLERANCE * 1.5, (
-            f"High vov: MC={mc_price:.4f}, QL={ql_price:.4f}, "
-            f"error={rel_error*100:.2f}%"
+            f"High vov: MC={mc_price:.4f}, QL={ql_price:.4f}, error={rel_error * 100:.2f}%"
         )
 
-        print(f"High VoV: MC={mc_price:.4f}, QL={ql_price:.4f}, error={rel_error*100:.2f}%")
+        print(f"High VoV: MC={mc_price:.4f}, QL={ql_price:.4f}, error={rel_error * 100:.2f}%")
 
 
 @pytest.mark.skipif(not QUANTLIB_AVAILABLE, reason="QuantLib not installed")
@@ -481,8 +573,7 @@ class TestHestonFFTvsQuantLib:
             pytest.skip("Heston module not available")
 
         params = HestonParams(
-            v0=self.V0, kappa=self.KAPPA, theta=self.THETA,
-            sigma=self.SIGMA, rho=self.RHO
+            v0=self.V0, kappa=self.KAPPA, theta=self.THETA, sigma=self.SIGMA, rho=self.RHO
         )
 
         print("\nFFT Bias Documentation:")
@@ -493,9 +584,17 @@ class TestHestonFFTvsQuantLib:
         biases = []
         for strike in strikes:
             ql_price = quantlib_heston_price(
-                self.SPOT, strike, self.RATE, self.DIVIDEND, self.TIME,
-                self.V0, self.KAPPA, self.THETA, self.SIGMA, self.RHO,
-                option_type="call"
+                self.SPOT,
+                strike,
+                self.RATE,
+                self.DIVIDEND,
+                self.TIME,
+                self.V0,
+                self.KAPPA,
+                self.THETA,
+                self.SIGMA,
+                self.RHO,
+                option_type="call",
             )
 
             fft_price = heston_price_call(

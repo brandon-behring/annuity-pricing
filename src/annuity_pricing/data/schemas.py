@@ -12,6 +12,7 @@ from datetime import date
 # Base Product
 # =============================================================================
 
+
 @dataclass(frozen=True)
 class BaseProduct:
     """
@@ -37,6 +38,7 @@ class BaseProduct:
 # =============================================================================
 # MYGA Product
 # =============================================================================
+
 
 @dataclass(frozen=True)
 class MYGAProduct(BaseProduct):
@@ -80,17 +82,13 @@ class MYGAProduct(BaseProduct):
         """Validate MYGA fields."""
         if self.product_group != "MYGA":
             raise ValueError(
-                f"CRITICAL: MYGAProduct requires product_group='MYGA', "
-                f"got '{self.product_group}'"
+                f"CRITICAL: MYGAProduct requires product_group='MYGA', got '{self.product_group}'"
             )
         if self.fixed_rate < 0:
-            raise ValueError(
-                f"CRITICAL: fixed_rate must be >= 0, got {self.fixed_rate}"
-            )
+            raise ValueError(f"CRITICAL: fixed_rate must be >= 0, got {self.fixed_rate}")
         if self.guarantee_duration < 0:
             raise ValueError(
-                f"CRITICAL: guarantee_duration must be >= 0, "
-                f"got {self.guarantee_duration}"
+                f"CRITICAL: guarantee_duration must be >= 0, got {self.guarantee_duration}"
             )
 
     @classmethod
@@ -119,6 +117,7 @@ class MYGAProduct(BaseProduct):
 # =============================================================================
 # FIA Product
 # =============================================================================
+
 
 @dataclass(frozen=True)
 class FIAProduct(BaseProduct):
@@ -172,19 +171,15 @@ class FIAProduct(BaseProduct):
         """Validate FIA fields."""
         if self.product_group != "FIA":
             raise ValueError(
-                f"CRITICAL: FIAProduct requires product_group='FIA', "
-                f"got '{self.product_group}'"
+                f"CRITICAL: FIAProduct requires product_group='FIA', got '{self.product_group}'"
             )
         # Cap rate validation
         if self.cap_rate is not None and self.cap_rate < 0:
-            raise ValueError(
-                f"CRITICAL: cap_rate must be >= 0, got {self.cap_rate}"
-            )
+            raise ValueError(f"CRITICAL: cap_rate must be >= 0, got {self.cap_rate}")
         # Participation rate validation (can exceed 1.0)
         if self.participation_rate is not None and self.participation_rate < 0:
             raise ValueError(
-                f"CRITICAL: participation_rate must be >= 0, "
-                f"got {self.participation_rate}"
+                f"CRITICAL: participation_rate must be >= 0, got {self.participation_rate}"
             )
 
     @classmethod
@@ -215,6 +210,7 @@ class FIAProduct(BaseProduct):
 # =============================================================================
 # RILA Product
 # =============================================================================
+
 
 @dataclass(frozen=True)
 class RILAProduct(BaseProduct):
@@ -268,13 +264,10 @@ class RILAProduct(BaseProduct):
         """Validate RILA fields."""
         if self.product_group != "RILA":
             raise ValueError(
-                f"CRITICAL: RILAProduct requires product_group='RILA', "
-                f"got '{self.product_group}'"
+                f"CRITICAL: RILAProduct requires product_group='RILA', got '{self.product_group}'"
             )
         if self.buffer_rate is not None and self.buffer_rate < 0:
-            raise ValueError(
-                f"CRITICAL: buffer_rate must be >= 0, got {self.buffer_rate}"
-            )
+            raise ValueError(f"CRITICAL: buffer_rate must be >= 0, got {self.buffer_rate}")
 
         # [F.2] Validate buffer_modifier for protection type classification
         if self.buffer_modifier is None:
@@ -351,6 +344,7 @@ class RILAProduct(BaseProduct):
 # =============================================================================
 # Factory Functions
 # =============================================================================
+
 
 def create_myga_from_row(row: dict) -> MYGAProduct:
     """
@@ -466,6 +460,7 @@ def create_rila_from_row(row: dict) -> RILAProduct:
 # GLWB Product
 # =============================================================================
 
+
 @dataclass(frozen=True)
 class GLWBProduct(BaseProduct):
     """
@@ -519,22 +514,17 @@ class GLWBProduct(BaseProduct):
         """Validate GLWB fields."""
         if self.product_group != "GLWB":
             raise ValueError(
-                f"CRITICAL: GLWBProduct requires product_group='GLWB', "
-                f"got '{self.product_group}'"
+                f"CRITICAL: GLWBProduct requires product_group='GLWB', got '{self.product_group}'"
             )
         if not 0 < self.withdrawal_rate <= 0.20:
             raise ValueError(
-                f"CRITICAL: withdrawal_rate must be in (0, 0.20], "
-                f"got {self.withdrawal_rate}"
+                f"CRITICAL: withdrawal_rate must be in (0, 0.20], got {self.withdrawal_rate}"
             )
         if self.rollup_rate < 0:
-            raise ValueError(
-                f"CRITICAL: rollup_rate must be >= 0, got {self.rollup_rate}"
-            )
+            raise ValueError(f"CRITICAL: rollup_rate must be >= 0, got {self.rollup_rate}")
         if self.rollup_type not in ("simple", "compound"):
             raise ValueError(
-                f"CRITICAL: rollup_type must be 'simple' or 'compound', "
-                f"got '{self.rollup_type}'"
+                f"CRITICAL: rollup_type must be 'simple' or 'compound', got '{self.rollup_type}'"
             )
         if self.fee_rate < 0:
             raise ValueError(f"CRITICAL: fee_rate must be >= 0, got {self.fee_rate}")

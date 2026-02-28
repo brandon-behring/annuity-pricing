@@ -316,17 +316,29 @@ class YieldCurveLoader:
     """
 
     # Standard Treasury maturities (years)
-    TREASURY_MATURITIES = np.array([
-        1/12, 2/12, 3/12, 6/12,  # Bills
-        1, 2, 3, 5, 7, 10, 20, 30  # Notes and bonds
-    ])
+    TREASURY_MATURITIES = np.array(
+        [
+            1 / 12,
+            2 / 12,
+            3 / 12,
+            6 / 12,  # Bills
+            1,
+            2,
+            3,
+            5,
+            7,
+            10,
+            20,
+            30,  # Notes and bonds
+        ]
+    )
 
     # FRED series IDs for Treasury rates
     FRED_SERIES = {
-        1/12: "DGS1MO",
-        2/12: "DGS2MO",
-        3/12: "DGS3MO",
-        6/12: "DGS6MO",
+        1 / 12: "DGS1MO",
+        2 / 12: "DGS2MO",
+        3 / 12: "DGS3MO",
+        6 / 12: "DGS6MO",
         1: "DGS1",
         2: "DGS2",
         3: "DGS3",
@@ -591,9 +603,7 @@ class YieldCurveLoader:
         rates = []
 
         with open(path) as f:
-            reader = csv.DictReader(
-                filter(lambda row: not row.startswith("#"), f)
-            )
+            reader = csv.DictReader(filter(lambda row: not row.startswith("#"), f))
             for row in reader:
                 maturities.append(float(row["maturity"]))
                 rates.append(float(row["rate"]))
@@ -652,8 +662,7 @@ class YieldCurveLoader:
             import QuantLib as ql
         except ImportError as err:
             raise ImportError(
-                "QuantLib required for this method. "
-                "Install with: pip install QuantLib-Python"
+                "QuantLib required for this method. Install with: pip install QuantLib-Python"
             ) from err
 
         # Parse date
@@ -685,9 +694,7 @@ class YieldCurveLoader:
 
         # Extract points
         maturities = np.array([m for m, _ in market_quotes])
-        rates = np.array([
-            curve.zeroRate(m, ql.Continuous).rate() for m in maturities
-        ])
+        rates = np.array([curve.zeroRate(m, ql.Continuous).rate() for m in maturities])
 
         return YieldCurve(
             maturities=maturities,

@@ -5,7 +5,6 @@ Handles outliers and data quality issues identified in gap reports.
 See: wink-research-archive/gap-reports/gap-report-round2.md
 """
 
-
 import numpy as np
 import pandas as pd
 
@@ -40,9 +39,7 @@ def clip_cap_rate(df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
     return df
 
 
-def clip_performance_triggered_rate(
-    df: pd.DataFrame, inplace: bool = False
-) -> pd.DataFrame:
+def clip_performance_triggered_rate(df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
     """
     Clip performanceTriggeredRate outliers to maximum value.
 
@@ -95,16 +92,12 @@ def clip_spread_rate(df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         df = df.copy()
 
     if "spreadRate" in df.columns:
-        df["spreadRate"] = df["spreadRate"].clip(
-            upper=SETTINGS.data.spread_rate_max
-        )
+        df["spreadRate"] = df["spreadRate"].clip(upper=SETTINGS.data.spread_rate_max)
 
     return df
 
 
-def filter_valid_guarantee_duration(
-    df: pd.DataFrame, inplace: bool = False
-) -> pd.DataFrame:
+def filter_valid_guarantee_duration(df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
     """
     Filter out invalid guaranteeDuration values.
 
@@ -242,9 +235,7 @@ def get_cleaning_summary(df_raw: pd.DataFrame, df_clean: pd.DataFrame) -> dict:
 
     # Check specific columns
     if "capRate" in df_raw.columns:
-        summary["cap_rate_clipped"] = (
-            df_raw["capRate"] > SETTINGS.data.cap_rate_max
-        ).sum()
+        summary["cap_rate_clipped"] = (df_raw["capRate"] > SETTINGS.data.cap_rate_max).sum()
 
     if "performanceTriggeredRate" in df_raw.columns:
         summary["perf_triggered_clipped"] = (

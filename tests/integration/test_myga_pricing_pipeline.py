@@ -5,7 +5,6 @@ Tests end-to-end workflow: data → pricing → valuation → recommendations.
 See: METHODOLOGY.md Section 4
 """
 
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -41,13 +40,15 @@ class TestMYGAPricingPipeline:
         rates_7y = np.random.normal(0.048, 0.005, 25)
         rates_7y = np.clip(rates_7y, 0.035, 0.065)
 
-        return pd.DataFrame({
-            "fixedRate": np.concatenate([rates_5y, rates_3y, rates_7y]),
-            "guaranteeDuration": [5]*50 + [3]*25 + [7]*25,
-            "productGroup": ["MYGA"] * 100,
-            "status": ["current"] * 100,
-            "companyName": [f"Company {i % 20}" for i in range(100)],
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": np.concatenate([rates_5y, rates_3y, rates_7y]),
+                "guaranteeDuration": [5] * 50 + [3] * 25 + [7] * 25,
+                "productGroup": ["MYGA"] * 100,
+                "status": ["current"] * 100,
+                "companyName": [f"Company {i % 20}" for i in range(100)],
+            }
+        )
 
     @pytest.fixture
     def target_product(self) -> MYGAProduct:
@@ -238,7 +239,9 @@ class TestMYGAPricingPipeline:
             guarantee_duration=target_product.guarantee_duration,
             discount_rate=base_rate + rate_change,
         )
-        actual_pct_change = (new_val.present_value - base_val.present_value) / base_val.present_value
+        actual_pct_change = (
+            new_val.present_value - base_val.present_value
+        ) / base_val.present_value
 
         # Duration should predict PV change within 1% relative error
         # (Convexity accounts for the difference)
@@ -411,12 +414,14 @@ class TestDataValidation:
 
     def test_handles_missing_rates_in_market_data(self) -> None:
         """Should handle market data with some null rates."""
-        market_data = pd.DataFrame({
-            "fixedRate": [0.040, None, 0.044, 0.046, None, 0.050],
-            "guaranteeDuration": [5, 5, 5, 5, 5, 5],
-            "productGroup": ["MYGA"] * 6,
-            "status": ["current"] * 6,
-        })
+        market_data = pd.DataFrame(
+            {
+                "fixedRate": [0.040, None, 0.044, 0.046, None, 0.050],
+                "guaranteeDuration": [5, 5, 5, 5, 5, 5],
+                "productGroup": ["MYGA"] * 6,
+                "status": ["current"] * 6,
+            }
+        )
 
         product = MYGAProduct(
             company_name="Test",
@@ -435,12 +440,14 @@ class TestDataValidation:
 
     def test_rejects_all_null_rates(self) -> None:
         """Should raise error if all rates are null."""
-        market_data = pd.DataFrame({
-            "fixedRate": [None, None, None],
-            "guaranteeDuration": [5, 5, 5],
-            "productGroup": ["MYGA"] * 3,
-            "status": ["current"] * 3,
-        })
+        market_data = pd.DataFrame(
+            {
+                "fixedRate": [None, None, None],
+                "guaranteeDuration": [5, 5, 5],
+                "productGroup": ["MYGA"] * 3,
+                "status": ["current"] * 3,
+            }
+        )
 
         product = MYGAProduct(
             company_name="Test",

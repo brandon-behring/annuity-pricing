@@ -24,11 +24,11 @@ from annuity_pricing.products.rila import MarketParams, RILAPricer
 
 #: Standard Heston parameters (typical equity index)
 STANDARD_HESTON = HestonParams(
-    v0=0.04,      # Initial variance (20% vol)
-    kappa=2.0,    # Mean reversion speed
-    theta=0.04,   # Long-run variance (20% vol)
-    sigma=0.3,    # Vol-of-vol
-    rho=-0.7,     # Negative correlation (leverage effect)
+    v0=0.04,  # Initial variance (20% vol)
+    kappa=2.0,  # Mean reversion speed
+    theta=0.04,  # Long-run variance (20% vol)
+    sigma=0.3,  # Vol-of-vol
+    rho=-0.7,  # Negative correlation (leverage effect)
 )
 
 #: Low vol-of-vol Heston (should converge to BS)
@@ -36,7 +36,7 @@ LOW_VOLVOL_HESTON = HestonParams(
     v0=0.04,
     kappa=2.0,
     theta=0.04,
-    sigma=0.01,   # Very low vol-of-vol
+    sigma=0.01,  # Very low vol-of-vol
     rho=-0.5,
 )
 
@@ -195,7 +195,10 @@ class TestHestonBSConvergence:
         result_bs = pricer_bs.price(buffer_product, term_years=1.0)
 
         # Protection values should be close
-        rel_diff = abs(result_heston.protection_value - result_bs.protection_value) / result_bs.protection_value
+        rel_diff = (
+            abs(result_heston.protection_value - result_bs.protection_value)
+            / result_bs.protection_value
+        )
         assert rel_diff < 0.10, (
             f"Heston protection value {result_heston.protection_value:.4f} "
             f"differs from BS {result_bs.protection_value:.4f} by {rel_diff:.1%}"
@@ -254,7 +257,9 @@ class TestHestonSanityChecks:
         expected_max_loss = 1.0 - buffer_product.buffer_rate
         assert abs(result.max_loss - expected_max_loss) < 0.001
 
-    def test_deeper_buffer_costs_more(self, market_params_heston, buffer_product, deep_buffer_product):
+    def test_deeper_buffer_costs_more(
+        self, market_params_heston, buffer_product, deep_buffer_product
+    ):
         """Deeper buffer should have higher protection cost."""
         pricer = RILAPricer(market_params=market_params_heston, n_mc_paths=10000, seed=42)
 
@@ -290,15 +295,27 @@ class TestStochasticVolEffects:
         high volatility, making OTM puts more expensive relative to BS.
         Buffer = Long ATM put - Short OTM put, so effect depends on relative changes.
         """
-        heston_neg = HestonVolatility(HestonParams(
-            v0=0.04, kappa=2.0, theta=0.04, sigma=0.3, rho=-0.7
-        ))
-        heston_zero = HestonVolatility(HestonParams(
-            v0=0.04, kappa=2.0, theta=0.04, sigma=0.3, rho=0.0
-        ))
+        heston_neg = HestonVolatility(
+            HestonParams(v0=0.04, kappa=2.0, theta=0.04, sigma=0.3, rho=-0.7)
+        )
+        heston_zero = HestonVolatility(
+            HestonParams(v0=0.04, kappa=2.0, theta=0.04, sigma=0.3, rho=0.0)
+        )
 
-        market_neg = MarketParams(spot=100, risk_free_rate=0.05, dividend_yield=0.02, volatility=0.20, vol_model=heston_neg)
-        market_zero = MarketParams(spot=100, risk_free_rate=0.05, dividend_yield=0.02, volatility=0.20, vol_model=heston_zero)
+        market_neg = MarketParams(
+            spot=100,
+            risk_free_rate=0.05,
+            dividend_yield=0.02,
+            volatility=0.20,
+            vol_model=heston_neg,
+        )
+        market_zero = MarketParams(
+            spot=100,
+            risk_free_rate=0.05,
+            dividend_yield=0.02,
+            volatility=0.20,
+            vol_model=heston_zero,
+        )
 
         pricer_neg = RILAPricer(market_params=market_neg, n_mc_paths=50000, seed=42)
         pricer_zero = RILAPricer(market_params=market_zero, n_mc_paths=50000, seed=42)
@@ -316,15 +333,27 @@ class TestStochasticVolEffects:
         [T1] More volatility of volatility means more uncertainty,
         which increases option values (convexity effect).
         """
-        heston_low = HestonVolatility(HestonParams(
-            v0=0.04, kappa=2.0, theta=0.04, sigma=0.1, rho=-0.5
-        ))
-        heston_high = HestonVolatility(HestonParams(
-            v0=0.04, kappa=2.0, theta=0.04, sigma=0.5, rho=-0.5
-        ))
+        heston_low = HestonVolatility(
+            HestonParams(v0=0.04, kappa=2.0, theta=0.04, sigma=0.1, rho=-0.5)
+        )
+        heston_high = HestonVolatility(
+            HestonParams(v0=0.04, kappa=2.0, theta=0.04, sigma=0.5, rho=-0.5)
+        )
 
-        market_low = MarketParams(spot=100, risk_free_rate=0.05, dividend_yield=0.02, volatility=0.20, vol_model=heston_low)
-        market_high = MarketParams(spot=100, risk_free_rate=0.05, dividend_yield=0.02, volatility=0.20, vol_model=heston_high)
+        market_low = MarketParams(
+            spot=100,
+            risk_free_rate=0.05,
+            dividend_yield=0.02,
+            volatility=0.20,
+            vol_model=heston_low,
+        )
+        market_high = MarketParams(
+            spot=100,
+            risk_free_rate=0.05,
+            dividend_yield=0.02,
+            volatility=0.20,
+            vol_model=heston_high,
+        )
 
         pricer_low = RILAPricer(market_params=market_low, n_mc_paths=50000, seed=42)
         pricer_high = RILAPricer(market_params=market_high, n_mc_paths=50000, seed=42)

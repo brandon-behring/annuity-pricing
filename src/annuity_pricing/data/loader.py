@@ -344,8 +344,7 @@ def compute_sha256(file_path: Path) -> str:
     """
     if not file_path.exists():
         raise FileNotFoundError(
-            f"CRITICAL: File not found: {file_path}. "
-            f"Expected WINK data at this location."
+            f"CRITICAL: File not found: {file_path}. Expected WINK data at this location."
         )
 
     sha256_hash = hashlib.sha256()
@@ -487,15 +486,13 @@ def load_wink_data(
             df = pd.read_parquet(file_path)
     except Exception as e:
         raise DataLoadError(
-            f"CRITICAL: Failed to load WINK data from {file_path}. "
-            f"Error: {e}"
+            f"CRITICAL: Failed to load WINK data from {file_path}. Error: {e}"
         ) from e
 
     # NEVER return empty data silently [T1]
     if df.empty:
         raise ValueError(
-            f"CRITICAL: WINK data is empty after loading from {file_path}. "
-            f"Expected ~1M rows."
+            f"CRITICAL: WINK data is empty after loading from {file_path}. Expected ~1M rows."
         )
 
     return df
@@ -540,16 +537,12 @@ def load_wink_by_product(
     valid_products = {"MYGA", "FIA", "RILA", "FA", "IVA"}
     if product_group not in valid_products:
         raise ValueError(
-            f"CRITICAL: Invalid product_group '{product_group}'. "
-            f"Must be one of: {valid_products}"
+            f"CRITICAL: Invalid product_group '{product_group}'. Must be one of: {valid_products}"
         )
 
     valid_statuses = {"current", "historic", "nlam", "new", "market_status"}
     if status not in valid_statuses:
-        raise ValueError(
-            f"CRITICAL: Invalid status '{status}'. "
-            f"Must be one of: {valid_statuses}"
-        )
+        raise ValueError(f"CRITICAL: Invalid status '{status}'. Must be one of: {valid_statuses}")
 
     df = load_wink_data(verify=verify, use_synthetic=use_synthetic)
 

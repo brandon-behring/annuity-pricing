@@ -311,9 +311,9 @@ class TestReproducibility:
         # With different seeds, at least one of these should differ:
         # (CTE values are more sensitive to path differences than final reserve)
         values_differ = (
-            result1.reserve != result2.reserve or
-            result1.cte70 != result2.cte70 or
-            result1.cte90 != result2.cte90
+            result1.reserve != result2.reserve
+            or result1.cte70 != result2.cte70
+            or result1.cte90 != result2.cte90
         )
         assert values_differ, (
             f"Different seeds produced identical results - stochastic model may be broken. "

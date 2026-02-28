@@ -68,14 +68,10 @@ class TestMonthlyAveragingObservations:
         engine = MonteCarloEngine(n_paths=100000, antithetic=True, seed=42)
 
         # Monthly averaging (12 steps)
-        result_monthly = engine.price_with_payoff(
-            standard_params, monthly_payoff, n_steps=12
-        )
+        result_monthly = engine.price_with_payoff(standard_params, monthly_payoff, n_steps=12)
 
         # Daily averaging (252 steps) - incorrect but for comparison
-        result_daily = engine.price_with_payoff(
-            standard_params, monthly_payoff, n_steps=252
-        )
+        result_daily = engine.price_with_payoff(standard_params, monthly_payoff, n_steps=252)
 
         # The variance should be DIFFERENT (monthly has higher variance per step)
         # This confirms we're actually using different path counts
@@ -92,13 +88,11 @@ class TestMonthlyAveragingObservations:
         rel_diff = abs(monthly_mean - daily_mean) / daily_mean if daily_mean != 0 else 0
         assert rel_diff < 0.05, (
             f"Monthly mean {monthly_mean:.4f} vs daily mean {daily_mean:.4f} "
-            f"differ by {rel_diff*100:.1f}%"
+            f"differ by {rel_diff * 100:.1f}%"
         )
 
     @pytest.mark.validation
-    def test_monthly_average_lower_value_than_point_to_point(
-        self, standard_params, monthly_payoff
-    ):
+    def test_monthly_average_lower_value_than_point_to_point(self, standard_params, monthly_payoff):
         """
         [T1] Monthly-average capped call should be worth less than point-to-point.
 
@@ -110,9 +104,7 @@ class TestMonthlyAveragingObservations:
         engine = MonteCarloEngine(n_paths=100000, antithetic=True, seed=42)
 
         # Monthly-average with 12 observations
-        result_avg = engine.price_with_payoff(
-            standard_params, monthly_payoff, n_steps=12
-        )
+        result_avg = engine.price_with_payoff(standard_params, monthly_payoff, n_steps=12)
 
         # Point-to-point (same cap, but using terminal value only)
         p2p_payoff = CappedCallPayoff(cap_rate=0.10, floor_rate=0.0)
@@ -159,9 +151,7 @@ class TestAsianCapBenchmarks:
             (0.20, 0.040, 0.080),  # 20% cap: generous cap
         ],
     )
-    def test_monthly_cap_value_bounds(
-        self, base_params, cap_rate, expected_min, expected_max
-    ):
+    def test_monthly_cap_value_bounds(self, base_params, cap_rate, expected_min, expected_max):
         """
         [T2] Monthly-average cap values should fall within empirical bounds.
 
@@ -245,6 +235,5 @@ class TestFIAIntegration:
         # If fix is working, monthly-average uses 12 steps and produces
         # a reasonable expected credit (not inflated by wrong averaging)
         assert 0.0 <= result.expected_credit <= 0.10, (
-            f"Expected credit {result.expected_credit:.4f} should be "
-            f"between 0 and cap rate 0.10"
+            f"Expected credit {result.expected_credit:.4f} should be between 0 and cap rate 0.10"
         )

@@ -214,9 +214,7 @@ class RILAPricer(BasePricer):
         self.seed = seed
 
         # Initialize MC engine
-        self.mc_engine = MonteCarloEngine(
-            n_paths=n_mc_paths, antithetic=True, seed=seed
-        )
+        self.mc_engine = MonteCarloEngine(n_paths=n_mc_paths, antithetic=True, seed=seed)
 
     def price(  # type: ignore[override]  # Subclass has specific params
         self,
@@ -257,13 +255,11 @@ class RILAPricer(BasePricer):
             If term_years is not provided and product.term_years is None
         """
         if not isinstance(product, RILAProduct):
-            raise ValueError(
-                f"CRITICAL: Expected RILAProduct, got {type(product).__name__}"
-            )
+            raise ValueError(f"CRITICAL: Expected RILAProduct, got {type(product).__name__}")
 
         # [F.1] Resolve term_years: require explicit value or from product
         if term_years is None:
-            term_years = getattr(product, 'term_years', None)
+            term_years = getattr(product, "term_years", None)
             if term_years is not None:
                 term_years = float(term_years)
         if term_years is None or term_years <= 0:
@@ -301,9 +297,7 @@ class RILAPricer(BasePricer):
             max_loss = buffer_rate  # Floor is the max loss
 
         # Price protection component
-        protection_value = self._price_protection(
-            is_buffer, buffer_rate, term_years, premium
-        )
+        protection_value = self._price_protection(is_buffer, buffer_rate, term_years, premium)
 
         # Price upside component (capped call)
         upside_value = self._price_upside(cap_rate, term_years, premium)
@@ -314,9 +308,7 @@ class RILAPricer(BasePricer):
         )
 
         # Calculate breakeven return
-        breakeven_return = self._calculate_breakeven(
-            is_buffer, buffer_rate, cap_rate
-        )
+        breakeven_return = self._calculate_breakeven(is_buffer, buffer_rate, cap_rate)
 
         # [T1] Risk-neutral PV: discount the full maturity payoff (principal + return)
         # At maturity, policyholder receives: premium * (1 + expected_return)
@@ -395,15 +387,12 @@ class RILAPricer(BasePricer):
 
         if comparables.empty:
             raise ValueError(
-                "CRITICAL: No comparable RILA products found. "
-                "Check filters and market data."
+                "CRITICAL: No comparable RILA products found. Check filters and market data."
             )
 
         # Use cap rate for comparison
         if product.cap_rate is None:
-            raise ValueError(
-                "CRITICAL: RILA product must have cap_rate for competitive analysis"
-            )
+            raise ValueError("CRITICAL: RILA product must have cap_rate for competitive analysis")
 
         rate = product.cap_rate
         distribution = comparables["capRate"].dropna()
@@ -833,9 +822,7 @@ class RILAPricer(BasePricer):
             If term_years is not provided or <= 0
         """
         if term_years is None or term_years <= 0:
-            raise ValueError(
-                f"CRITICAL: term_years required and must be > 0, got {term_years}"
-            )
+            raise ValueError(f"CRITICAL: term_years required and must be > 0, got {term_years}")
 
         # Create dummy products with explicit term_years
         buffer_product = RILAProduct(
@@ -1000,7 +987,7 @@ class RILAPricer(BasePricer):
 
         # [F.1] Resolve term_years: require explicit value or from product
         if term_years is None:
-            term_years = getattr(product, 'term_years', None)
+            term_years = getattr(product, "term_years", None)
             if term_years is not None:
                 term_years = float(term_years)
         if term_years is None or term_years <= 0:

@@ -306,10 +306,7 @@ def get_scenario_by_severity(
     3  # 2018 Q4, 2011 Euro, 2015 China
     """
     all_scenarios = get_all_historical_scenarios()
-    return tuple(
-        s for s in all_scenarios
-        if min_equity_shock <= s.equity_shock <= max_equity_shock
-    )
+    return tuple(s for s in all_scenarios if min_equity_shock <= s.equity_shock <= max_equity_shock)
 
 
 def scenario_summary(scenario: StressScenario) -> str:

@@ -216,9 +216,7 @@ class TestSpreadVsCapComparison:
 
     @pytest.mark.validation
     @pytest.mark.parametrize("spread_rate", [0.02, 0.03, 0.05])
-    def test_spread_value_decreases_with_higher_spread(
-        self, financepy_adapter, spread_rate
-    ):
+    def test_spread_value_decreases_with_higher_spread(self, financepy_adapter, spread_rate):
         """
         [T1] Higher spread rate → lower option value (more OTM).
 
@@ -284,9 +282,7 @@ class TestSpreadPricerIntegration:
             (0.03, 3.0),
         ],
     )
-    def test_fia_spread_embedded_option_value(
-        self, financepy_adapter, spread_rate, term_years
-    ):
+    def test_fia_spread_embedded_option_value(self, financepy_adapter, spread_rate, term_years):
         """
         [T1] FIAPricer spread embedded option value matches financepy OTM call.
 

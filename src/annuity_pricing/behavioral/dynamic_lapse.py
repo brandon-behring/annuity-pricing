@@ -32,8 +32,9 @@ import numpy as np
 
 class CalibrationSource(Enum):
     """Source of calibration data for lapse model."""
+
     HARDCODED = "hardcoded"  # Original fixed parameters
-    SOA_2006 = "soa_2006"    # SOA 2006 Deferred Annuity Persistency Study
+    SOA_2006 = "soa_2006"  # SOA 2006 Deferred Annuity Persistency Study
 
 
 @dataclass(frozen=True)
@@ -145,7 +146,7 @@ class DynamicLapseModel:
 
         # Dynamic adjustment factor
         # Apply sensitivity: factor = moneyness^sensitivity
-        adjustment_factor = moneyness ** self.assumptions.sensitivity
+        adjustment_factor = moneyness**self.assumptions.sensitivity
 
         # Calculate adjusted lapse rate
         base_rate = self.assumptions.base_annual_lapse
@@ -194,9 +195,7 @@ class DynamicLapseModel:
             Lapse rates at each time step (shape: [n_steps])
         """
         if len(gwb_path) != len(av_path):
-            raise ValueError(
-                f"Path lengths must match: gwb={len(gwb_path)}, av={len(av_path)}"
-            )
+            raise ValueError(f"Path lengths must match: gwb={len(gwb_path)}, av={len(av_path)}")
 
         n_steps = len(gwb_path)
         lapse_rates = np.zeros(n_steps)
@@ -282,7 +281,7 @@ class SOALapseAssumptions:
     use_age_adjustment: bool = False
     moneyness_sensitivity: float = 1.0
     min_lapse: float = 0.005  # 0.5% floor
-    max_lapse: float = 0.25   # 25% cap
+    max_lapse: float = 0.25  # 25% cap
 
 
 @dataclass(frozen=True)
@@ -440,7 +439,7 @@ class SOADynamicLapseModel:
         # 4. Age adjustment (optional)
         if self.assumptions.use_age_adjustment and age is not None:
             # Get age-based rate and compare to overall average
-            age_rate = interpolate_surrender_by_age(age, surrender_type='full')
+            age_rate = interpolate_surrender_by_age(age, surrender_type="full")
             avg_rate = 0.052  # SOA average full surrender rate
             age_factor = age_rate / avg_rate
         else:
@@ -495,9 +494,7 @@ class SOADynamicLapseModel:
             Lapse rates at each time step (shape: [n_steps])
         """
         if len(gwb_path) != len(av_path):
-            raise ValueError(
-                f"Path lengths must match: gwb={len(gwb_path)}, av={len(av_path)}"
-            )
+            raise ValueError(f"Path lengths must match: gwb={len(gwb_path)}, av={len(av_path)}")
 
         sc_length = surrender_charge_length or self.assumptions.surrender_charge_length
         n_steps = len(gwb_path)

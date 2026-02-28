@@ -69,8 +69,7 @@ class HestonParams:
         """Validate Heston parameters."""
         if self.v0 <= 0:
             raise ValueError(
-                f"CRITICAL: v0 must be > 0. Got: v0={self.v0}. "
-                f"[T1] v0 is initial variance."
+                f"CRITICAL: v0 must be > 0. Got: v0={self.v0}. [T1] v0 is initial variance."
             )
         if self.kappa <= 0:
             raise ValueError(
@@ -151,10 +150,7 @@ def heston_characteristic_function(
     drift = (rate - dividend) * time
 
     # Compute d and g [T1]
-    d = np.sqrt(
-        (rho * sigma * u * 1j - kappa) ** 2
-        + sigma**2 * (u * 1j + u**2)
-    )
+    d = np.sqrt((rho * sigma * u * 1j - kappa) ** 2 + sigma**2 * (u * 1j + u**2))
 
     numerator = kappa - rho * sigma * u * 1j - d
     denominator = kappa - rho * sigma * u * 1j + d
@@ -415,9 +411,7 @@ def heston_price_call(
     [T2] NOTE: Use heston_price_call_mc for production (<1% error).
     FFT has 20-50% systematic bias.
     """
-    return heston_price_fft(
-        spot, strike, rate, dividend, time, params, option_type=OptionType.CALL
-    )
+    return heston_price_fft(spot, strike, rate, dividend, time, params, option_type=OptionType.CALL)
 
 
 def heston_price_put(
@@ -434,9 +428,7 @@ def heston_price_put(
     [T2] NOTE: Use heston_price_put_mc for production (<1% error).
     FFT has 20-50% systematic bias.
     """
-    return heston_price_fft(
-        spot, strike, rate, dividend, time, params, option_type=OptionType.PUT
-    )
+    return heston_price_fft(spot, strike, rate, dividend, time, params, option_type=OptionType.PUT)
 
 
 def heston_price(
@@ -505,13 +497,21 @@ def heston_price(
 
     if method == "cos":
         from annuity_pricing.options.pricing.heston_cos import heston_price_cos
+
         return heston_price_cos(
-            spot, strike, rate, dividend, time, params, option_type,
+            spot,
+            strike,
+            rate,
+            dividend,
+            time,
+            params,
+            option_type,
             cos_params=kwargs.get("cos_params"),
         )
 
     elif method == "mc":
         from annuity_pricing.options.simulation.heston_paths import generate_heston_terminal_spots
+
         paths = kwargs.get("paths", 50000)
         steps = kwargs.get("steps", 252)
         seed = kwargs.get("seed")
@@ -530,14 +530,17 @@ def heston_price(
 
     elif method == "fft":
         return heston_price_fft(
-            spot, strike, rate, dividend, time, params, option_type,
+            spot,
+            strike,
+            rate,
+            dividend,
+            time,
+            params,
+            option_type,
             N=kwargs.get("N", 4096),
             B=kwargs.get("B", 15.0),
             alpha=kwargs.get("alpha", 1.5),
         )
 
     else:
-        raise ValueError(
-            f"CRITICAL: Unknown method '{method}'. "
-            f"Valid methods: 'cos', 'mc', 'fft'"
-        )
+        raise ValueError(f"CRITICAL: Unknown method '{method}'. Valid methods: 'cos', 'mc', 'fft'")

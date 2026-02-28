@@ -279,9 +279,7 @@ class TestDeterministicScenarios:
 
     def test_base_scenario(self) -> None:
         """Base scenario should use base values."""
-        scenarios = generate_deterministic_scenarios(
-            n_years=10, base_rate=0.04, base_equity=0.07
-        )
+        scenarios = generate_deterministic_scenarios(n_years=10, base_rate=0.04, base_equity=0.07)
 
         base = scenarios[0]
         assert np.all(base.rates == 0.04)
@@ -289,18 +287,14 @@ class TestDeterministicScenarios:
 
     def test_up_scenario(self) -> None:
         """Up scenario should have higher rates."""
-        scenarios = generate_deterministic_scenarios(
-            n_years=10, base_rate=0.04, base_equity=0.07
-        )
+        scenarios = generate_deterministic_scenarios(n_years=10, base_rate=0.04, base_equity=0.07)
 
         up = scenarios[1]
         assert np.all(up.rates == 0.06)  # +2%
 
     def test_down_scenario(self) -> None:
         """Down scenario should have lower rates."""
-        scenarios = generate_deterministic_scenarios(
-            n_years=10, base_rate=0.04, base_equity=0.07
-        )
+        scenarios = generate_deterministic_scenarios(n_years=10, base_rate=0.04, base_equity=0.07)
 
         down = scenarios[2]
         assert np.all(down.rates == 0.02)  # -2%
@@ -354,12 +348,8 @@ class TestReproducibility:
         s1 = gen1.generate_ag43_scenarios()
         s2 = gen2.generate_ag43_scenarios()
 
-        np.testing.assert_array_equal(
-            s1.get_rate_matrix(), s2.get_rate_matrix()
-        )
-        np.testing.assert_array_equal(
-            s1.get_equity_matrix(), s2.get_equity_matrix()
-        )
+        np.testing.assert_array_equal(s1.get_rate_matrix(), s2.get_rate_matrix())
+        np.testing.assert_array_equal(s1.get_equity_matrix(), s2.get_equity_matrix())
 
     def test_different_seed_different_result(self) -> None:
         """Different seeds should produce different scenarios."""
@@ -466,14 +456,10 @@ class TestRiskNeutralScenarios:
         curve = YieldCurveLoader().flat_curve(0.04)
 
         # Low dividend (mu = 4% - 1% = 3%)
-        low_div = gen1.generate_risk_neutral_scenarios(
-            yield_curve=curve, dividend_yield=0.01
-        )
+        low_div = gen1.generate_risk_neutral_scenarios(yield_curve=curve, dividend_yield=0.01)
 
         # High dividend (mu = 4% - 4% = 0%)
-        high_div = gen2.generate_risk_neutral_scenarios(
-            yield_curve=curve, dividend_yield=0.04
-        )
+        high_div = gen2.generate_risk_neutral_scenarios(yield_curve=curve, dividend_yield=0.04)
 
         low_mean = np.mean(low_div.get_equity_matrix())
         high_mean = np.mean(high_div.get_equity_matrix())

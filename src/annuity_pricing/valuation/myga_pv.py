@@ -345,8 +345,7 @@ def value_myga(
 
     # Calculate PV
     present_value = sum(
-        calculate_present_value(cf.amount, discount_rate, cf.time)
-        for cf in cash_flows
+        calculate_present_value(cf.amount, discount_rate, cf.time) for cf in cash_flows
     )
 
     # Calculate duration and convexity
@@ -358,12 +357,10 @@ def value_myga(
     # Calculate effective duration (shock rates ±1%)
     rate_shift = 0.01
     pv_up = sum(
-        calculate_present_value(cf.amount, discount_rate + rate_shift, cf.time)
-        for cf in cash_flows
+        calculate_present_value(cf.amount, discount_rate + rate_shift, cf.time) for cf in cash_flows
     )
     pv_down = sum(
-        calculate_present_value(cf.amount, discount_rate - rate_shift, cf.time)
-        for cf in cash_flows
+        calculate_present_value(cf.amount, discount_rate - rate_shift, cf.time) for cf in cash_flows
     )
     effective_duration = calculate_effective_duration(pv_up, pv_down, present_value, rate_shift)
 

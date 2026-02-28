@@ -26,24 +26,27 @@ from annuity_pricing.options.payoffs.rila import (
 # =============================================================================
 
 # Test returns including edge cases
-TEST_RETURNS = np.array([
-    -0.50,  # Large loss
-    -0.30,  # Moderate loss
-    -0.15,  # Small loss (within typical buffer)
-    -0.10,  # Exactly at buffer level
-    -0.05,  # Small loss (within buffer)
-    0.00,   # Flat
-    0.05,   # Small gain
-    0.10,   # Moderate gain (typical cap level)
-    0.15,   # Above typical cap
-    0.30,   # Large gain
-    0.50,   # Very large gain
-])
+TEST_RETURNS = np.array(
+    [
+        -0.50,  # Large loss
+        -0.30,  # Moderate loss
+        -0.15,  # Small loss (within typical buffer)
+        -0.10,  # Exactly at buffer level
+        -0.05,  # Small loss (within buffer)
+        0.00,  # Flat
+        0.05,  # Small gain
+        0.10,  # Moderate gain (typical cap level)
+        0.15,  # Above typical cap
+        0.30,  # Large gain
+        0.50,  # Very large gain
+    ]
+)
 
 
 # =============================================================================
 # FIA Payoff Vectorization Tests
 # =============================================================================
+
 
 @pytest.mark.anti_pattern
 class TestCappedCallVectorizedConsistency:
@@ -55,29 +58,27 @@ class TestCappedCallVectorizedConsistency:
         payoff = CappedCallPayoff(cap_rate=cap_rate)
 
         # Skip if vectorized not implemented yet
-        if not hasattr(payoff, 'calculate_vectorized'):
+        if not hasattr(payoff, "calculate_vectorized"):
             pytest.skip("calculate_vectorized not implemented yet")
 
         # Vectorized calculation
         vectorized_results = payoff.calculate_vectorized(TEST_RETURNS)
 
         # Scalar calculation (one at a time)
-        scalar_results = np.array([
-            payoff.calculate(r).credited_return for r in TEST_RETURNS
-        ])
+        scalar_results = np.array([payoff.calculate(r).credited_return for r in TEST_RETURNS])
 
         np.testing.assert_allclose(
             vectorized_results,
             scalar_results,
             rtol=1e-10,
-            err_msg=f"CappedCallPayoff vectorized != scalar for cap={cap_rate}"
+            err_msg=f"CappedCallPayoff vectorized != scalar for cap={cap_rate}",
         )
 
     def test_vectorized_preserves_shape(self) -> None:
         """Vectorized output should have same shape as input."""
         payoff = CappedCallPayoff(cap_rate=0.10)
 
-        if not hasattr(payoff, 'calculate_vectorized'):
+        if not hasattr(payoff, "calculate_vectorized"):
             pytest.skip("calculate_vectorized not implemented yet")
 
         result = payoff.calculate_vectorized(TEST_RETURNS)
@@ -88,34 +89,33 @@ class TestCappedCallVectorizedConsistency:
 class TestParticipationVectorizedConsistency:
     """Vectorized ParticipationPayoff must match scalar."""
 
-    @pytest.mark.parametrize("participation_rate,cap_rate", [
-        (0.50, None),
-        (0.80, None),
-        (1.0, None),
-        (0.80, 0.15),
-    ])
-    def test_vectorized_matches_scalar(
-        self, participation_rate: float, cap_rate: float
-    ) -> None:
+    @pytest.mark.parametrize(
+        "participation_rate,cap_rate",
+        [
+            (0.50, None),
+            (0.80, None),
+            (1.0, None),
+            (0.80, 0.15),
+        ],
+    )
+    def test_vectorized_matches_scalar(self, participation_rate: float, cap_rate: float) -> None:
         """Vectorized and scalar must produce identical results."""
         payoff = ParticipationPayoff(
             participation_rate=participation_rate,
             cap_rate=cap_rate,
         )
 
-        if not hasattr(payoff, 'calculate_vectorized'):
+        if not hasattr(payoff, "calculate_vectorized"):
             pytest.skip("calculate_vectorized not implemented yet")
 
         vectorized_results = payoff.calculate_vectorized(TEST_RETURNS)
-        scalar_results = np.array([
-            payoff.calculate(r).credited_return for r in TEST_RETURNS
-        ])
+        scalar_results = np.array([payoff.calculate(r).credited_return for r in TEST_RETURNS])
 
         np.testing.assert_allclose(
             vectorized_results,
             scalar_results,
             rtol=1e-10,
-            err_msg="ParticipationPayoff vectorized != scalar"
+            err_msg="ParticipationPayoff vectorized != scalar",
         )
 
 
@@ -128,19 +128,17 @@ class TestSpreadVectorizedConsistency:
         """Vectorized and scalar must produce identical results."""
         payoff = SpreadPayoff(spread_rate=spread_rate)
 
-        if not hasattr(payoff, 'calculate_vectorized'):
+        if not hasattr(payoff, "calculate_vectorized"):
             pytest.skip("calculate_vectorized not implemented yet")
 
         vectorized_results = payoff.calculate_vectorized(TEST_RETURNS)
-        scalar_results = np.array([
-            payoff.calculate(r).credited_return for r in TEST_RETURNS
-        ])
+        scalar_results = np.array([payoff.calculate(r).credited_return for r in TEST_RETURNS])
 
         np.testing.assert_allclose(
             vectorized_results,
             scalar_results,
             rtol=1e-10,
-            err_msg=f"SpreadPayoff vectorized != scalar for spread={spread_rate}"
+            err_msg=f"SpreadPayoff vectorized != scalar for spread={spread_rate}",
         )
 
 
@@ -152,19 +150,17 @@ class TestTriggerVectorizedConsistency:
         """Vectorized and scalar must produce identical results."""
         payoff = TriggerPayoff(trigger_rate=0.05)
 
-        if not hasattr(payoff, 'calculate_vectorized'):
+        if not hasattr(payoff, "calculate_vectorized"):
             pytest.skip("calculate_vectorized not implemented yet")
 
         vectorized_results = payoff.calculate_vectorized(TEST_RETURNS)
-        scalar_results = np.array([
-            payoff.calculate(r).credited_return for r in TEST_RETURNS
-        ])
+        scalar_results = np.array([payoff.calculate(r).credited_return for r in TEST_RETURNS])
 
         np.testing.assert_allclose(
             vectorized_results,
             scalar_results,
             rtol=1e-10,
-            err_msg="TriggerPayoff vectorized != scalar"
+            err_msg="TriggerPayoff vectorized != scalar",
         )
 
 
@@ -172,35 +168,35 @@ class TestTriggerVectorizedConsistency:
 # RILA Payoff Vectorization Tests
 # =============================================================================
 
+
 @pytest.mark.anti_pattern
 class TestBufferVectorizedConsistency:
     """Vectorized BufferPayoff must match scalar."""
 
-    @pytest.mark.parametrize("buffer_rate,cap_rate", [
-        (0.10, None),
-        (0.10, 0.15),
-        (0.15, 0.20),
-        (0.20, None),
-    ])
-    def test_vectorized_matches_scalar(
-        self, buffer_rate: float, cap_rate: float
-    ) -> None:
+    @pytest.mark.parametrize(
+        "buffer_rate,cap_rate",
+        [
+            (0.10, None),
+            (0.10, 0.15),
+            (0.15, 0.20),
+            (0.20, None),
+        ],
+    )
+    def test_vectorized_matches_scalar(self, buffer_rate: float, cap_rate: float) -> None:
         """Vectorized and scalar must produce identical results."""
         payoff = BufferPayoff(buffer_rate=buffer_rate, cap_rate=cap_rate)
 
-        if not hasattr(payoff, 'calculate_vectorized'):
+        if not hasattr(payoff, "calculate_vectorized"):
             pytest.skip("calculate_vectorized not implemented yet")
 
         vectorized_results = payoff.calculate_vectorized(TEST_RETURNS)
-        scalar_results = np.array([
-            payoff.calculate(r).credited_return for r in TEST_RETURNS
-        ])
+        scalar_results = np.array([payoff.calculate(r).credited_return for r in TEST_RETURNS])
 
         np.testing.assert_allclose(
             vectorized_results,
             scalar_results,
             rtol=1e-10,
-            err_msg=f"BufferPayoff vectorized != scalar for buffer={buffer_rate}"
+            err_msg=f"BufferPayoff vectorized != scalar for buffer={buffer_rate}",
         )
 
 
@@ -208,37 +204,37 @@ class TestBufferVectorizedConsistency:
 class TestFloorVectorizedConsistency:
     """Vectorized FloorPayoff must match scalar."""
 
-    @pytest.mark.parametrize("floor_rate,cap_rate", [
-        (-0.10, None),
-        (-0.10, 0.15),
-        (-0.15, 0.20),
-        (-0.20, None),
-    ])
-    def test_vectorized_matches_scalar(
-        self, floor_rate: float, cap_rate: float
-    ) -> None:
+    @pytest.mark.parametrize(
+        "floor_rate,cap_rate",
+        [
+            (-0.10, None),
+            (-0.10, 0.15),
+            (-0.15, 0.20),
+            (-0.20, None),
+        ],
+    )
+    def test_vectorized_matches_scalar(self, floor_rate: float, cap_rate: float) -> None:
         """Vectorized and scalar must produce identical results."""
         payoff = FloorPayoff(floor_rate=floor_rate, cap_rate=cap_rate)
 
-        if not hasattr(payoff, 'calculate_vectorized'):
+        if not hasattr(payoff, "calculate_vectorized"):
             pytest.skip("calculate_vectorized not implemented yet")
 
         vectorized_results = payoff.calculate_vectorized(TEST_RETURNS)
-        scalar_results = np.array([
-            payoff.calculate(r).credited_return for r in TEST_RETURNS
-        ])
+        scalar_results = np.array([payoff.calculate(r).credited_return for r in TEST_RETURNS])
 
         np.testing.assert_allclose(
             vectorized_results,
             scalar_results,
             rtol=1e-10,
-            err_msg=f"FloorPayoff vectorized != scalar for floor={floor_rate}"
+            err_msg=f"FloorPayoff vectorized != scalar for floor={floor_rate}",
         )
 
 
 # =============================================================================
 # Interface Tests
 # =============================================================================
+
 
 @pytest.mark.anti_pattern
 class TestVectorizedInterface:
@@ -256,7 +252,7 @@ class TestVectorizedInterface:
         ]
 
         for payoff in payoffs:
-            if not hasattr(payoff, 'supports_vectorized'):
+            if not hasattr(payoff, "supports_vectorized"):
                 pytest.skip("supports_vectorized not implemented yet")
 
             # Method should return bool
@@ -267,7 +263,7 @@ class TestVectorizedInterface:
         """calculate_vectorized should return numpy array."""
         payoff = CappedCallPayoff(cap_rate=0.10)
 
-        if not hasattr(payoff, 'calculate_vectorized'):
+        if not hasattr(payoff, "calculate_vectorized"):
             pytest.skip("calculate_vectorized not implemented yet")
 
         result = payoff.calculate_vectorized(TEST_RETURNS)

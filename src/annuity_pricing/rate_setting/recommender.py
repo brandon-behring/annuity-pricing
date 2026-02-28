@@ -161,13 +161,9 @@ class RateRecommender:
         """
         # Validate inputs
         if not 0 <= target_percentile <= 100:
-            raise ValueError(
-                f"CRITICAL: target_percentile must be 0-100, got {target_percentile}"
-            )
+            raise ValueError(f"CRITICAL: target_percentile must be 0-100, got {target_percentile}")
         if guarantee_duration <= 0:
-            raise ValueError(
-                f"CRITICAL: guarantee_duration must be > 0, got {guarantee_duration}"
-            )
+            raise ValueError(f"CRITICAL: guarantee_duration must be > 0, got {guarantee_duration}")
 
         # Filter to comparable products
         comparables = self._get_comparables(market_data, guarantee_duration)
@@ -182,9 +178,7 @@ class RateRecommender:
         rates = comparables["fixedRate"].dropna()
 
         if rates.empty:
-            raise ValueError(
-                "CRITICAL: All fixedRate values are null in comparable products."
-            )
+            raise ValueError("CRITICAL: All fixedRate values are null in comparable products.")
 
         # Calculate rate at target percentile
         recommended_rate = float(np.percentile(rates, target_percentile))
@@ -250,9 +244,7 @@ class RateRecommender:
             Complete recommendation
         """
         if treasury_rate < 0:
-            raise ValueError(
-                f"CRITICAL: treasury_rate must be >= 0, got {treasury_rate}"
-            )
+            raise ValueError(f"CRITICAL: treasury_rate must be >= 0, got {treasury_rate}")
 
         # Calculate rate from spread target
         recommended_rate = treasury_rate + (target_spread_bps / 10000)
@@ -261,9 +253,7 @@ class RateRecommender:
         comparables = self._get_comparables(market_data, guarantee_duration)
 
         if comparables.empty:
-            raise ValueError(
-                f"CRITICAL: No comparable products for duration {guarantee_duration}"
-            )
+            raise ValueError(f"CRITICAL: No comparable products for duration {guarantee_duration}")
 
         rates = comparables["fixedRate"].dropna()
 
@@ -434,9 +424,7 @@ class RateRecommender:
     def _calculate_percentile(self, value: float, distribution: pd.Series) -> float:
         """Calculate percentile of value within distribution."""
         if distribution.empty:
-            raise ValueError(
-                "CRITICAL: Cannot calculate percentile with empty distribution"
-            )
+            raise ValueError("CRITICAL: Cannot calculate percentile with empty distribution")
         count_le = (distribution <= value).sum()
         return float((count_le / len(distribution)) * 100)
 

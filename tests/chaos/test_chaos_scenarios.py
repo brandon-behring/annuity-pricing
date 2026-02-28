@@ -252,9 +252,7 @@ class TestExtremeMarketConditions:
             option_budget_pct=0.03,
         )
 
-        registry = ProductRegistry(
-            market_env=crisis_env, n_mc_paths=1000, seed=BENCHMARK_SEED
-        )
+        registry = ProductRegistry(market_env=crisis_env, n_mc_paths=1000, seed=BENCHMARK_SEED)
 
         # Should complete without error
         result = registry.price(sample_fia, term_years=1.0, validate=False)
@@ -304,9 +302,7 @@ class TestExtremeMarketConditions:
             volatility=0.0001,  # Near-zero vol (exactly 0 may cause numerical issues)
         )
 
-        registry = ProductRegistry(
-            market_env=zero_vol_env, n_mc_paths=1000, seed=BENCHMARK_SEED
-        )
+        registry = ProductRegistry(market_env=zero_vol_env, n_mc_paths=1000, seed=BENCHMARK_SEED)
         result = registry.price(sample_fia, term_years=1.0, validate=False)
 
         assert result.present_value > 0
@@ -321,9 +317,7 @@ class TestExtremeMarketConditions:
             volatility=1.50,  # 150% annualized vol
         )
 
-        registry = ProductRegistry(
-            market_env=high_vol_env, n_mc_paths=1000, seed=BENCHMARK_SEED
-        )
+        registry = ProductRegistry(market_env=high_vol_env, n_mc_paths=1000, seed=BENCHMARK_SEED)
         result = registry.price(sample_rila, term_years=6.0, validate=False)
 
         assert result.present_value > 0
@@ -349,9 +343,7 @@ class TestProductEdgeCases:
             term_years=0.25,  # 3 months
         )
 
-        registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED
-        )
+        registry = ProductRegistry(market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED)
         result = registry.price(fia, validate=False)
 
         assert result.present_value > 0
@@ -386,9 +378,7 @@ class TestProductEdgeCases:
             term_years=1,
         )
 
-        registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED
-        )
+        registry = ProductRegistry(market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED)
         result = registry.price(fia, validate=False)
 
         assert result.present_value > 0
@@ -408,9 +398,7 @@ class TestProductEdgeCases:
             term_years=6,
         )
 
-        registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED
-        )
+        registry = ProductRegistry(market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED)
         result = registry.price(rila, term_years=6.0, validate=False)
 
         assert result.present_value > 0
@@ -465,23 +453,37 @@ class TestConcurrentPricing:
 
     def test_concurrent_mixed_products(self, market_env: MarketEnvironment) -> None:
         """Thread-safe pricing of mixed product types."""
-        registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED
-        )
+        registry = ProductRegistry(market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED)
 
         # Create products with unique names
         products: list[tuple[Any, dict]] = []
         for i in range(5):
-            products.append((MYGAProduct(
-                company_name="Test", product_name=f"MYGA {i}",
-                product_group="MYGA", status="current",
-                fixed_rate=0.04, guarantee_duration=5,
-            ), {}))
-            products.append((FIAProduct(
-                company_name="Test", product_name=f"FIA {i}",
-                product_group="FIA", status="current",
-                cap_rate=0.10, term_years=1,
-            ), {"validate": False}))
+            products.append(
+                (
+                    MYGAProduct(
+                        company_name="Test",
+                        product_name=f"MYGA {i}",
+                        product_group="MYGA",
+                        status="current",
+                        fixed_rate=0.04,
+                        guarantee_duration=5,
+                    ),
+                    {},
+                )
+            )
+            products.append(
+                (
+                    FIAProduct(
+                        company_name="Test",
+                        product_name=f"FIA {i}",
+                        product_group="FIA",
+                        status="current",
+                        cap_rate=0.10,
+                        term_years=1,
+                    ),
+                    {"validate": False},
+                )
+            )
 
         results = []
         errors = []
@@ -546,13 +548,9 @@ class TestLargePortfolio:
 class TestNumericalStability:
     """Tests for numerical stability in edge cases."""
 
-    def test_no_nan_in_results(
-        self, market_env: MarketEnvironment, sample_fia: FIAProduct
-    ) -> None:
+    def test_no_nan_in_results(self, market_env: MarketEnvironment, sample_fia: FIAProduct) -> None:
         """No NaN values in pricing results."""
-        registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED
-        )
+        registry = ProductRegistry(market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED)
         result = registry.price(sample_fia, term_years=1.0, validate=False)
 
         assert not np.isnan(result.present_value)
@@ -560,13 +558,9 @@ class TestNumericalStability:
         assert not np.isnan(result.expected_credit)
         assert not np.isnan(result.duration)
 
-    def test_no_inf_in_results(
-        self, market_env: MarketEnvironment, sample_fia: FIAProduct
-    ) -> None:
+    def test_no_inf_in_results(self, market_env: MarketEnvironment, sample_fia: FIAProduct) -> None:
         """No Inf values in pricing results."""
-        registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED
-        )
+        registry = ProductRegistry(market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED)
         result = registry.price(sample_fia, term_years=1.0, validate=False)
 
         assert not np.isinf(result.present_value)

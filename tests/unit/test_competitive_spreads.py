@@ -143,12 +143,14 @@ class TestCalculateMarketSpreads:
 
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
-        return pd.DataFrame({
-            "fixedRate": [0.045, 0.048, 0.050, 0.046],
-            "guaranteeDuration": [5, 5, 7, 3],
-            "productGroup": ["MYGA"] * 4,
-            "status": ["current"] * 4,
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.045, 0.048, 0.050, 0.046],
+                "guaranteeDuration": [5, 5, 7, 3],
+                "productGroup": ["MYGA"] * 4,
+                "status": ["current"] * 4,
+            }
+        )
 
     @pytest.fixture
     def treasury_curve(self) -> dict[int, float]:
@@ -190,12 +192,14 @@ class TestGetSpreadDistribution:
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
         np.random.seed(42)
-        return pd.DataFrame({
-            "fixedRate": np.random.uniform(0.04, 0.055, 100),
-            "guaranteeDuration": [5] * 100,
-            "productGroup": ["MYGA"] * 100,
-            "status": ["current"] * 100,
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": np.random.uniform(0.04, 0.055, 100),
+                "guaranteeDuration": [5] * 100,
+                "productGroup": ["MYGA"] * 100,
+                "status": ["current"] * 100,
+            }
+        )
 
     @pytest.fixture
     def treasury_curve(self) -> dict[int, float]:
@@ -237,12 +241,14 @@ class TestAnalyzeSpreadPosition:
 
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
-        return pd.DataFrame({
-            "fixedRate": [0.045, 0.048, 0.050, 0.052, 0.055],
-            "guaranteeDuration": [5] * 5,
-            "productGroup": ["MYGA"] * 5,
-            "status": ["current"] * 5,
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.045, 0.048, 0.050, 0.052, 0.055],
+                "guaranteeDuration": [5] * 5,
+                "productGroup": ["MYGA"] * 5,
+                "status": ["current"] * 5,
+            }
+        )
 
     @pytest.fixture
     def treasury_curve(self) -> dict[int, float]:
@@ -272,12 +278,14 @@ class TestSpreadByDuration:
 
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
-        return pd.DataFrame({
-            "fixedRate": [0.045, 0.048, 0.050, 0.052],
-            "guaranteeDuration": [3, 5, 5, 7],
-            "productGroup": ["MYGA"] * 4,
-            "status": ["current"] * 4,
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.045, 0.048, 0.050, 0.052],
+                "guaranteeDuration": [3, 5, 5, 7],
+                "productGroup": ["MYGA"] * 4,
+                "status": ["current"] * 4,
+            }
+        )
 
     @pytest.fixture
     def treasury_curve(self) -> dict[int, float]:

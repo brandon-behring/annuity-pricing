@@ -110,13 +110,15 @@ class TestAnalyzePosition:
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
         """Create sample market data."""
-        return pd.DataFrame({
-            "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050],
-            "guaranteeDuration": [5, 5, 5, 5, 5, 5],
-            "productGroup": ["MYGA"] * 6,
-            "status": ["current"] * 6,
-            "companyName": ["A", "B", "C", "D", "E", "F"],
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050],
+                "guaranteeDuration": [5, 5, 5, 5, 5, 5],
+                "productGroup": ["MYGA"] * 6,
+                "status": ["current"] * 6,
+                "companyName": ["A", "B", "C", "D", "E", "F"],
+            }
+        )
 
     def test_returns_position_result(
         self, analyzer: PositioningAnalyzer, market_data: pd.DataFrame
@@ -174,16 +176,16 @@ class TestAnalyzePosition:
         result = analyzer.analyze_position(rate=0.041, market_data=market_data)
         assert result.quartile == 4
 
-    def test_product_group_filter(
-        self, analyzer: PositioningAnalyzer
-    ) -> None:
+    def test_product_group_filter(self, analyzer: PositioningAnalyzer) -> None:
         """Should filter by product group."""
-        market_data = pd.DataFrame({
-            "fixedRate": [0.040, 0.050, 0.045, 0.055],
-            "guaranteeDuration": [5, 5, 5, 5],
-            "productGroup": ["MYGA", "MYGA", "FIA", "FIA"],
-            "status": ["current"] * 4,
-        })
+        market_data = pd.DataFrame(
+            {
+                "fixedRate": [0.040, 0.050, 0.045, 0.055],
+                "guaranteeDuration": [5, 5, 5, 5],
+                "productGroup": ["MYGA", "MYGA", "FIA", "FIA"],
+                "status": ["current"] * 4,
+            }
+        )
 
         result = analyzer.analyze_position(
             rate=0.045,
@@ -194,16 +196,16 @@ class TestAnalyzePosition:
         # Only MYGA products considered
         assert result.total_products == 2
 
-    def test_duration_filter(
-        self, analyzer: PositioningAnalyzer
-    ) -> None:
+    def test_duration_filter(self, analyzer: PositioningAnalyzer) -> None:
         """Should filter by duration."""
-        market_data = pd.DataFrame({
-            "fixedRate": [0.040, 0.045, 0.050, 0.055],
-            "guaranteeDuration": [3, 5, 5, 10],
-            "productGroup": ["MYGA"] * 4,
-            "status": ["current"] * 4,
-        })
+        market_data = pd.DataFrame(
+            {
+                "fixedRate": [0.040, 0.045, 0.050, 0.055],
+                "guaranteeDuration": [3, 5, 5, 10],
+                "productGroup": ["MYGA"] * 4,
+                "status": ["current"] * 4,
+            }
+        )
 
         result = analyzer.analyze_position(
             rate=0.047,
@@ -227,16 +229,16 @@ class TestAnalyzePosition:
 
         assert result.total_products == 5
 
-    def test_raises_on_no_comparables(
-        self, analyzer: PositioningAnalyzer
-    ) -> None:
+    def test_raises_on_no_comparables(self, analyzer: PositioningAnalyzer) -> None:
         """Should raise if no comparable products."""
-        empty_data = pd.DataFrame({
-            "fixedRate": [],
-            "guaranteeDuration": [],
-            "productGroup": [],
-            "status": [],
-        })
+        empty_data = pd.DataFrame(
+            {
+                "fixedRate": [],
+                "guaranteeDuration": [],
+                "productGroup": [],
+                "status": [],
+            }
+        )
 
         with pytest.raises(ValueError, match="CRITICAL"):
             analyzer.analyze_position(
@@ -254,12 +256,14 @@ class TestGetDistributionStats:
 
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
-        return pd.DataFrame({
-            "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050],
-            "guaranteeDuration": [5, 5, 5, 5, 5, 5],
-            "productGroup": ["MYGA"] * 6,
-            "status": ["current"] * 6,
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050],
+                "guaranteeDuration": [5, 5, 5, 5, 5, 5],
+                "productGroup": ["MYGA"] * 6,
+                "status": ["current"] * 6,
+            }
+        )
 
     def test_returns_distribution_stats(
         self, analyzer: PositioningAnalyzer, market_data: pd.DataFrame
@@ -292,12 +296,14 @@ class TestGetPercentileThresholds:
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
         np.random.seed(42)
-        return pd.DataFrame({
-            "fixedRate": np.linspace(0.03, 0.06, 100),
-            "guaranteeDuration": [5] * 100,
-            "productGroup": ["MYGA"] * 100,
-            "status": ["current"] * 100,
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": np.linspace(0.03, 0.06, 100),
+                "guaranteeDuration": [5] * 100,
+                "productGroup": ["MYGA"] * 100,
+                "status": ["current"] * 100,
+            }
+        )
 
     def test_returns_thresholds(
         self, analyzer: PositioningAnalyzer, market_data: pd.DataFrame
@@ -330,13 +336,15 @@ class TestCompareToPeers:
 
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
-        return pd.DataFrame({
-            "fixedRate": [0.050, 0.048, 0.046, 0.044, 0.042, 0.040],
-            "guaranteeDuration": [5] * 6,
-            "productGroup": ["MYGA"] * 6,
-            "status": ["current"] * 6,
-            "companyName": ["A", "B", "C", "D", "E", "F"],
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.050, 0.048, 0.046, 0.044, 0.042, 0.040],
+                "guaranteeDuration": [5] * 6,
+                "productGroup": ["MYGA"] * 6,
+                "status": ["current"] * 6,
+                "companyName": ["A", "B", "C", "D", "E", "F"],
+            }
+        )
 
     def test_returns_comparison_df(
         self, analyzer: PositioningAnalyzer, market_data: pd.DataFrame

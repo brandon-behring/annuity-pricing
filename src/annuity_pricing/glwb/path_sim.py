@@ -174,15 +174,9 @@ class GLWBPathSimulator:
         self._mortality_loader = MortalityLoader()
 
         # Behavioral models with defaults
-        self._lapse_model = DynamicLapseModel(
-            lapse_assumptions or LapseAssumptions()
-        )
-        self._withdrawal_model = WithdrawalModel(
-            withdrawal_assumptions or WithdrawalAssumptions()
-        )
-        self._expense_model = ExpenseModel(
-            expense_assumptions or ExpenseAssumptions()
-        )
+        self._lapse_model = DynamicLapseModel(lapse_assumptions or LapseAssumptions())
+        self._withdrawal_model = WithdrawalModel(withdrawal_assumptions or WithdrawalAssumptions())
+        self._expense_model = ExpenseModel(expense_assumptions or ExpenseAssumptions())
 
     def price(
         self,

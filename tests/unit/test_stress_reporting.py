@@ -269,9 +269,7 @@ class TestExecutiveSummary:
     def test_summary_with_sensitivity(self, sample_summary, sample_tornado):
         """Test summary includes sensitivity insights."""
         reporter = StressTestReporter()
-        summary = reporter.generate_executive_summary(
-            sample_summary, sensitivity=sample_tornado
-        )
+        summary = reporter.generate_executive_summary(sample_summary, sensitivity=sample_tornado)
 
         assert "most sensitive" in summary.lower() or "equity" in summary.lower()
 
@@ -364,9 +362,7 @@ class TestMarkdownGeneration:
     def test_markdown_with_reverse_stress(self, sample_result, sample_reverse_stress_report):
         """Test Markdown includes reverse stress section."""
         reporter = StressTestReporter()
-        markdown = reporter.to_markdown(
-            sample_result, reverse_stress=sample_reverse_stress_report
-        )
+        markdown = reporter.to_markdown(sample_result, reverse_stress=sample_reverse_stress_report)
 
         assert "## Reverse Stress Testing" in markdown
         assert "Breaking Points" in markdown
@@ -460,9 +456,7 @@ class TestJSONGeneration:
     def test_json_with_reverse_stress(self, sample_result, sample_reverse_stress_report):
         """Test JSON includes reverse stress data."""
         reporter = StressTestReporter()
-        json_str = reporter.to_json(
-            sample_result, reverse_stress=sample_reverse_stress_report
-        )
+        json_str = reporter.to_json(sample_result, reverse_stress=sample_reverse_stress_report)
         data = json.loads(json_str)
 
         assert "reverse_stress" in data
@@ -518,9 +512,7 @@ class TestSaveReport:
         """Test saving Markdown report."""
         reporter = StressTestReporter()
 
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".md", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             filepath = f.name
 
         try:
@@ -534,9 +526,7 @@ class TestSaveReport:
         """Test saving JSON report."""
         reporter = StressTestReporter()
 
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".json", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             filepath = f.name
 
         try:
@@ -576,9 +566,7 @@ class TestConvenienceFunctions:
 
     def test_generate_stress_report_custom_title(self, sample_result):
         """Test generate_stress_report with custom title."""
-        report = generate_stress_report(
-            sample_result, format="markdown", title="Custom Title"
-        )
+        report = generate_stress_report(sample_result, format="markdown", title="Custom Title")
         assert "# Custom Title" in report
 
     def test_generate_stress_report_invalid_format(self, sample_result):

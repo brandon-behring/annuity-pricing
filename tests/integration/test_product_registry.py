@@ -162,6 +162,7 @@ class TestUnifiedPricing:
 
     def test_unsupported_product_type(self, registry):
         """Should reject unsupported product types."""
+
         class UnsupportedProduct:
             pass
 
@@ -176,14 +177,20 @@ class TestPriceMultiple:
         """Should price multiple products of same type."""
         products = [
             MYGAProduct(
-                company_name="A", product_name="MYGA A",
-                product_group="MYGA", status="current",
-                fixed_rate=0.04, guarantee_duration=3,
+                company_name="A",
+                product_name="MYGA A",
+                product_group="MYGA",
+                status="current",
+                fixed_rate=0.04,
+                guarantee_duration=3,
             ),
             MYGAProduct(
-                company_name="B", product_name="MYGA B",
-                product_group="MYGA", status="current",
-                fixed_rate=0.05, guarantee_duration=5,
+                company_name="B",
+                product_name="MYGA B",
+                product_group="MYGA",
+                status="current",
+                fixed_rate=0.05,
+                guarantee_duration=5,
             ),
         ]
 
@@ -278,22 +285,24 @@ class TestCompetitivePosition:
     @pytest.fixture
     def myga_market_data(self):
         """Sample MYGA market data."""
-        return pd.DataFrame({
-            "productGroup": ["MYGA"] * 10,
-            "fixedRate": [0.03, 0.035, 0.04, 0.042, 0.045,
-                         0.047, 0.05, 0.052, 0.055, 0.06],
-            "guaranteeDuration": [5] * 10,
-        })
+        return pd.DataFrame(
+            {
+                "productGroup": ["MYGA"] * 10,
+                "fixedRate": [0.03, 0.035, 0.04, 0.042, 0.045, 0.047, 0.05, 0.052, 0.055, 0.06],
+                "guaranteeDuration": [5] * 10,
+            }
+        )
 
     @pytest.fixture
     def fia_market_data(self):
         """Sample FIA market data."""
-        return pd.DataFrame({
-            "productGroup": ["FIA"] * 10,
-            "capRate": [0.06, 0.07, 0.08, 0.09, 0.10,
-                       0.11, 0.12, 0.13, 0.14, 0.15],
-            "indexUsed": ["S&P 500"] * 10,
-        })
+        return pd.DataFrame(
+            {
+                "productGroup": ["FIA"] * 10,
+                "capRate": [0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15],
+                "indexUsed": ["S&P 500"] * 10,
+            }
+        )
 
     def test_myga_competitive_position(self, registry, myga_product, myga_market_data):
         """Should calculate MYGA competitive position."""

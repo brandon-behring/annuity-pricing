@@ -250,9 +250,7 @@ class ExpenseModel:
         # Add acquisition cost if requested
         if include_acquisition:
             if premium is None:
-                raise ValueError(
-                    "Premium required when include_acquisition=True"
-                )
+                raise ValueError("Premium required when include_acquisition=True")
             pv += self.calculate_acquisition_cost(premium)
 
         return pv
@@ -347,7 +345,8 @@ class ExpenseModel:
         else:
             # For others, sensitivity is per relative change
             param_change = (
-                a.per_policy_annual * delta if parameter == "per_policy"
+                a.per_policy_annual * delta
+                if parameter == "per_policy"
                 else a.pct_of_av_annual * delta
             )
             return expense_change / param_change if param_change != 0 else 0.0

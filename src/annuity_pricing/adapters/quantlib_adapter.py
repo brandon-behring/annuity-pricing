@@ -163,9 +163,7 @@ class QuantLibAdapter(BaseAdapter):
         maturity = self._make_date(term_years)
 
         # Get zero rate (continuously compounded)
-        zero = curve_handle.zeroRate(
-            maturity, ql.Actual365Fixed(), ql.Continuous
-        ).rate()
+        zero = curve_handle.zeroRate(maturity, ql.Actual365Fixed(), ql.Continuous).rate()
 
         return float(zero)
 

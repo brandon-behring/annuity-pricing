@@ -496,7 +496,9 @@ class VM21Calculator:
         pv_liability = 0.0
         alive = True
 
-        rng = np.random.default_rng(abs(hash((self.seed or 0, scenario.scenario_id))))  # Deterministic per scenario
+        rng = np.random.default_rng(
+            abs(hash((self.seed or 0, scenario.scenario_id)))
+        )  # Deterministic per scenario
 
         for t in range(n_years):
             current_age = policy.age + t

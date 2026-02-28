@@ -101,8 +101,7 @@ class TestWithdrawalModel:
         results = []
         for years in range(5):
             result = model.calculate_withdrawal(
-                gwb=100_000, withdrawal_rate=0.05, age=65,
-                years_since_first_withdrawal=years
+                gwb=100_000, withdrawal_rate=0.05, age=65, years_since_first_withdrawal=years
             )
             results.append(result)
 
@@ -126,8 +125,7 @@ class TestWithdrawalModel:
 
         # Year 0 ramp (70% of 30% = 21%) would be below floor
         result = model.calculate_withdrawal(
-            gwb=100_000, withdrawal_rate=0.05, age=55,
-            years_since_first_withdrawal=0
+            gwb=100_000, withdrawal_rate=0.05, age=55, years_since_first_withdrawal=0
         )
 
         # Should be floored at min_utilization
@@ -147,8 +145,7 @@ class TestWithdrawalModel:
 
         # Age 80 would calculate 0.90 + 0.05*15 = 1.65 (>1.0)
         result = model.calculate_withdrawal(
-            gwb=100_000, withdrawal_rate=0.05, age=80,
-            years_since_first_withdrawal=10
+            gwb=100_000, withdrawal_rate=0.05, age=80, years_since_first_withdrawal=10
         )
 
         # Should be capped at max_utilization
@@ -158,9 +155,7 @@ class TestWithdrawalModel:
         """
         [T1] Zero GWB should result in zero withdrawal.
         """
-        result = model.calculate_withdrawal(
-            gwb=0, withdrawal_rate=0.05, age=70
-        )
+        result = model.calculate_withdrawal(gwb=0, withdrawal_rate=0.05, age=70)
 
         assert result.max_allowed == 0
         assert result.withdrawal_amount == 0
@@ -168,21 +163,15 @@ class TestWithdrawalModel:
     def test_invalid_gwb_raises(self, model: WithdrawalModel) -> None:
         """Negative GWB should raise error."""
         with pytest.raises(ValueError, match="negative"):
-            model.calculate_withdrawal(
-                gwb=-100_000, withdrawal_rate=0.05, age=70
-            )
+            model.calculate_withdrawal(gwb=-100_000, withdrawal_rate=0.05, age=70)
 
     def test_invalid_withdrawal_rate_raises(self, model: WithdrawalModel) -> None:
         """Withdrawal rate outside [0, 1] should raise error."""
         with pytest.raises(ValueError, match="Withdrawal rate"):
-            model.calculate_withdrawal(
-                gwb=100_000, withdrawal_rate=1.5, age=70
-            )
+            model.calculate_withdrawal(gwb=100_000, withdrawal_rate=1.5, age=70)
 
         with pytest.raises(ValueError, match="Withdrawal rate"):
-            model.calculate_withdrawal(
-                gwb=100_000, withdrawal_rate=-0.05, age=70
-            )
+            model.calculate_withdrawal(gwb=100_000, withdrawal_rate=-0.05, age=70)
 
 
 class TestPathWithdrawals:
@@ -221,7 +210,7 @@ class TestPathWithdrawals:
 
         # After ramp-up period (year 3+), should be increasing
         for i in range(4, len(withdrawals) - 1):
-            assert withdrawals[i+1] >= withdrawals[i]
+            assert withdrawals[i + 1] >= withdrawals[i]
 
     def test_path_withdrawals_delayed_start(self, model: WithdrawalModel) -> None:
         """Withdrawals before first_withdrawal_year should be zero."""
@@ -318,4 +307,6 @@ class TestWithdrawalRateSchedule:
         rates = [model.get_withdrawal_rate_by_age(age) for age in ages]
 
         for i in range(len(rates) - 1):
-            assert rates[i] <= rates[i + 1], f"Rate at age {ages[i]} exceeds rate at age {ages[i+1]}"
+            assert rates[i] <= rates[i + 1], (
+                f"Rate at age {ages[i]} exceeds rate at age {ages[i + 1]}"
+            )

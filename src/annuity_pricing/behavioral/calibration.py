@@ -15,7 +15,6 @@ annuity_pricing.behavioral.soa_benchmarks : Source data tables
 docs/assumptions/BEHAVIOR_CALIBRATION.md : Full methodology documentation
 """
 
-
 from annuity_pricing.behavioral.soa_benchmarks import (
     SOA_2006_FULL_SURRENDER_BY_AGE,
     SOA_2006_POST_SC_DECAY,
@@ -142,8 +141,7 @@ def interpolate_surrender_by_duration(
         # Map to year 8+ in 7-year data
         equivalent_duration = 7 + years_post_sc
         return _linear_interpolate(
-            min(equivalent_duration, 11),
-            SOA_2006_SURRENDER_BY_DURATION_7YR_SC
+            min(equivalent_duration, 11), SOA_2006_SURRENDER_BY_DURATION_7YR_SC
         )
 
 
@@ -182,22 +180,22 @@ def get_sc_cliff_multiplier(
     Multipliers are calculated relative to the 3+ years remaining
     base rate (2.6%).
     """
-    base_rate = SOA_2006_SC_CLIFF_EFFECT['years_remaining_3plus']
+    base_rate = SOA_2006_SC_CLIFF_EFFECT["years_remaining_3plus"]
 
     if years_to_sc_end >= 3:
         return 1.0  # Base rate
     elif years_to_sc_end == 2:
-        return SOA_2006_SC_CLIFF_EFFECT['years_remaining_2'] / base_rate
+        return SOA_2006_SC_CLIFF_EFFECT["years_remaining_2"] / base_rate
     elif years_to_sc_end == 1:
-        return SOA_2006_SC_CLIFF_EFFECT['years_remaining_1'] / base_rate
+        return SOA_2006_SC_CLIFF_EFFECT["years_remaining_1"] / base_rate
     elif years_to_sc_end == 0:
         return SOA_2006_SC_CLIFF_MULTIPLIER  # 2.48x
     elif years_to_sc_end == -1:
-        return SOA_2006_SC_CLIFF_EFFECT['post_sc_year_1'] / base_rate
+        return SOA_2006_SC_CLIFF_EFFECT["post_sc_year_1"] / base_rate
     elif years_to_sc_end == -2:
-        return SOA_2006_SC_CLIFF_EFFECT['post_sc_year_2'] / base_rate
+        return SOA_2006_SC_CLIFF_EFFECT["post_sc_year_2"] / base_rate
     else:  # years_to_sc_end <= -3
-        return SOA_2006_SC_CLIFF_EFFECT['post_sc_year_3plus'] / base_rate
+        return SOA_2006_SC_CLIFF_EFFECT["post_sc_year_3plus"] / base_rate
 
 
 def get_post_sc_decay_factor(
@@ -239,7 +237,7 @@ def get_post_sc_decay_factor(
 
 def interpolate_surrender_by_age(
     age: int,
-    surrender_type: str = 'full',
+    surrender_type: str = "full",
 ) -> float:
     """
     Interpolate surrender rate by owner age from SOA 2006 Table 8.
@@ -269,9 +267,9 @@ def interpolate_surrender_by_age(
         SOA_2006_PARTIAL_WITHDRAWAL_BY_AGE,
     )
 
-    if surrender_type == 'full':
+    if surrender_type == "full":
         return _linear_interpolate(age, SOA_2006_FULL_SURRENDER_BY_AGE)
-    elif surrender_type == 'partial':
+    elif surrender_type == "partial":
         return _linear_interpolate(age, SOA_2006_PARTIAL_WITHDRAWAL_BY_AGE)
     else:
         raise ValueError(f"surrender_type must be 'full' or 'partial', got {surrender_type}")
@@ -380,13 +378,13 @@ def get_itm_sensitivity_factor(
     2.11
     """
     if moneyness <= 1.0:
-        return SOA_2018_ITM_SENSITIVITY['not_itm']
+        return SOA_2018_ITM_SENSITIVITY["not_itm"]
     elif moneyness <= 1.25:
-        return SOA_2018_ITM_SENSITIVITY['itm_100_125']
+        return SOA_2018_ITM_SENSITIVITY["itm_100_125"]
     elif moneyness <= 1.50:
-        return SOA_2018_ITM_SENSITIVITY['itm_125_150']
+        return SOA_2018_ITM_SENSITIVITY["itm_125_150"]
     else:
-        return SOA_2018_ITM_SENSITIVITY['itm_150_plus']
+        return SOA_2018_ITM_SENSITIVITY["itm_150_plus"]
 
 
 def get_itm_sensitivity_factor_continuous(
@@ -417,10 +415,10 @@ def get_itm_sensitivity_factor_continuous(
 
     # Create interpolation points
     x_points = {
-        1.00: SOA_2018_ITM_SENSITIVITY['not_itm'],
-        1.125: SOA_2018_ITM_SENSITIVITY['itm_100_125'],  # Midpoint of 1.0-1.25
-        1.375: SOA_2018_ITM_SENSITIVITY['itm_125_150'],  # Midpoint of 1.25-1.50
-        1.75: SOA_2018_ITM_SENSITIVITY['itm_150_plus'],  # Representative of >1.50
+        1.00: SOA_2018_ITM_SENSITIVITY["not_itm"],
+        1.125: SOA_2018_ITM_SENSITIVITY["itm_100_125"],  # Midpoint of 1.0-1.25
+        1.375: SOA_2018_ITM_SENSITIVITY["itm_125_150"],  # Midpoint of 1.25-1.50
+        1.75: SOA_2018_ITM_SENSITIVITY["itm_150_plus"],  # Representative of >1.50
     }
 
     return _linear_interpolate(moneyness, x_points)
@@ -435,7 +433,7 @@ def combined_utilization(
     duration: int,
     age: int,
     moneyness: float = 1.0,
-    combination_method: str = 'multiplicative',
+    combination_method: str = "multiplicative",
 ) -> float:
     """
     Combine duration, age, and ITM effects for total utilization.
@@ -475,7 +473,7 @@ def combined_utilization(
     util_age = interpolate_utilization_by_age(age)
     itm_factor = get_itm_sensitivity_factor(moneyness)
 
-    if combination_method == 'multiplicative':
+    if combination_method == "multiplicative":
         # Use duration as base, adjust for age deviation from 67
         # Reference age is 67 (SOA midpoint for mature utilization)
         base_age_util = interpolate_utilization_by_age(67)
@@ -486,7 +484,7 @@ def combined_utilization(
         # Apply factors
         combined = util_duration * age_adjustment * itm_factor
 
-    elif combination_method == 'additive':
+    elif combination_method == "additive":
         # Simple average of duration and age effects, scaled by ITM
         combined = ((util_duration + util_age) / 2) * itm_factor
 
@@ -521,10 +519,7 @@ def get_surrender_curve(
     dict
         Mapping of duration to surrender rate
     """
-    return {
-        d: interpolate_surrender_by_duration(d, sc_length)
-        for d in range(1, max_duration + 1)
-    }
+    return {d: interpolate_surrender_by_duration(d, sc_length) for d in range(1, max_duration + 1)}
 
 
 def get_utilization_curve(
@@ -546,7 +541,4 @@ def get_utilization_curve(
     dict
         Mapping of duration to utilization rate
     """
-    return {
-        d: combined_utilization(d, age, moneyness=1.0)
-        for d in range(1, max_duration + 1)
-    }
+    return {d: combined_utilization(d, age, moneyness=1.0) for d in range(1, max_duration + 1)}

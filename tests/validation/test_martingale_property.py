@@ -174,8 +174,12 @@ class TestOptionPayoffMartingale:
         mc_price = np.mean(payoffs) * discount_factor
 
         bs_price = black_scholes_call(
-            params.spot, strike, params.rate, params.dividend,
-            params.volatility, params.time_to_expiry
+            params.spot,
+            strike,
+            params.rate,
+            params.dividend,
+            params.volatility,
+            params.time_to_expiry,
         )
 
         relative_error = abs(mc_price - bs_price) / bs_price
@@ -201,8 +205,12 @@ class TestOptionPayoffMartingale:
         mc_price = np.mean(payoffs) * discount_factor
 
         bs_price = black_scholes_call(
-            params.spot, strike, params.rate, params.dividend,
-            params.volatility, params.time_to_expiry
+            params.spot,
+            strike,
+            params.rate,
+            params.dividend,
+            params.volatility,
+            params.time_to_expiry,
         )
 
         relative_error = abs(mc_price - bs_price) / bs_price
@@ -228,8 +236,12 @@ class TestOptionPayoffMartingale:
         mc_price = np.mean(payoffs) * discount_factor
 
         bs_price = black_scholes_call(
-            params.spot, strike, params.rate, params.dividend,
-            params.volatility, params.time_to_expiry
+            params.spot,
+            strike,
+            params.rate,
+            params.dividend,
+            params.volatility,
+            params.time_to_expiry,
         )
 
         relative_error = abs(mc_price - bs_price) / bs_price
@@ -255,8 +267,12 @@ class TestOptionPayoffMartingale:
         mc_price = np.mean(payoffs) * discount_factor
 
         bs_price = black_scholes_put(
-            params.spot, strike, params.rate, params.dividend,
-            params.volatility, params.time_to_expiry
+            params.spot,
+            strike,
+            params.rate,
+            params.dividend,
+            params.volatility,
+            params.time_to_expiry,
         )
 
         relative_error = abs(mc_price - bs_price) / bs_price
@@ -500,7 +516,7 @@ class TestMartingaleEdgeCases:
             rate=0.05,
             dividend=0.02,
             volatility=0.20,
-            time_to_expiry=1/252,  # 1 day
+            time_to_expiry=1 / 252,  # 1 day
         )
 
         terminal = generate_terminal_values(params, n_paths=100_000, seed=42)
@@ -547,9 +563,7 @@ class TestMartingaleEdgeCases:
 
         relative_error = abs(discounted_mean - params.spot) / params.spot
         # Higher tolerance for high vol (more variance)
-        assert relative_error < 0.02, (
-            f"High vol martingale failed: error = {relative_error:.4%}"
-        )
+        assert relative_error < 0.02, f"High vol martingale failed: error = {relative_error:.4%}"
 
     def test_negative_rate(self) -> None:
         """[T1] Martingale holds with negative interest rates (per VM-21)."""

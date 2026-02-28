@@ -84,9 +84,7 @@ class TestThreeWayCallPriceConvergence:
             "high-div",
         ],
     )
-    def test_call_three_way_convergence(
-        self, adapters, spot, strike, rate, dividend, vol, T
-    ):
+    def test_call_three_way_convergence(self, adapters, spot, strike, rate, dividend, vol, T):
         """
         [T1] Our BS, financepy, QuantLib must all agree on call price.
 
@@ -99,9 +97,7 @@ class TestThreeWayCallPriceConvergence:
         fp_price = adapters["financepy"].price_call(spot, strike, rate, dividend, vol, T)
 
         # QuantLib
-        ql_price = adapters["quantlib"].price_european_call(
-            spot, strike, rate, dividend, vol, T
-        )
+        ql_price = adapters["quantlib"].price_european_call(spot, strike, rate, dividend, vol, T)
 
         prices = {"ours": our_price, "financepy": fp_price, "quantlib": ql_price}
 
@@ -151,9 +147,7 @@ class TestThreeWayPutPriceConvergence:
         ],
         ids=["ATM", "ITM-put", "OTM-put", "high-vol"],
     )
-    def test_put_three_way_convergence(
-        self, adapters, spot, strike, rate, dividend, vol, T
-    ):
+    def test_put_three_way_convergence(self, adapters, spot, strike, rate, dividend, vol, T):
         """
         [T1] Our BS, financepy, QuantLib must all agree on put price.
         """
@@ -164,9 +158,7 @@ class TestThreeWayPutPriceConvergence:
         fp_price = adapters["financepy"].price_put(spot, strike, rate, dividend, vol, T)
 
         # QuantLib
-        ql_price = adapters["quantlib"].price_european_put(
-            spot, strike, rate, dividend, vol, T
-        )
+        ql_price = adapters["quantlib"].price_european_put(spot, strike, rate, dividend, vol, T)
 
         prices = {"ours": our_price, "financepy": fp_price, "quantlib": ql_price}
 
@@ -230,12 +222,8 @@ class TestThreeWayPutCallParity:
         fp_diff = fp_call - fp_put
 
         # QuantLib
-        ql_call = adapters["quantlib"].price_european_call(
-            spot, strike, rate, dividend, vol, T
-        )
-        ql_put = adapters["quantlib"].price_european_put(
-            spot, strike, rate, dividend, vol, T
-        )
+        ql_call = adapters["quantlib"].price_european_call(spot, strike, rate, dividend, vol, T)
+        ql_put = adapters["quantlib"].price_european_put(spot, strike, rate, dividend, vol, T)
         ql_diff = ql_call - ql_put
 
         # Each must satisfy parity (use absolute tolerance since diff may be small)
@@ -293,12 +281,8 @@ class TestFIACapValidationThreeWay:
         fp_spread = fp_atm - fp_otm
 
         # QuantLib spread
-        ql_atm = adapters["quantlib"].price_european_call(
-            spot, atm_strike, rate, dividend, vol, T
-        )
-        ql_otm = adapters["quantlib"].price_european_call(
-            spot, otm_strike, rate, dividend, vol, T
-        )
+        ql_atm = adapters["quantlib"].price_european_call(spot, atm_strike, rate, dividend, vol, T)
+        ql_otm = adapters["quantlib"].price_european_call(spot, otm_strike, rate, dividend, vol, T)
         ql_spread = ql_atm - ql_otm
 
         spreads = {"ours": our_spread, "financepy": fp_spread, "quantlib": ql_spread}
@@ -359,12 +343,8 @@ class TestRILABufferValidationThreeWay:
         fp_spread = fp_atm - fp_otm
 
         # QuantLib spread
-        ql_atm = adapters["quantlib"].price_european_put(
-            spot, atm_strike, rate, dividend, vol, T
-        )
-        ql_otm = adapters["quantlib"].price_european_put(
-            spot, otm_strike, rate, dividend, vol, T
-        )
+        ql_atm = adapters["quantlib"].price_european_put(spot, atm_strike, rate, dividend, vol, T)
+        ql_otm = adapters["quantlib"].price_european_put(spot, otm_strike, rate, dividend, vol, T)
         ql_spread = ql_atm - ql_otm
 
         spreads = {"ours": our_spread, "financepy": fp_spread, "quantlib": ql_spread}

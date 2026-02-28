@@ -134,9 +134,7 @@ class MonteCarloEngine:
         if strike <= 0:
             raise ValueError(f"CRITICAL: strike must be > 0, got {strike}")
 
-        terminal = generate_terminal_values(
-            params, self.n_paths, self.seed, self.antithetic
-        )
+        terminal = generate_terminal_values(params, self.n_paths, self.seed, self.antithetic)
 
         # Call payoff
         payoffs = np.maximum(terminal - strike, 0)
@@ -168,9 +166,7 @@ class MonteCarloEngine:
         if strike <= 0:
             raise ValueError(f"CRITICAL: strike must be > 0, got {strike}")
 
-        terminal = generate_terminal_values(
-            params, self.n_paths, self.seed, self.antithetic
-        )
+        terminal = generate_terminal_values(params, self.n_paths, self.seed, self.antithetic)
 
         # Put payoff
         payoffs = np.maximum(strike - terminal, 0)
@@ -206,9 +202,7 @@ class MonteCarloEngine:
         # Use vectorized path for point-to-point payoffs (>10x faster)
         if payoff.supports_vectorized():
             # Generate only terminal values for efficiency
-            terminal = generate_terminal_values(
-                params, self.n_paths, self.seed, self.antithetic
-            )
+            terminal = generate_terminal_values(params, self.n_paths, self.seed, self.antithetic)
 
             # Calculate returns
             index_returns = (terminal - params.spot) / params.spot
@@ -222,9 +216,7 @@ class MonteCarloEngine:
             return self._compute_result(params, payoffs)
 
         # Fallback: full path simulation for path-dependent payoffs
-        path_result = generate_gbm_paths(
-            params, self.n_paths, n_steps, self.seed, self.antithetic
-        )
+        path_result = generate_gbm_paths(params, self.n_paths, n_steps, self.seed, self.antithetic)
 
         # Calculate payoffs for each path
         payoffs = np.zeros(self.n_paths)
@@ -369,9 +361,7 @@ class MonteCarloEngine:
         MCResult
             Monte Carlo pricing result
         """
-        terminal = generate_terminal_values(
-            params, self.n_paths, self.seed, self.antithetic
-        )
+        terminal = generate_terminal_values(params, self.n_paths, self.seed, self.antithetic)
 
         payoffs = np.array([payoff_func(params.spot, t) for t in terminal])
 
@@ -402,9 +392,7 @@ class MonteCarloEngine:
         if cap_rate <= 0:
             raise ValueError(f"CRITICAL: cap_rate must be > 0, got {cap_rate}")
 
-        terminal = generate_terminal_values(
-            params, self.n_paths, self.seed, self.antithetic
-        )
+        terminal = generate_terminal_values(params, self.n_paths, self.seed, self.antithetic)
 
         # Return = (S(T) - S(0)) / S(0)
         returns = (terminal - params.spot) / params.spot
@@ -445,9 +433,7 @@ class MonteCarloEngine:
         if buffer_rate <= 0:
             raise ValueError(f"CRITICAL: buffer_rate must be > 0, got {buffer_rate}")
 
-        terminal = generate_terminal_values(
-            params, self.n_paths, self.seed, self.antithetic
-        )
+        terminal = generate_terminal_values(params, self.n_paths, self.seed, self.antithetic)
 
         returns = (terminal - params.spot) / params.spot
 
@@ -494,9 +480,7 @@ class MonteCarloEngine:
         if floor_rate > 0:
             raise ValueError(f"CRITICAL: floor_rate should be <= 0, got {floor_rate}")
 
-        terminal = generate_terminal_values(
-            params, self.n_paths, self.seed, self.antithetic
-        )
+        terminal = generate_terminal_values(params, self.n_paths, self.seed, self.antithetic)
 
         returns = (terminal - params.spot) / params.spot
 

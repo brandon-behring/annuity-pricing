@@ -274,8 +274,7 @@ class TestBSGreeksVsOracle:
 
         diff = abs(greeks.gamma - oracle_gamma)
         assert diff < 0.001, (
-            f"Gamma mismatch: ours={greeks.gamma:.4f}, "
-            f"oracle={oracle_gamma:.4f}, diff={diff:.6f}"
+            f"Gamma mismatch: ours={greeks.gamma:.4f}, oracle={oracle_gamma:.4f}, diff={diff:.6f}"
         )
 
     @pytest.mark.validation
@@ -309,8 +308,7 @@ class TestBSGreeksVsOracle:
 
         diff = abs(greeks.vega - oracle_vega)
         assert diff < 0.1, (  # Vega is larger, so allow more absolute tolerance
-            f"Vega mismatch: ours={greeks.vega:.4f}, "
-            f"oracle={oracle_vega:.4f}, diff={diff:.4f}"
+            f"Vega mismatch: ours={greeks.vega:.4f}, oracle={oracle_vega:.4f}, diff={diff:.4f}"
         )
 
 

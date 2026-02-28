@@ -58,7 +58,9 @@ buffer_strategy = st.floats(min_value=0.05, max_value=0.30, allow_nan=False, all
 floor_strategy = st.floats(min_value=-0.30, max_value=-0.01, allow_nan=False, allow_infinity=False)
 
 # Participation rate: typically 50% to 150%
-participation_strategy = st.floats(min_value=0.50, max_value=1.50, allow_nan=False, allow_infinity=False)
+participation_strategy = st.floats(
+    min_value=0.50, max_value=1.50, allow_nan=False, allow_infinity=False
+)
 
 # Spread rate: small positive
 spread_strategy = st.floats(min_value=0.005, max_value=0.05, allow_nan=False, allow_infinity=False)
@@ -70,6 +72,7 @@ trigger_strategy = st.floats(min_value=0.02, max_value=0.10, allow_nan=False, al
 # =============================================================================
 # FIA Cap Properties
 # =============================================================================
+
 
 class TestCappedCallProperties:
     """[T1] Capped call payoff: max(floor, min(index_return, cap))."""
@@ -85,8 +88,7 @@ class TestCappedCallProperties:
         result = payoff.calculate(index_return)
 
         assert result.credited_return >= -FLOOR_ENFORCEMENT_TOLERANCE, (
-            f"FIA floor violated: credited={result.credited_return}, "
-            f"expected >= 0"
+            f"FIA floor violated: credited={result.credited_return}, expected >= 0"
         )
 
     @given(
@@ -104,7 +106,9 @@ class TestCappedCallProperties:
         )
 
     @given(
-        index_return=st.floats(min_value=0.0, max_value=0.30, allow_nan=False, allow_infinity=False),
+        index_return=st.floats(
+            min_value=0.0, max_value=0.30, allow_nan=False, allow_infinity=False
+        ),
         cap_rate=cap_strategy,
     )
     @settings(max_examples=200)
@@ -122,6 +126,7 @@ class TestCappedCallProperties:
 # =============================================================================
 # FIA Participation Properties
 # =============================================================================
+
 
 class TestParticipationProperties:
     """[T1] Participation payoff: max(floor, participation × max(0, return))."""
@@ -141,7 +146,9 @@ class TestParticipationProperties:
         )
 
     @given(
-        index_return=st.floats(min_value=0.01, max_value=0.30, allow_nan=False, allow_infinity=False),
+        index_return=st.floats(
+            min_value=0.01, max_value=0.30, allow_nan=False, allow_infinity=False
+        ),
         participation_rate=participation_strategy,
     )
     @settings(max_examples=200)
@@ -157,7 +164,9 @@ class TestParticipationProperties:
         )
 
     @given(
-        index_return=st.floats(min_value=-0.30, max_value=-0.01, allow_nan=False, allow_infinity=False),
+        index_return=st.floats(
+            min_value=-0.30, max_value=-0.01, allow_nan=False, allow_infinity=False
+        ),
         participation_rate=participation_strategy,
     )
     @settings(max_examples=200)
@@ -174,6 +183,7 @@ class TestParticipationProperties:
 # =============================================================================
 # FIA Spread Properties
 # =============================================================================
+
 
 class TestSpreadProperties:
     """[T1] Spread payoff: max(floor, return - spread) for positive returns."""
@@ -193,7 +203,9 @@ class TestSpreadProperties:
         )
 
     @given(
-        index_return=st.floats(min_value=0.10, max_value=0.30, allow_nan=False, allow_infinity=False),
+        index_return=st.floats(
+            min_value=0.10, max_value=0.30, allow_nan=False, allow_infinity=False
+        ),
         spread_rate=spread_strategy,
     )
     @settings(max_examples=200)
@@ -216,6 +228,7 @@ class TestSpreadProperties:
 # FIA Trigger Properties
 # =============================================================================
 
+
 class TestTriggerProperties:
     """[T1] Trigger payoff: trigger_rate if threshold met, else floor."""
 
@@ -233,12 +246,13 @@ class TestTriggerProperties:
         min_dist = min(abs(result.credited_return - v) for v in valid_values)
 
         assert min_dist < ANTI_PATTERN_TOLERANCE, (
-            f"Trigger not binary: got {result.credited_return}, "
-            f"expected one of {valid_values}"
+            f"Trigger not binary: got {result.credited_return}, expected one of {valid_values}"
         )
 
     @given(
-        index_return=st.floats(min_value=0.001, max_value=0.30, allow_nan=False, allow_infinity=False),
+        index_return=st.floats(
+            min_value=0.001, max_value=0.30, allow_nan=False, allow_infinity=False
+        ),
         trigger_rate=trigger_strategy,
     )
     @settings(max_examples=200)
@@ -256,11 +270,14 @@ class TestTriggerProperties:
 # RILA Buffer Properties
 # =============================================================================
 
+
 class TestBufferProperties:
     """[T1] Buffer payoff: absorbs first X% of losses."""
 
     @given(
-        index_return=st.floats(min_value=-0.50, max_value=-0.001, allow_nan=False, allow_infinity=False),
+        index_return=st.floats(
+            min_value=-0.50, max_value=-0.001, allow_nan=False, allow_infinity=False
+        ),
         buffer_rate=buffer_strategy,
     )
     @settings(max_examples=200)
@@ -278,11 +295,15 @@ class TestBufferProperties:
         )
 
     @given(
-        index_return=st.floats(min_value=-0.50, max_value=-0.001, allow_nan=False, allow_infinity=False),
+        index_return=st.floats(
+            min_value=-0.50, max_value=-0.001, allow_nan=False, allow_infinity=False
+        ),
         buffer_rate=buffer_strategy,
     )
     @settings(max_examples=200)
-    def test_buffer_pass_through_beyond_buffer(self, index_return: float, buffer_rate: float) -> None:
+    def test_buffer_pass_through_beyond_buffer(
+        self, index_return: float, buffer_rate: float
+    ) -> None:
         """[T1] Losses beyond buffer pass through dollar-for-dollar."""
         # Only test when loss exceeds buffer
         assume(-index_return > buffer_rate)
@@ -297,7 +318,9 @@ class TestBufferProperties:
         )
 
     @given(
-        index_return=st.floats(min_value=0.0, max_value=0.30, allow_nan=False, allow_infinity=False),
+        index_return=st.floats(
+            min_value=0.0, max_value=0.30, allow_nan=False, allow_infinity=False
+        ),
         buffer_rate=buffer_strategy,
     )
     @settings(max_examples=200)
@@ -315,6 +338,7 @@ class TestBufferProperties:
 # =============================================================================
 # RILA Floor Properties
 # =============================================================================
+
 
 class TestFloorProperties:
     """[T1] Floor payoff: limits maximum loss."""
@@ -334,7 +358,9 @@ class TestFloorProperties:
         )
 
     @given(
-        index_return=st.floats(min_value=-0.50, max_value=-0.001, allow_nan=False, allow_infinity=False),
+        index_return=st.floats(
+            min_value=-0.50, max_value=-0.001, allow_nan=False, allow_infinity=False
+        ),
         floor_rate=floor_strategy,
     )
     @settings(max_examples=200)
@@ -351,7 +377,9 @@ class TestFloorProperties:
         )
 
     @given(
-        index_return=st.floats(min_value=0.0, max_value=0.30, allow_nan=False, allow_infinity=False),
+        index_return=st.floats(
+            min_value=0.0, max_value=0.30, allow_nan=False, allow_infinity=False
+        ),
         floor_rate=floor_strategy,
     )
     @settings(max_examples=200)
@@ -370,12 +398,17 @@ class TestFloorProperties:
 # Buffer vs Floor Comparison Properties
 # =============================================================================
 
+
 class TestBufferVsFloorProperties:
     """[T1] Buffer and Floor have distinct behavior patterns."""
 
     @given(
-        index_return=st.floats(min_value=-0.15, max_value=-0.05, allow_nan=False, allow_infinity=False),
-        protection_rate=st.floats(min_value=0.10, max_value=0.20, allow_nan=False, allow_infinity=False),
+        index_return=st.floats(
+            min_value=-0.15, max_value=-0.05, allow_nan=False, allow_infinity=False
+        ),
+        protection_rate=st.floats(
+            min_value=0.10, max_value=0.20, allow_nan=False, allow_infinity=False
+        ),
     )
     @settings(max_examples=200)
     def test_buffer_better_for_small_losses(
@@ -392,15 +425,21 @@ class TestBufferVsFloorProperties:
         floor_result = floor_payoff.calculate(index_return)
 
         # Buffer should give 0%, floor gives index_return (which is negative)
-        assert buffer_result.credited_return >= floor_result.credited_return - ANTI_PATTERN_TOLERANCE, (
+        assert (
+            buffer_result.credited_return >= floor_result.credited_return - ANTI_PATTERN_TOLERANCE
+        ), (
             f"Buffer should be better for small loss: "
             f"return={index_return}, buffer_credit={buffer_result.credited_return}, "
             f"floor_credit={floor_result.credited_return}"
         )
 
     @given(
-        index_return=st.floats(min_value=-0.50, max_value=-0.25, allow_nan=False, allow_infinity=False),
-        protection_rate=st.floats(min_value=0.10, max_value=0.20, allow_nan=False, allow_infinity=False),
+        index_return=st.floats(
+            min_value=-0.50, max_value=-0.25, allow_nan=False, allow_infinity=False
+        ),
+        protection_rate=st.floats(
+            min_value=0.10, max_value=0.20, allow_nan=False, allow_infinity=False
+        ),
     )
     @settings(max_examples=200)
     def test_floor_better_for_large_losses(
@@ -417,7 +456,9 @@ class TestBufferVsFloorProperties:
         floor_result = floor_payoff.calculate(index_return)
 
         # Floor caps at -protection_rate, buffer gives index_return + protection_rate
-        assert floor_result.credited_return >= buffer_result.credited_return - ANTI_PATTERN_TOLERANCE, (
+        assert (
+            floor_result.credited_return >= buffer_result.credited_return - ANTI_PATTERN_TOLERANCE
+        ), (
             f"Floor should be better for large loss: "
             f"return={index_return}, buffer_credit={buffer_result.credited_return}, "
             f"floor_credit={floor_result.credited_return}"

@@ -156,15 +156,23 @@ class TestSinglePathSimulation:
         """Lower utilization → less withdrawals."""
         # Full utilization
         result_full = simulator.simulate_single_path(
-            premium=100_000, age=65, r=0.04, sigma=0.18,
-            n_years=20, mortality_func=lambda age: 0.0,  # No mortality
+            premium=100_000,
+            age=65,
+            r=0.04,
+            sigma=0.18,
+            n_years=20,
+            mortality_func=lambda age: 0.0,  # No mortality
             utilization_rate=1.0,
         )
 
         # Half utilization
         result_half = simulator.simulate_single_path(
-            premium=100_000, age=65, r=0.04, sigma=0.18,
-            n_years=20, mortality_func=lambda age: 0.0,
+            premium=100_000,
+            age=65,
+            r=0.04,
+            sigma=0.18,
+            n_years=20,
+            mortality_func=lambda age: 0.0,
             utilization_rate=0.5,
         )
 
@@ -185,13 +193,19 @@ class TestMortalityIntegration:
         """Higher mortality → lower guarantee value (die before ruin)."""
         # Low mortality
         result_low = simulator.price(
-            100_000, 65, 0.04, 0.18,
+            100_000,
+            65,
+            0.04,
+            0.18,
             mortality_table=lambda age: 0.01,  # 1%
         )
 
         # High mortality
         result_high = simulator.price(
-            100_000, 65, 0.04, 0.18,
+            100_000,
+            65,
+            0.04,
+            0.18,
             mortality_table=lambda age: 0.10,  # 10%
         )
 
@@ -412,7 +426,10 @@ class TestBehavioralIntegration:
 
         # Without behavioral models (simpler simulation)
         result_without = sim.price(
-            100_000, 65, 0.04, 0.18,
+            100_000,
+            65,
+            0.04,
+            0.18,
             use_behavioral_models=False,
             utilization_rate=1.0,  # Must provide explicit rate
         )

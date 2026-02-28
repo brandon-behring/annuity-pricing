@@ -274,18 +274,14 @@ class TestStepRateBufferPayoff:
 
     def test_tier1_full_protection(self):
         """Losses within tier 1 fully absorbed."""
-        payoff = StepRateBufferPayoff(
-            tier1_buffer=0.10, tier2_buffer=0.10, tier2_protection=0.50
-        )
+        payoff = StepRateBufferPayoff(tier1_buffer=0.10, tier2_buffer=0.10, tier2_protection=0.50)
         result = payoff.calculate(-0.08)
 
         assert result.credited_return == 0.0
 
     def test_tier2_partial_protection(self):
         """Losses in tier 2 get partial protection."""
-        payoff = StepRateBufferPayoff(
-            tier1_buffer=0.10, tier2_buffer=0.10, tier2_protection=0.50
-        )
+        payoff = StepRateBufferPayoff(tier1_buffer=0.10, tier2_buffer=0.10, tier2_protection=0.50)
         # -15% loss: tier 1 absorbs 10%, tier 2 absorbs 50% of next 5%
         result = payoff.calculate(-0.15)
 
@@ -294,9 +290,7 @@ class TestStepRateBufferPayoff:
 
     def test_beyond_tier2(self):
         """Losses beyond tier 2 are dollar-for-dollar."""
-        payoff = StepRateBufferPayoff(
-            tier1_buffer=0.10, tier2_buffer=0.10, tier2_protection=0.50
-        )
+        payoff = StepRateBufferPayoff(tier1_buffer=0.10, tier2_buffer=0.10, tier2_protection=0.50)
         # -25% loss: tier 1 absorbs 10%, tier 2 absorbs 5% (50% of 10%),
         # beyond: 5% dollar-for-dollar
         result = payoff.calculate(-0.25)

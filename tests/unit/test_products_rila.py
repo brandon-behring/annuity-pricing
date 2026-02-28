@@ -186,13 +186,21 @@ class TestProtectionLevels:
     def test_higher_buffer_more_protection_value(self, pricer):
         """Higher buffer should have higher protection value."""
         low_buffer = RILAProduct(
-            company_name="Test", product_name="5% Buffer", product_group="RILA",
-            status="current", buffer_rate=0.05, buffer_modifier="Losses Covered Up To",
+            company_name="Test",
+            product_name="5% Buffer",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.05,
+            buffer_modifier="Losses Covered Up To",
             cap_rate=0.15,
         )
         high_buffer = RILAProduct(
-            company_name="Test", product_name="20% Buffer", product_group="RILA",
-            status="current", buffer_rate=0.20, buffer_modifier="Losses Covered Up To",
+            company_name="Test",
+            product_name="20% Buffer",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.20,
+            buffer_modifier="Losses Covered Up To",
             cap_rate=0.15,
         )
 
@@ -204,13 +212,21 @@ class TestProtectionLevels:
     def test_higher_cap_more_upside(self, pricer):
         """Higher cap should have higher upside value."""
         low_cap = RILAProduct(
-            company_name="Test", product_name="10% Cap", product_group="RILA",
-            status="current", buffer_rate=0.10, buffer_modifier="Losses Covered Up To",
+            company_name="Test",
+            product_name="10% Cap",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.10,
+            buffer_modifier="Losses Covered Up To",
             cap_rate=0.10,
         )
         high_cap = RILAProduct(
-            company_name="Test", product_name="25% Cap", product_group="RILA",
-            status="current", buffer_rate=0.10, buffer_modifier="Losses Covered Up To",
+            company_name="Test",
+            product_name="25% Cap",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.10,
+            buffer_modifier="Losses Covered Up To",
             cap_rate=0.25,
         )
 
@@ -226,13 +242,15 @@ class TestCompetitivePosition:
     @pytest.fixture
     def market_data(self):
         """Sample RILA market data."""
-        return pd.DataFrame({
-            "productGroup": ["RILA"] * 10,
-            "bufferRate": [0.10] * 10,
-            "bufferModifier": ["Losses Covered Up To"] * 10,
-            "capRate": [0.10, 0.12, 0.14, 0.16, 0.18, 0.20, 0.22, 0.24, 0.26, 0.28],
-            "indexUsed": ["S&P 500"] * 10,
-        })
+        return pd.DataFrame(
+            {
+                "productGroup": ["RILA"] * 10,
+                "bufferRate": [0.10] * 10,
+                "bufferModifier": ["Losses Covered Up To"] * 10,
+                "capRate": [0.10, 0.12, 0.14, 0.16, 0.18, 0.20, 0.22, 0.24, 0.26, 0.28],
+                "indexUsed": ["S&P 500"] * 10,
+            }
+        )
 
     def test_competitive_position_buffer(self, pricer, buffer_product, market_data):
         """Should calculate percentile for buffer product."""
@@ -244,13 +262,21 @@ class TestCompetitivePosition:
     def test_higher_cap_better_position(self, pricer, market_data):
         """Higher cap should have higher percentile."""
         low_cap = RILAProduct(
-            company_name="Test", product_name="Low", product_group="RILA",
-            status="current", buffer_rate=0.10, buffer_modifier="Losses Covered Up To",
+            company_name="Test",
+            product_name="Low",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.10,
+            buffer_modifier="Losses Covered Up To",
             cap_rate=0.10,
         )
         high_cap = RILAProduct(
-            company_name="Test", product_name="High", product_group="RILA",
-            status="current", buffer_rate=0.10, buffer_modifier="Losses Covered Up To",
+            company_name="Test",
+            product_name="High",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.10,
+            buffer_modifier="Losses Covered Up To",
             cap_rate=0.28,
         )
 
@@ -268,8 +294,12 @@ class TestEdgeCases:
         from annuity_pricing.data.schemas import MYGAProduct
 
         myga = MYGAProduct(
-            company_name="Test", product_name="Test", product_group="MYGA",
-            status="current", fixed_rate=0.04, guarantee_duration=5,
+            company_name="Test",
+            product_name="Test",
+            product_group="MYGA",
+            status="current",
+            fixed_rate=0.04,
+            guarantee_duration=5,
         )
 
         with pytest.raises(ValueError, match="Expected RILAProduct"):
@@ -278,9 +308,14 @@ class TestEdgeCases:
     def test_product_with_term(self, pricer):
         """Should use term from product if available."""
         product = RILAProduct(
-            company_name="Test", product_name="6Y Buffer", product_group="RILA",
-            status="current", buffer_rate=0.10, buffer_modifier="Losses Covered Up To",
-            cap_rate=0.15, term_years=6,
+            company_name="Test",
+            product_name="6Y Buffer",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.10,
+            buffer_modifier="Losses Covered Up To",
+            cap_rate=0.15,
+            term_years=6,
         )
 
         result = pricer.price(product)
@@ -295,13 +330,21 @@ class TestPriceMultiple:
         """Should price multiple products."""
         products = [
             RILAProduct(
-                company_name="A", product_name="10% Buffer", product_group="RILA",
-                status="current", buffer_rate=0.10, buffer_modifier="Losses Covered Up To",
+                company_name="A",
+                product_name="10% Buffer",
+                product_group="RILA",
+                status="current",
+                buffer_rate=0.10,
+                buffer_modifier="Losses Covered Up To",
                 cap_rate=0.15,
             ),
             RILAProduct(
-                company_name="B", product_name="15% Buffer", product_group="RILA",
-                status="current", buffer_rate=0.15, buffer_modifier="Losses Covered Up To",
+                company_name="B",
+                product_name="15% Buffer",
+                product_group="RILA",
+                status="current",
+                buffer_rate=0.15,
+                buffer_modifier="Losses Covered Up To",
                 cap_rate=0.20,
             ),
         ]
@@ -490,20 +533,26 @@ class TestGreeksCalculation:
         greeks_100 = pricer.calculate_greeks(buffer_product, notional=100.0)
         greeks_1000 = pricer.calculate_greeks(buffer_product, notional=1000.0)
 
-        assert greeks_1000.dollar_delta == pytest.approx(
-            greeks_100.dollar_delta * 10, rel=1e-10
-        )
+        assert greeks_1000.dollar_delta == pytest.approx(greeks_100.dollar_delta * 10, rel=1e-10)
 
     def test_higher_buffer_lower_delta_magnitude(self, pricer):
         """Higher buffer should have lower delta magnitude (more OTM put offset)."""
         low_buffer = RILAProduct(
-            company_name="Test", product_name="5% Buffer", product_group="RILA",
-            status="current", buffer_rate=0.05, buffer_modifier="Losses Covered Up To",
+            company_name="Test",
+            product_name="5% Buffer",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.05,
+            buffer_modifier="Losses Covered Up To",
             cap_rate=0.15,
         )
         high_buffer = RILAProduct(
-            company_name="Test", product_name="20% Buffer", product_group="RILA",
-            status="current", buffer_rate=0.20, buffer_modifier="Losses Covered Up To",
+            company_name="Test",
+            product_name="20% Buffer",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.20,
+            buffer_modifier="Losses Covered Up To",
             cap_rate=0.15,
         )
 
@@ -534,8 +583,12 @@ class TestGreeksCalculation:
         from annuity_pricing.data.schemas import MYGAProduct
 
         myga = MYGAProduct(
-            company_name="Test", product_name="Test", product_group="MYGA",
-            status="current", fixed_rate=0.04, guarantee_duration=5,
+            company_name="Test",
+            product_name="Test",
+            product_group="MYGA",
+            status="current",
+            fixed_rate=0.04,
+            guarantee_duration=5,
         )
 
         with pytest.raises(ValueError, match="Expected RILAProduct"):
@@ -624,14 +677,24 @@ class TestTermYearsRequirement:
         """price_multiple should use each product's term_years when not specified."""
         products = [
             RILAProduct(
-                company_name="A", product_name="3Y Buffer", product_group="RILA",
-                status="current", buffer_rate=0.10, buffer_modifier="Losses Covered Up To",
-                cap_rate=0.15, term_years=3,
+                company_name="A",
+                product_name="3Y Buffer",
+                product_group="RILA",
+                status="current",
+                buffer_rate=0.10,
+                buffer_modifier="Losses Covered Up To",
+                cap_rate=0.15,
+                term_years=3,
             ),
             RILAProduct(
-                company_name="B", product_name="5Y Buffer", product_group="RILA",
-                status="current", buffer_rate=0.15, buffer_modifier="Losses Covered Up To",
-                cap_rate=0.20, term_years=5,
+                company_name="B",
+                product_name="5Y Buffer",
+                product_group="RILA",
+                status="current",
+                buffer_rate=0.15,
+                buffer_modifier="Losses Covered Up To",
+                cap_rate=0.20,
+                term_years=5,
             ),
         ]
 
@@ -744,19 +807,27 @@ class TestBufferModifierValidation:
         """Buffer modifier matching should be case insensitive."""
         # Lowercase
         product1 = RILAProduct(
-            company_name="Test", product_name="Test1", product_group="RILA",
-            status="current", buffer_rate=0.10,
+            company_name="Test",
+            product_name="Test1",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.10,
             buffer_modifier="losses covered up to",  # lowercase
-            cap_rate=0.15, term_years=1,
+            cap_rate=0.15,
+            term_years=1,
         )
         assert product1.is_buffer() is True
 
         # Mixed case
         product2 = RILAProduct(
-            company_name="Test", product_name="Test2", product_group="RILA",
-            status="current", buffer_rate=0.10,
+            company_name="Test",
+            product_name="Test2",
+            product_group="RILA",
+            status="current",
+            buffer_rate=0.10,
             buffer_modifier="Losses Covered AFTER",  # mixed case
-            cap_rate=0.15, term_years=1,
+            cap_rate=0.15,
+            term_years=1,
         )
         assert product2.is_floor() is True
 
@@ -774,9 +845,14 @@ class TestBufferModifierValidation:
 
         for modifier, expected_buffer, expected_floor in buffer_modifiers:
             product = RILAProduct(
-                company_name="Test", product_name="Test", product_group="RILA",
-                status="current", buffer_rate=0.10, buffer_modifier=modifier,
-                cap_rate=0.15, term_years=1,
+                company_name="Test",
+                product_name="Test",
+                product_group="RILA",
+                status="current",
+                buffer_rate=0.10,
+                buffer_modifier=modifier,
+                cap_rate=0.15,
+                term_years=1,
             )
             assert product.is_buffer() == expected_buffer, f"Failed for modifier: {modifier}"
             assert product.is_floor() == expected_floor, f"Failed for modifier: {modifier}"

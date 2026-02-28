@@ -8,7 +8,6 @@ See: docs/knowledge/domain/glwb_mechanics.md
 See: docs/references/L3/bauer_kling_russ_2008.md
 """
 
-
 import pytest
 
 from annuity_pricing import GLWBPricer, GLWBPricingResult, GLWBProduct
@@ -242,9 +241,7 @@ class TestGLWBRegistryIntegration:
 
         assert result.present_value >= 0
 
-    def test_create_default_registry_supports_glwb(
-        self, glwb_product: GLWBProduct
-    ) -> None:
+    def test_create_default_registry_supports_glwb(self, glwb_product: GLWBProduct) -> None:
         """create_default_registry() should support GLWB."""
         registry = create_default_registry(seed=42)
 

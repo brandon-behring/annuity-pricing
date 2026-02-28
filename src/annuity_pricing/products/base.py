@@ -75,9 +75,7 @@ class CompetitivePosition:
     def __post_init__(self) -> None:
         """Validate position."""
         if not 0 <= self.percentile <= 100:
-            raise ValueError(
-                f"CRITICAL: percentile must be 0-100, got {self.percentile}"
-            )
+            raise ValueError(f"CRITICAL: percentile must be 0-100, got {self.percentile}")
 
 
 class BasePricer(ABC):
@@ -193,9 +191,7 @@ class BasePricer(ABC):
             Percentile (0-100)
         """
         if distribution.empty:
-            raise ValueError(
-                "CRITICAL: Cannot calculate percentile with empty distribution"
-            )
+            raise ValueError("CRITICAL: Cannot calculate percentile with empty distribution")
 
         # Count values less than or equal to our value
         count_le = (distribution <= value).sum()

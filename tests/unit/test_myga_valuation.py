@@ -5,7 +5,6 @@ Tests myga_pv.py: PV, duration, convexity, sensitivity analysis.
 See: METHODOLOGY.md Section 4.1
 """
 
-
 import pytest
 
 from annuity_pricing.valuation.myga_pv import (
@@ -53,7 +52,7 @@ class TestMaturityValue:
             compounding_frequency=2,
         )
 
-        expected = 100_000 * (1 + 0.045/2) ** (2*5)
+        expected = 100_000 * (1 + 0.045 / 2) ** (2 * 5)
         assert abs(result - expected) < 0.01
 
     def test_quarterly_compounding(self) -> None:
@@ -67,7 +66,7 @@ class TestMaturityValue:
             compounding_frequency=4,
         )
 
-        expected = 100_000 * (1 + 0.045/4) ** (4*5)
+        expected = 100_000 * (1 + 0.045 / 4) ** (4 * 5)
         assert abs(result - expected) < 0.01
 
     def test_higher_frequency_yields_more(self) -> None:
@@ -273,7 +272,7 @@ class TestEffectiveDuration:
         [T1] EffD = (PV_down - PV_up) / (2 × PV_base × Δr)
         """
         pv_base = 100_000
-        pv_up = 95_000    # PV when rates up
+        pv_up = 95_000  # PV when rates up
         pv_down = 105_000  # PV when rates down
         rate_shift = 0.01
 
@@ -337,7 +336,7 @@ class TestValueMyga:
         """
         result = value_myga(
             principal=100_000,
-            fixed_rate=0.05,    # Higher
+            fixed_rate=0.05,  # Higher
             guarantee_duration=5,
             discount_rate=0.04,  # Lower
         )
@@ -350,7 +349,7 @@ class TestValueMyga:
         """
         result = value_myga(
             principal=100_000,
-            fixed_rate=0.04,    # Lower
+            fixed_rate=0.04,  # Lower
             guarantee_duration=5,
             discount_rate=0.05,  # Higher
         )
@@ -369,7 +368,9 @@ class TestValueMyga:
         )
 
         # Should be within 1% of modified duration
-        rel_diff = abs(result.effective_duration - result.modified_duration) / result.modified_duration
+        rel_diff = (
+            abs(result.effective_duration - result.modified_duration) / result.modified_duration
+        )
         assert rel_diff < 0.01, (
             f"Effective duration {result.effective_duration:.4f} should be close to "
             f"modified duration {result.modified_duration:.4f}"
@@ -407,10 +408,10 @@ class TestSensitivityAnalysis:
 
         # Check PV decreases as rate increases
         for i in range(1, len(sorted_results)):
-            assert sorted_results[i][1] < sorted_results[i-1][1], (
+            assert sorted_results[i][1] < sorted_results[i - 1][1], (
                 f"PV should decrease as rate increases: "
                 f"rate {sorted_results[i][0]} has PV {sorted_results[i][1]} >= "
-                f"rate {sorted_results[i-1][0]} PV {sorted_results[i-1][1]}"
+                f"rate {sorted_results[i - 1][0]} PV {sorted_results[i - 1][1]}"
             )
 
     def test_base_rate_has_zero_pct_change(self) -> None:

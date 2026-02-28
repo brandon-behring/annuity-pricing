@@ -111,12 +111,14 @@ class TestRecommendRate:
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
         """Create sample market data with known distribution."""
-        return pd.DataFrame({
-            "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050],
-            "guaranteeDuration": [5, 5, 5, 5, 5, 5],
-            "productGroup": ["MYGA"] * 6,
-            "status": ["current"] * 6,
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050],
+                "guaranteeDuration": [5, 5, 5, 5, 5, 5],
+                "productGroup": ["MYGA"] * 6,
+                "status": ["current"] * 6,
+            }
+        )
 
     def test_returns_recommendation(
         self, recommender: RateRecommender, market_data: pd.DataFrame
@@ -163,9 +165,7 @@ class TestRecommendRate:
         # Median rate is ~0.045, Treasury is 0.04, spread ≈ 50 bps
         assert result.spread_over_treasury > 0
 
-    def test_margin_estimate(
-        self, recommender: RateRecommender, market_data: pd.DataFrame
-    ) -> None:
+    def test_margin_estimate(self, recommender: RateRecommender, market_data: pd.DataFrame) -> None:
         """Should estimate margin when Treasury provided."""
         result = recommender.recommend_rate(
             guarantee_duration=5,
@@ -202,16 +202,16 @@ class TestRecommendRate:
                 market_data=market_data,
             )
 
-    def test_raises_on_no_comparables(
-        self, recommender: RateRecommender
-    ) -> None:
+    def test_raises_on_no_comparables(self, recommender: RateRecommender) -> None:
         """Should raise ValueError when no comparables found."""
-        empty_market = pd.DataFrame({
-            "fixedRate": [],
-            "guaranteeDuration": [],
-            "productGroup": [],
-            "status": [],
-        })
+        empty_market = pd.DataFrame(
+            {
+                "fixedRate": [],
+                "guaranteeDuration": [],
+                "productGroup": [],
+                "status": [],
+            }
+        )
 
         with pytest.raises(ValueError, match="CRITICAL"):
             recommender.recommend_rate(
@@ -220,16 +220,16 @@ class TestRecommendRate:
                 market_data=empty_market,
             )
 
-    def test_duration_matching(
-        self, recommender: RateRecommender
-    ) -> None:
+    def test_duration_matching(self, recommender: RateRecommender) -> None:
         """Should filter to similar duration products."""
-        market_data = pd.DataFrame({
-            "fixedRate": [0.040, 0.042, 0.044, 0.055, 0.060],
-            "guaranteeDuration": [5, 5, 5, 3, 10],
-            "productGroup": ["MYGA"] * 5,
-            "status": ["current"] * 5,
-        })
+        market_data = pd.DataFrame(
+            {
+                "fixedRate": [0.040, 0.042, 0.044, 0.055, 0.060],
+                "guaranteeDuration": [5, 5, 5, 3, 10],
+                "productGroup": ["MYGA"] * 5,
+                "status": ["current"] * 5,
+            }
+        )
 
         result = recommender.recommend_rate(
             guarantee_duration=5,
@@ -240,17 +240,17 @@ class TestRecommendRate:
         # Should only use 3 products (duration 4-6)
         assert result.comparable_count == 3
 
-    def test_confidence_levels(
-        self, recommender: RateRecommender
-    ) -> None:
+    def test_confidence_levels(self, recommender: RateRecommender) -> None:
         """Should assess confidence based on sample size and percentile."""
         # Large sample, moderate percentile -> high confidence
-        large_market = pd.DataFrame({
-            "fixedRate": np.linspace(0.03, 0.06, 100),
-            "guaranteeDuration": [5] * 100,
-            "productGroup": ["MYGA"] * 100,
-            "status": ["current"] * 100,
-        })
+        large_market = pd.DataFrame(
+            {
+                "fixedRate": np.linspace(0.03, 0.06, 100),
+                "guaranteeDuration": [5] * 100,
+                "productGroup": ["MYGA"] * 100,
+                "status": ["current"] * 100,
+            }
+        )
 
         result = recommender.recommend_rate(
             guarantee_duration=5,
@@ -262,12 +262,14 @@ class TestRecommendRate:
         assert result.confidence == "high"
 
         # Small sample -> lower confidence
-        small_market = pd.DataFrame({
-            "fixedRate": [0.040, 0.045, 0.050],
-            "guaranteeDuration": [5, 5, 5],
-            "productGroup": ["MYGA"] * 3,
-            "status": ["current"] * 3,
-        })
+        small_market = pd.DataFrame(
+            {
+                "fixedRate": [0.040, 0.045, 0.050],
+                "guaranteeDuration": [5, 5, 5],
+                "productGroup": ["MYGA"] * 3,
+                "status": ["current"] * 3,
+            }
+        )
 
         result = recommender.recommend_rate(
             guarantee_duration=5,
@@ -288,12 +290,14 @@ class TestRecommendForSpread:
 
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
-        return pd.DataFrame({
-            "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050],
-            "guaranteeDuration": [5, 5, 5, 5, 5, 5],
-            "productGroup": ["MYGA"] * 6,
-            "status": ["current"] * 6,
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050],
+                "guaranteeDuration": [5, 5, 5, 5, 5, 5],
+                "productGroup": ["MYGA"] * 6,
+                "status": ["current"] * 6,
+            }
+        )
 
     def test_calculates_rate_from_spread(
         self, recommender: RateRecommender, market_data: pd.DataFrame
@@ -346,9 +350,7 @@ class TestAnalyzeMargin:
     def recommender(self) -> RateRecommender:
         return RateRecommender()
 
-    def test_calculates_margin_breakdown(
-        self, recommender: RateRecommender
-    ) -> None:
+    def test_calculates_margin_breakdown(self, recommender: RateRecommender) -> None:
         """Should calculate complete margin breakdown."""
         result = recommender.analyze_margin(
             rate=0.045,
@@ -361,9 +363,7 @@ class TestAnalyzeMargin:
         assert result.expense_load == 50.0  # Default 50 bps
         assert abs(result.net_margin - 0.0) < 1e-6  # 50 - 0 - 50 = 0
 
-    def test_custom_expense_load(
-        self, recommender: RateRecommender
-    ) -> None:
+    def test_custom_expense_load(self, recommender: RateRecommender) -> None:
         """Should use custom expense load if provided."""
         result = recommender.analyze_margin(
             rate=0.045,
@@ -374,9 +374,7 @@ class TestAnalyzeMargin:
         assert result.expense_load == 30.0
         assert abs(result.net_margin - 20.0) < 1e-6  # 50 - 0 - 30 = 20
 
-    def test_negative_margin_possible(
-        self, recommender: RateRecommender
-    ) -> None:
+    def test_negative_margin_possible(self, recommender: RateRecommender) -> None:
         """Margin can be negative if spread < expenses."""
         result = recommender.analyze_margin(
             rate=0.041,  # Only 10 bps over Treasury
@@ -396,12 +394,14 @@ class TestSensitivityAnalysis:
 
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
-        return pd.DataFrame({
-            "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050],
-            "guaranteeDuration": [5, 5, 5, 5, 5, 5],
-            "productGroup": ["MYGA"] * 6,
-            "status": ["current"] * 6,
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.040, 0.042, 0.044, 0.046, 0.048, 0.050],
+                "guaranteeDuration": [5, 5, 5, 5, 5, 5],
+                "productGroup": ["MYGA"] * 6,
+                "status": ["current"] * 6,
+            }
+        )
 
     def test_returns_dataframe(
         self, recommender: RateRecommender, market_data: pd.DataFrame
@@ -461,6 +461,4 @@ class TestSensitivityAnalysis:
         rates = result.sort_values("percentile")["rate"].tolist()
 
         for i in range(1, len(rates)):
-            assert rates[i] >= rates[i-1], (
-                f"Rate should increase with percentile: {rates}"
-            )
+            assert rates[i] >= rates[i - 1], f"Rate should increase with percentile: {rates}"

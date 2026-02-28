@@ -21,6 +21,7 @@ from annuity_pricing.config.tolerances import (
 # Data Configuration
 # =============================================================================
 
+
 def _resolve_wink_path() -> Path:
     """
     Resolve WINK data file path with environment variable override.
@@ -74,6 +75,7 @@ class DataConfig:
 # Market Data Configuration
 # =============================================================================
 
+
 @dataclass(frozen=True)
 class MarketDataConfig:
     """
@@ -89,21 +91,21 @@ class MarketDataConfig:
 
     # FRED series for rates [T1]
     fred_series: tuple[str, ...] = (
-        "DTB3",    # 3-month T-bill
-        "DGS1",    # 1-year Treasury
-        "DGS2",    # 2-year Treasury
-        "DGS5",    # 5-year Treasury
-        "DGS10",   # 10-year Treasury
-        "DGS30",   # 30-year Treasury
-        "SOFR",    # Secured Overnight Financing Rate
+        "DTB3",  # 3-month T-bill
+        "DGS1",  # 1-year Treasury
+        "DGS2",  # 2-year Treasury
+        "DGS5",  # 5-year Treasury
+        "DGS10",  # 10-year Treasury
+        "DGS30",  # 30-year Treasury
+        "SOFR",  # Secured Overnight Financing Rate
         "VIXCLS",  # VIX (implied vol proxy)
     )
 
     # Index tickers for Yahoo Finance [T2]
     index_tickers: tuple[str, ...] = (
-        "^GSPC",   # S&P 500
-        "^RUT",    # Russell 2000
-        "^NDX",    # NASDAQ-100
+        "^GSPC",  # S&P 500
+        "^RUT",  # Russell 2000
+        "^NDX",  # NASDAQ-100
         "^STOXX50E",  # Euro Stoxx 50
     )
 
@@ -114,6 +116,7 @@ class MarketDataConfig:
 # =============================================================================
 # Option Pricing Configuration
 # =============================================================================
+
 
 @dataclass(frozen=True)
 class OptionConfig:
@@ -152,6 +155,7 @@ class OptionConfig:
 # MYGA Configuration
 # =============================================================================
 
+
 @dataclass(frozen=True)
 class MYGAConfig:
     """
@@ -172,6 +176,7 @@ class MYGAConfig:
 # =============================================================================
 # FIA/RILA Configuration
 # =============================================================================
+
 
 @dataclass(frozen=True)
 class IndexedAnnuityConfig:
@@ -198,6 +203,7 @@ class IndexedAnnuityConfig:
 # Validation Configuration
 # =============================================================================
 
+
 @dataclass(frozen=True)
 class ValidationConfig:
     """
@@ -221,6 +227,7 @@ class ValidationConfig:
 # =============================================================================
 # Master Configuration
 # =============================================================================
+
 
 @dataclass(frozen=True)
 class Settings:

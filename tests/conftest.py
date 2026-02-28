@@ -40,6 +40,7 @@ CHECKSUMS_PATH = FIXTURES_DIR / "CHECKSUMS.sha256"
 # TOLERANCE TIERS (from plan decisions)
 # =============================================================================
 
+
 @dataclass(frozen=True)
 class ToleranceTiers:
     """
@@ -75,6 +76,7 @@ def tolerances() -> ToleranceTiers:
 # =============================================================================
 # CHECKSUM VERIFICATION
 # =============================================================================
+
 
 def _compute_sha256(filepath: Path) -> str:
     """Compute SHA-256 hash of a file."""
@@ -130,6 +132,7 @@ def verify_fixture_checksums():
 # MARKET PARAMETERS
 # =============================================================================
 
+
 @dataclass(frozen=True)
 class MarketParams:
     """Standard market parameters for option pricing tests."""
@@ -164,6 +167,7 @@ def market_params_dict() -> dict[str, float]:
 # =============================================================================
 # HULL TEXTBOOK EXAMPLES
 # =============================================================================
+
 
 @dataclass(frozen=True)
 class HullExample:
@@ -236,6 +240,7 @@ def hull_examples() -> list[HullExample]:
 # WINK DATA FIXTURES
 # =============================================================================
 
+
 @pytest.fixture(scope="session")
 def wink_sample_path() -> Path:
     """Path to WINK sample fixture."""
@@ -261,6 +266,7 @@ def treasury_yields() -> pd.DataFrame:
 # =============================================================================
 # PRODUCT FIXTURES
 # =============================================================================
+
 
 @pytest.fixture
 def sample_myga_product():
@@ -313,6 +319,7 @@ def sample_rila_product():
 # REGISTRY FIXTURE
 # =============================================================================
 
+
 @pytest.fixture
 def registry():
     """Product registry for pricing."""
@@ -324,6 +331,7 @@ def registry():
 # =============================================================================
 # ADAPTER FIXTURES (Optional Dependencies)
 # =============================================================================
+
 
 @pytest.fixture
 def financepy_adapter():
@@ -367,6 +375,7 @@ def pyfeng_adapter():
 # =============================================================================
 # NUMPY RANDOM SEED
 # =============================================================================
+
 
 @pytest.fixture
 def fixed_seed():

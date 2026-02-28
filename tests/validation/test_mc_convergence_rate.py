@@ -138,9 +138,7 @@ class TestCLTBounds:
                 violations += 1
 
         # Should have at most 1 violation out of 5 (allowing some noise)
-        assert violations <= 1, (
-            f"Too many CLT violations: {violations}/{len(PATH_COUNTS)}"
-        )
+        assert violations <= 1, f"Too many CLT violations: {violations}/{len(PATH_COUNTS)}"
 
     def test_clt_bounds_across_seeds(self, standard_params, bs_call_price):
         """
@@ -245,7 +243,7 @@ class TestSEScaling:
         for i in range(1, len(ses)):
             assert ses[i] < ses[i - 1], (
                 f"SE at {PATH_COUNTS[i]} paths ({ses[i]:.6f}) "
-                f"not less than at {PATH_COUNTS[i-1]} paths ({ses[i-1]:.6f})"
+                f"not less than at {PATH_COUNTS[i - 1]} paths ({ses[i - 1]:.6f})"
             )
 
 
@@ -405,9 +403,7 @@ class TestCLTBoundsThorough:
 
         # 3 SE should contain ~99.7% of estimates
         # With 30 samples, expect ~29-30 within bounds
-        assert coverage > 0.90, (
-            f"CLT coverage {coverage:.0%} too low (expected ~99%)"
-        )
+        assert coverage > 0.90, f"CLT coverage {coverage:.0%} too low (expected ~99%)"
 
     def test_95ci_coverage_statistical(self, standard_params, bs_call_price):
         """
@@ -428,9 +424,7 @@ class TestCLTBoundsThorough:
 
         # 95% CI should cover ~95% of the time
         # Allow 85-100% for finite sample
-        assert coverage > 0.85, (
-            f"95% CI coverage {coverage:.0%} too low"
-        )
+        assert coverage > 0.85, f"95% CI coverage {coverage:.0%} too low"
 
 
 # =============================================================================

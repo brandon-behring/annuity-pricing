@@ -202,9 +202,7 @@ class TestLifeExpectancy:
 
         assert ex_female > ex_male
 
-    def test_life_expectancy_at_birth_reasonable(
-        self, soa_male: MortalityTable
-    ) -> None:
+    def test_life_expectancy_at_birth_reasonable(self, soa_male: MortalityTable) -> None:
         """Life expectancy at birth should be reasonable."""
         ex = soa_male.life_expectancy(0)
         # Annuitant tables start higher, expect > 70
@@ -267,18 +265,14 @@ class TestAnnuityFactor:
         ax = soa_male.annuity_factor(65, r=0.05)
         assert ax > 0
 
-    def test_annuity_factor_increases_with_rate(
-        self, soa_male: MortalityTable
-    ) -> None:
+    def test_annuity_factor_increases_with_rate(self, soa_male: MortalityTable) -> None:
         """Higher rate → lower annuity factor (more discounting)."""
         ax_low = soa_male.annuity_factor(65, r=0.03)
         ax_high = soa_male.annuity_factor(65, r=0.07)
 
         assert ax_low > ax_high
 
-    def test_annuity_factor_decreases_with_age(
-        self, soa_male: MortalityTable
-    ) -> None:
+    def test_annuity_factor_decreases_with_age(self, soa_male: MortalityTable) -> None:
         """Older age → lower annuity factor (fewer expected payments)."""
         ax_60 = soa_male.annuity_factor(60, r=0.05)
         ax_70 = soa_male.annuity_factor(70, r=0.05)
@@ -370,13 +364,13 @@ class TestMortalityImprovement:
         for age in [50, 65, 80]:
             assert improved.get_qx(age) < base_table.get_qx(age)
 
-    def test_improvement_formula(
-        self, loader: MortalityLoader, base_table: MortalityTable
-    ) -> None:
+    def test_improvement_formula(self, loader: MortalityLoader, base_table: MortalityTable) -> None:
         """Improvement should follow (1-r)^years formula."""
         rate = 0.01
         years = 10
-        improved = loader.with_improvement(base_table, improvement_rate=rate, projection_years=years)
+        improved = loader.with_improvement(
+            base_table, improvement_rate=rate, projection_years=years
+        )
 
         age = 70
         base_qx = base_table.get_qx(age)

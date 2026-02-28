@@ -102,8 +102,7 @@ class MYGAPricer(BasePricer):
 
         if product.guarantee_duration <= 0:
             raise ValueError(
-                f"CRITICAL: guarantee_duration must be > 0, "
-                f"got {product.guarantee_duration}"
+                f"CRITICAL: guarantee_duration must be > 0, got {product.guarantee_duration}"
             )
 
         rate = product.fixed_rate
@@ -210,9 +209,7 @@ class MYGAPricer(BasePricer):
         rates = df["fixedRate"].dropna()
 
         if rates.empty:
-            raise ValueError(
-                "CRITICAL: All fixedRate values are null in comparable products."
-            )
+            raise ValueError("CRITICAL: All fixedRate values are null in comparable products.")
 
         # Calculate percentile (higher rate = higher percentile)
         percentile = self._calculate_percentile(product.fixed_rate, rates)
@@ -312,9 +309,7 @@ class MYGAPricer(BasePricer):
         0.048  # Example: 4.8% needed for 75th percentile
         """
         if not 0 <= target_percentile <= 100:
-            raise ValueError(
-                f"CRITICAL: target_percentile must be 0-100, got {target_percentile}"
-            )
+            raise ValueError(f"CRITICAL: target_percentile must be 0-100, got {target_percentile}")
 
         # Filter to comparable products
         df = market_data.copy()
@@ -332,16 +327,12 @@ class MYGAPricer(BasePricer):
             ]
 
         if "fixedRate" not in df.columns or df.empty:
-            raise ValueError(
-                "CRITICAL: No comparable MYGA products found for rate recommendation."
-            )
+            raise ValueError("CRITICAL: No comparable MYGA products found for rate recommendation.")
 
         rates = df["fixedRate"].dropna()
 
         if rates.empty:
-            raise ValueError(
-                "CRITICAL: All fixedRate values are null in comparable products."
-            )
+            raise ValueError("CRITICAL: All fixedRate values are null in comparable products.")
 
         # Calculate rate at target percentile
         recommended_rate = float(np.percentile(rates, target_percentile))

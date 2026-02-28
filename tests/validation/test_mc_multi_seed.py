@@ -298,9 +298,7 @@ class TestCICoverageCI:
 
         # With 10 seeds at 95% CI, expect ~9.5 successes
         # Allow 70-100% coverage (binomial variability with small N)
-        assert coverage >= 0.70, (
-            f"CI coverage {coverage:.0%} is too low (expected ~95%)"
-        )
+        assert coverage >= 0.70, f"CI coverage {coverage:.0%} is too low (expected ~95%)"
 
     def test_ci_coverage_put(self, standard_params, bs_put_price):
         """
@@ -318,9 +316,7 @@ class TestCICoverageCI:
 
         coverage = sum(contains_true_price) / len(contains_true_price)
 
-        assert coverage >= 0.70, (
-            f"Put CI coverage {coverage:.0%} is too low"
-        )
+        assert coverage >= 0.70, f"Put CI coverage {coverage:.0%} is too low"
 
 
 # =============================================================================
@@ -368,9 +364,7 @@ class TestPriceStabilityThorough:
         # Normality test (Shapiro-Wilk)
         # With 100 samples, we have good power
         stat, p_value = stats.shapiro(prices)
-        assert p_value > 0.01, (
-            f"Price distribution fails normality test (p={p_value:.4f})"
-        )
+        assert p_value > 0.01, f"Price distribution fails normality test (p={p_value:.4f})"
 
     def test_ci_coverage_statistical(self, standard_params, bs_call_price):
         """

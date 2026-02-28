@@ -241,13 +241,7 @@ class StressTestRunner:
         withdrawal_impact = (scenario.withdrawal_multiplier - 1.0) * 0.16
 
         # Total impact (multiplicative for severe scenarios)
-        total_impact = (
-            equity_impact
-            + rate_impact
-            + vol_impact
-            + lapse_impact
-            + withdrawal_impact
-        )
+        total_impact = equity_impact + rate_impact + vol_impact + lapse_impact + withdrawal_impact
 
         # Ensure reserve doesn't go negative
         stressed_reserve = base_reserve * (1.0 + total_impact)
@@ -352,14 +346,12 @@ class StressTestRunner:
 
         if config.parallel and len(scenarios) > 1:
             # Parallel execution
-            metrics_list = self._run_parallel(
-                scenarios, base_reserve, config
-            )
+            metrics_list = self._run_parallel(scenarios, base_reserve, config)
         else:
             # Sequential execution
             for i, scenario in enumerate(scenarios):
                 if config.verbose:
-                    logger.info(f"  [{i+1}/{len(scenarios)}] {scenario.display_name}")
+                    logger.info(f"  [{i + 1}/{len(scenarios)}] {scenario.display_name}")
 
                 metrics = self._run_single_scenario(
                     scenario, base_reserve, config.max_reserve_increase
@@ -373,7 +365,9 @@ class StressTestRunner:
 
         if config.verbose:
             logger.info(f"Completed in {execution_time:.2f}s")
-            logger.info(f"Worst case: {summary.worst_scenario} ({summary.worst_reserve_delta_pct*100:+.1f}%)")
+            logger.info(
+                f"Worst case: {summary.worst_scenario} ({summary.worst_reserve_delta_pct * 100:+.1f}%)"
+            )
 
         return StressTestResult(
             summary=summary,
@@ -572,6 +566,4 @@ def stress_single_scenario(
         Metrics for the single scenario
     """
     runner = StressTestRunner()
-    return runner._run_single_scenario(
-        scenario, base_reserve, max_reserve_increase=1.0
-    )
+    return runner._run_single_scenario(scenario, base_reserve, max_reserve_increase=1.0)

@@ -25,6 +25,7 @@ import pytest
 # Import Tests
 # =============================================================================
 
+
 class TestRegulatoryImports:
     """Test that regulatory modules are importable."""
 
@@ -69,6 +70,7 @@ class TestRegulatoryImports:
 # CTE Level Tests
 # =============================================================================
 
+
 class TestCTELevels:
     """Test CTE level calculations."""
 
@@ -82,13 +84,14 @@ class TestCTELevels:
         cte_levels = calculate_cte_levels(losses)
 
         # Should have CTE levels (uppercase keys)
-        assert 'CTE70' in cte_levels or 'cte_70' in cte_levels
-        assert 'CTE90' in cte_levels or 'cte_90' in cte_levels
+        assert "CTE70" in cte_levels or "cte_70" in cte_levels
+        assert "CTE90" in cte_levels or "cte_90" in cte_levels
 
 
 # =============================================================================
 # Reserve Type Tests
 # =============================================================================
+
 
 class TestReserveTypes:
     """Test reserve type enumeration."""
@@ -98,12 +101,13 @@ class TestReserveTypes:
         from annuity_pricing.regulatory import ReserveType
 
         # Should have common reserve types
-        assert hasattr(ReserveType, 'STOCHASTIC') or hasattr(ReserveType, 'stochastic')
+        assert hasattr(ReserveType, "STOCHASTIC") or hasattr(ReserveType, "stochastic")
 
 
 # =============================================================================
 # Disclaimer Tests
 # =============================================================================
+
 
 class TestRegulatoryDisclaimers:
     """Ensure regulatory disclaimers are present."""
@@ -111,6 +115,7 @@ class TestRegulatoryDisclaimers:
     def test_init_disclaimer(self):
         """Regulatory __init__ should include disclaimer."""
         import annuity_pricing.regulatory as reg
+
         assert "NOT FOR PRODUCTION" in reg.__doc__ or "EDUCATIONAL" in reg.__doc__
 
 
@@ -250,10 +255,13 @@ class TestVM22GoldenBaseline:
         """Load VM-22 golden file."""
         return load_golden("vm22_baseline.json")
 
-    @pytest.mark.parametrize("product_key", [
-        "fixed_annuity_5yr",
-        "fixed_annuity_10yr",
-    ])
+    @pytest.mark.parametrize(
+        "product_key",
+        [
+            "fixed_annuity_5yr",
+            "fixed_annuity_10yr",
+        ],
+    )
     def test_fixed_annuity_reserve(self, vm22_data: dict, product_key: str) -> None:
         """[P1] Reserve calculation should match baseline."""
         from annuity_pricing.regulatory.vm22 import FixedAnnuityPolicy, VM22Calculator
@@ -294,10 +302,13 @@ class TestVM22GoldenBaseline:
             f"expected {expected_reserve:.2f}, error={rel_error:.2%}"
         )
 
-    @pytest.mark.parametrize("product_key", [
-        "fixed_annuity_5yr",
-        "fixed_annuity_10yr",
-    ])
+    @pytest.mark.parametrize(
+        "product_key",
+        [
+            "fixed_annuity_5yr",
+            "fixed_annuity_10yr",
+        ],
+    )
     def test_deterministic_reserve(self, vm22_data: dict, product_key: str) -> None:
         """[P1] Deterministic reserve should match baseline."""
         from annuity_pricing.regulatory.vm22 import FixedAnnuityPolicy, VM22Calculator

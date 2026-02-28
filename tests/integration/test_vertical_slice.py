@@ -30,6 +30,7 @@ from annuity_pricing.products.rila import RILAPricingResult
 # Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def market_env():
     """Standard market environment for integration tests."""
@@ -96,6 +97,7 @@ def rila_product():
 # =============================================================================
 # Vertical Slice Tests
 # =============================================================================
+
 
 class TestMYGAVerticalSlice:
     """MYGA: Create → Price → Validate complete workflow."""
@@ -173,9 +175,9 @@ class TestFIAVerticalSlice:
         result = registry.price(fia_product, term_years=1.0, premium=100_000.0)
 
         # Fair rates (if computed) should be positive
-        if hasattr(result, 'fair_cap') and result.fair_cap is not None:
+        if hasattr(result, "fair_cap") and result.fair_cap is not None:
             assert result.fair_cap > 0, "Fair cap must be positive"
-        if hasattr(result, 'fair_participation') and result.fair_participation is not None:
+        if hasattr(result, "fair_participation") and result.fair_participation is not None:
             assert result.fair_participation > 0, "Fair participation must be positive"
 
 
@@ -232,5 +234,5 @@ class TestMixedProductSlice:
         results_df = registry.price_multiple(products, term_years=1.0)
 
         assert len(results_df) == 3
-        assert all(results_df['present_value'] > 0)
-        assert 'error' not in results_df.columns or results_df['error'].isna().all()
+        assert all(results_df["present_value"] > 0)
+        assert "error" not in results_df.columns or results_df["error"].isna().all()

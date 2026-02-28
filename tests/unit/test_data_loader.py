@@ -50,6 +50,7 @@ def sample_wink_df() -> pd.DataFrame:
 # Checksum Tests
 # =============================================================================
 
+
 class TestComputeSha256:
     """Tests for compute_sha256 function."""
 
@@ -94,6 +95,7 @@ class TestVerifyChecksum:
 # Load WINK Data Tests
 # =============================================================================
 
+
 class TestLoadWinkData:
     """Tests for load_wink_data function.
 
@@ -131,7 +133,9 @@ class TestLoadWinkData:
         columns = ["companyName", "productGroup", "status"]
 
         # Explicitly disable synthetic to test real file loading
-        df = load_wink_data(path=sample_wink_path, verify=False, columns=columns, use_synthetic=False)
+        df = load_wink_data(
+            path=sample_wink_path, verify=False, columns=columns, use_synthetic=False
+        )
 
         assert list(df.columns) == columns
         assert len(df) == 100
@@ -158,6 +162,7 @@ class TestLoadWinkData:
 # =============================================================================
 # Load WINK By Product Tests
 # =============================================================================
+
 
 class TestLoadWinkByProduct:
     """Tests for load_wink_by_product function."""
@@ -218,6 +223,7 @@ class TestLoadWinkByProduct:
 # =============================================================================
 # Data Quality Tests
 # =============================================================================
+
 
 class TestWinkDataQuality:
     """Tests to verify WINK sample fixture has expected structure."""

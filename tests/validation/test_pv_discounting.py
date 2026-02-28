@@ -66,9 +66,7 @@ class TestPVDiscountingFormula:
 
         # Verify the difference is material (~22% for these params)
         error_if_wrong = (pv_wrong - pv_correct) / pv_correct
-        assert error_if_wrong > 0.20, (
-            f"Error should be >20%, got {error_if_wrong:.2%}"
-        )
+        assert error_if_wrong > 0.20, f"Error should be >20%, got {error_if_wrong:.2%}"
 
     @pytest.mark.validation
     def test_pv_discount_factor_calculation(self) -> None:
@@ -90,11 +88,11 @@ class TestPVDiscountingFormula:
     @pytest.mark.parametrize(
         "rate,term_years,expected_credit",
         [
-            (0.05, 5.0, 0.05),   # Standard case
-            (0.03, 7.0, 0.04),   # Lower rate, longer term
-            (0.08, 3.0, 0.06),   # Higher rate, shorter term
-            (0.00, 5.0, 0.05),   # Zero rate
-            (0.05, 1.0, 0.02),   # Short term, low credit
+            (0.05, 5.0, 0.05),  # Standard case
+            (0.03, 7.0, 0.04),  # Lower rate, longer term
+            (0.08, 3.0, 0.06),  # Higher rate, shorter term
+            (0.00, 5.0, 0.05),  # Zero rate
+            (0.05, 1.0, 0.02),  # Short term, low credit
         ],
     )
     def test_pv_formula_parametrized(
@@ -111,14 +109,10 @@ class TestPVDiscountingFormula:
 
         # Basic sanity checks
         assert pv > 0, "PV must be positive"
-        assert pv <= premium * (1 + expected_credit), (
-            "PV cannot exceed undiscounted value"
-        )
+        assert pv <= premium * (1 + expected_credit), "PV cannot exceed undiscounted value"
 
         if rate > 0:
-            assert pv < premium * (1 + expected_credit), (
-                "With positive rate, PV must be discounted"
-            )
+            assert pv < premium * (1 + expected_credit), "With positive rate, PV must be discounted"
 
 
 class TestPVErrorMagnitude:
@@ -143,9 +137,7 @@ class TestPVErrorMagnitude:
 
         # Errors should increase with rate
         for i in range(len(errors) - 1):
-            assert errors[i+1] > errors[i], (
-                f"Error should increase with rate: {errors}"
-            )
+            assert errors[i + 1] > errors[i], f"Error should increase with rate: {errors}"
 
     @pytest.mark.validation
     def test_error_increases_with_term(self) -> None:
@@ -166,9 +158,7 @@ class TestPVErrorMagnitude:
 
         # Errors should increase with term
         for i in range(len(errors) - 1):
-            assert errors[i+1] > errors[i], (
-                f"Error should increase with term: {errors}"
-            )
+            assert errors[i + 1] > errors[i], f"Error should increase with term: {errors}"
 
 
 class TestFIARILAPVIntegration:
@@ -196,9 +186,7 @@ class TestFIARILAPVIntegration:
         # This should NOT equal: premium + df * premium * expected_credit
         pv_wrong = premium + df * premium * expected_credit
 
-        assert pv_maturity_value < pv_wrong, (
-            "FIA PV should discount principal, not just credit"
-        )
+        assert pv_maturity_value < pv_wrong, "FIA PV should discount principal, not just credit"
 
     @pytest.mark.validation
     def test_rila_pv_uses_correct_formula(self) -> None:

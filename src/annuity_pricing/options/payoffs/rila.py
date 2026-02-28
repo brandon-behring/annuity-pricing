@@ -13,7 +13,6 @@ See: docs/knowledge/domain/buffer_floor.md
 [T1] Floor = long OTM put at floor strike
 """
 
-
 import numpy as np
 
 from annuity_pricing.options.payoffs.base import (

@@ -32,6 +32,7 @@ from annuity_pricing.validation.gates import (
 # Test Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def valid_myga_result():
     """Valid MYGA pricing result."""
@@ -75,6 +76,7 @@ def valid_rila_result():
 # =============================================================================
 # Test GateResult and ValidationReport
 # =============================================================================
+
 
 class TestGateResult:
     """Tests for GateResult dataclass."""
@@ -155,9 +157,7 @@ class TestValidationReport:
 
     def test_to_dict(self):
         """Should convert to dictionary."""
-        results = (
-            GateResult(status=GateStatus.PASS, gate_name="test", message="ok"),
-        )
+        results = (GateResult(status=GateStatus.PASS, gate_name="test", message="ok"),)
         report = ValidationReport(results=results)
         d = report.to_dict()
         assert d["overall_status"] == "pass"
@@ -167,6 +167,7 @@ class TestValidationReport:
 # =============================================================================
 # Test Individual Gates
 # =============================================================================
+
 
 class TestPresentValueBoundsGate:
     """Tests for PresentValueBoundsGate."""
@@ -502,6 +503,7 @@ class TestProductParameterSanityGate:
 # Test Validation Engine
 # =============================================================================
 
+
 class TestValidationEngine:
     """Tests for ValidationEngine."""
 
@@ -553,6 +555,7 @@ class TestValidationEngine:
 # Test Convenience Functions
 # =============================================================================
 
+
 class TestConvenienceFunctions:
     """Tests for convenience functions."""
 
@@ -576,6 +579,7 @@ class TestConvenienceFunctions:
 # =============================================================================
 # Integration Tests
 # =============================================================================
+
 
 class TestFullValidationPipeline:
     """Integration tests for full validation pipeline."""

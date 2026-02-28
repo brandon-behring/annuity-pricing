@@ -368,38 +368,46 @@ class ProductRegistry:
 
                 # Add type-specific fields
                 if isinstance(result, FIAPricingResult):
-                    result_dict.update({
-                        "embedded_option_value": result.embedded_option_value,
-                        "expected_credit": result.expected_credit,
-                        "fair_cap": result.fair_cap,
-                        "fair_participation": result.fair_participation,
-                    })
+                    result_dict.update(
+                        {
+                            "embedded_option_value": result.embedded_option_value,
+                            "expected_credit": result.expected_credit,
+                            "fair_cap": result.fair_cap,
+                            "fair_participation": result.fair_participation,
+                        }
+                    )
                 elif isinstance(result, RILAPricingResult):
-                    result_dict.update({
-                        "protection_value": result.protection_value,
-                        "protection_type": result.protection_type,
-                        "upside_value": result.upside_value,
-                        "expected_return": result.expected_return,
-                        "max_loss": result.max_loss,
-                    })
+                    result_dict.update(
+                        {
+                            "protection_value": result.protection_value,
+                            "protection_type": result.protection_type,
+                            "upside_value": result.upside_value,
+                            "expected_return": result.expected_return,
+                            "max_loss": result.max_loss,
+                        }
+                    )
                 elif isinstance(result, GLWBPricingResult):
-                    result_dict.update({
-                        "guarantee_cost": result.guarantee_cost,
-                        "prob_ruin": result.prob_ruin,
-                        "mean_ruin_year": result.mean_ruin_year,
-                        "prob_lapse": result.prob_lapse,
-                        "mean_lapse_year": result.mean_lapse_year,
-                        "n_paths": result.n_paths,
-                    })
+                    result_dict.update(
+                        {
+                            "guarantee_cost": result.guarantee_cost,
+                            "prob_ruin": result.prob_ruin,
+                            "mean_ruin_year": result.mean_ruin_year,
+                            "prob_lapse": result.prob_lapse,
+                            "mean_lapse_year": result.mean_lapse_year,
+                            "n_paths": result.n_paths,
+                        }
+                    )
 
                 results.append(result_dict)
             except ValueError as e:
-                results.append({
-                    "company_name": product.company_name,
-                    "product_name": product.product_name,
-                    "product_group": product.product_group,
-                    "error": str(e),
-                })
+                results.append(
+                    {
+                        "company_name": product.company_name,
+                        "product_name": product.product_name,
+                        "product_group": product.product_group,
+                        "error": str(e),
+                    }
+                )
 
         return pd.DataFrame(results)
 
@@ -500,6 +508,7 @@ class ProductRegistry:
 # =============================================================================
 # Convenience Functions
 # =============================================================================
+
 
 def create_default_registry(
     risk_free_rate: float = 0.05,

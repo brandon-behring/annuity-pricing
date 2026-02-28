@@ -117,7 +117,9 @@ class TestRILAPutComponentsVsQuantLib:
             time_to_expiry=standard_params["time_to_expiry"],
         )
 
-        rel_error = abs(our_price - ql_price) / ql_price if ql_price > 0.01 else abs(our_price - ql_price)
+        rel_error = (
+            abs(our_price - ql_price) / ql_price if ql_price > 0.01 else abs(our_price - ql_price)
+        )
         assert rel_error < 0.01, (
             f"OTM put at buffer {buffer_rate:.0%} error {rel_error:.2%} exceeds 1% tolerance. "
             f"Our: {our_price:.4f}, QuantLib: {ql_price:.4f}"
@@ -208,7 +210,11 @@ class TestRILABufferVsQuantLib:
         )
         ql_spread = ql_atm - ql_otm
 
-        rel_error = abs(our_spread - ql_spread) / ql_spread if ql_spread > 0.01 else abs(our_spread - ql_spread)
+        rel_error = (
+            abs(our_spread - ql_spread) / ql_spread
+            if ql_spread > 0.01
+            else abs(our_spread - ql_spread)
+        )
         assert rel_error < 0.01, (
             f"Buffer {buffer_rate:.0%} put spread error {rel_error:.2%} exceeds 1%. "
             f"Our spread: {our_spread:.4f}, QuantLib spread: {ql_spread:.4f}"
@@ -248,9 +254,7 @@ class TestRILAFloorVsQuantLib:
         "floor_rate",
         [0.10, 0.15, 0.20, 0.25],  # 10% to 25% floors
     )
-    def test_floor_otm_put_matches_quantlib(
-        self, quantlib_adapter, standard_params, floor_rate
-    ):
+    def test_floor_otm_put_matches_quantlib(self, quantlib_adapter, standard_params, floor_rate):
         """
         [T1] Floor OTM put matches QuantLib within 1%.
 
@@ -279,7 +283,9 @@ class TestRILAFloorVsQuantLib:
             time_to_expiry=standard_params["time_to_expiry"],
         )
 
-        rel_error = abs(our_price - ql_price) / ql_price if ql_price > 0.01 else abs(our_price - ql_price)
+        rel_error = (
+            abs(our_price - ql_price) / ql_price if ql_price > 0.01 else abs(our_price - ql_price)
+        )
         assert rel_error < 0.01, (
             f"Floor {floor_rate:.0%} OTM put error {rel_error:.2%} exceeds 1%. "
             f"Our: {our_price:.4f}, QuantLib: {ql_price:.4f}"
@@ -471,9 +477,7 @@ class TestBufferVsFloorValueComparison:
         "protection_rate",
         [0.10, 0.15, 0.20],
     )
-    def test_buffer_more_valuable_than_floor(
-        self, quantlib_adapter, protection_rate
-    ):
+    def test_buffer_more_valuable_than_floor(self, quantlib_adapter, protection_rate):
         """
         [T1] Buffer (put spread) should be worth more than floor (OTM put).
 

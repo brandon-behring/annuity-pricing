@@ -48,6 +48,7 @@ N_PATHS_VARIANCE_TEST = 100_000
 # Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def standard_params() -> GBMParams:
     """Standard GBM parameters for variance reduction tests."""
@@ -63,6 +64,7 @@ def standard_params() -> GBMParams:
 # =============================================================================
 # Antithetic Variance Reduction Tests
 # =============================================================================
+
 
 @pytest.mark.validation
 class TestAntitheticVarianceReduction:
@@ -86,15 +88,11 @@ class TestAntitheticVarianceReduction:
         strike = standard_params.spot  # ATM
 
         # Without antithetic
-        engine_normal = MonteCarloEngine(
-            n_paths=N_PATHS_VARIANCE_TEST, antithetic=False, seed=42
-        )
+        engine_normal = MonteCarloEngine(n_paths=N_PATHS_VARIANCE_TEST, antithetic=False, seed=42)
         result_normal = engine_normal.price_european_call(standard_params, strike)
 
         # With antithetic (same total paths)
-        engine_anti = MonteCarloEngine(
-            n_paths=N_PATHS_VARIANCE_TEST, antithetic=True, seed=42
-        )
+        engine_anti = MonteCarloEngine(n_paths=N_PATHS_VARIANCE_TEST, antithetic=True, seed=42)
         result_anti = engine_anti.price_european_call(standard_params, strike)
 
         # Antithetic should not significantly increase variance
@@ -112,14 +110,10 @@ class TestAntitheticVarianceReduction:
         """
         strike = standard_params.spot  # ATM
 
-        engine_normal = MonteCarloEngine(
-            n_paths=N_PATHS_VARIANCE_TEST, antithetic=False, seed=42
-        )
+        engine_normal = MonteCarloEngine(n_paths=N_PATHS_VARIANCE_TEST, antithetic=False, seed=42)
         result_normal = engine_normal.price_european_put(standard_params, strike)
 
-        engine_anti = MonteCarloEngine(
-            n_paths=N_PATHS_VARIANCE_TEST, antithetic=True, seed=42
-        )
+        engine_anti = MonteCarloEngine(n_paths=N_PATHS_VARIANCE_TEST, antithetic=True, seed=42)
         result_anti = engine_anti.price_european_put(standard_params, strike)
 
         variance_ratio = (result_anti.standard_error / result_normal.standard_error) ** 2
@@ -135,14 +129,10 @@ class TestAntitheticVarianceReduction:
         """
         strike = standard_params.spot * 0.90  # 10% ITM
 
-        engine_normal = MonteCarloEngine(
-            n_paths=N_PATHS_VARIANCE_TEST, antithetic=False, seed=42
-        )
+        engine_normal = MonteCarloEngine(n_paths=N_PATHS_VARIANCE_TEST, antithetic=False, seed=42)
         result_normal = engine_normal.price_european_call(standard_params, strike)
 
-        engine_anti = MonteCarloEngine(
-            n_paths=N_PATHS_VARIANCE_TEST, antithetic=True, seed=42
-        )
+        engine_anti = MonteCarloEngine(n_paths=N_PATHS_VARIANCE_TEST, antithetic=True, seed=42)
         result_anti = engine_anti.price_european_call(standard_params, strike)
 
         variance_ratio = (result_anti.standard_error / result_normal.standard_error) ** 2
@@ -158,14 +148,10 @@ class TestAntitheticVarianceReduction:
         """
         strike = standard_params.spot * 1.10  # 10% OTM
 
-        engine_normal = MonteCarloEngine(
-            n_paths=N_PATHS_VARIANCE_TEST, antithetic=False, seed=42
-        )
+        engine_normal = MonteCarloEngine(n_paths=N_PATHS_VARIANCE_TEST, antithetic=False, seed=42)
         result_normal = engine_normal.price_european_call(standard_params, strike)
 
-        engine_anti = MonteCarloEngine(
-            n_paths=N_PATHS_VARIANCE_TEST, antithetic=True, seed=42
-        )
+        engine_anti = MonteCarloEngine(n_paths=N_PATHS_VARIANCE_TEST, antithetic=True, seed=42)
         result_anti = engine_anti.price_european_call(standard_params, strike)
 
         variance_ratio = (result_anti.standard_error / result_normal.standard_error) ** 2
@@ -186,14 +172,10 @@ class TestAntitheticVarianceReduction:
         """
         strike = standard_params.spot * moneyness
 
-        engine_normal = MonteCarloEngine(
-            n_paths=N_PATHS_VARIANCE_TEST, antithetic=False, seed=42
-        )
+        engine_normal = MonteCarloEngine(n_paths=N_PATHS_VARIANCE_TEST, antithetic=False, seed=42)
         result_normal = engine_normal.price_european_call(standard_params, strike)
 
-        engine_anti = MonteCarloEngine(
-            n_paths=N_PATHS_VARIANCE_TEST, antithetic=True, seed=42
-        )
+        engine_anti = MonteCarloEngine(n_paths=N_PATHS_VARIANCE_TEST, antithetic=True, seed=42)
         result_anti = engine_anti.price_european_call(standard_params, strike)
 
         variance_ratio = (result_anti.standard_error / result_normal.standard_error) ** 2
@@ -207,6 +189,7 @@ class TestAntitheticVarianceReduction:
 # =============================================================================
 # Multi-Seed Stability Tests
 # =============================================================================
+
 
 @pytest.mark.validation
 class TestMultiSeedStability:
@@ -232,9 +215,7 @@ class TestMultiSeedStability:
         reported_ses = []
 
         for seed in range(42, 42 + n_seeds):
-            engine = MonteCarloEngine(
-                n_paths=n_paths_per_seed, antithetic=True, seed=seed
-            )
+            engine = MonteCarloEngine(n_paths=n_paths_per_seed, antithetic=True, seed=seed)
             result = engine.price_european_call(standard_params, strike)
             prices.append(result.price)
             reported_ses.append(result.standard_error)
@@ -253,9 +234,7 @@ class TestMultiSeedStability:
             f"reported SE {avg_reported_se:.4f} (ratio: {ratio:.2f})"
         )
 
-    def test_coefficient_of_variation_acceptable(
-        self, standard_params: GBMParams
-    ) -> None:
+    def test_coefficient_of_variation_acceptable(self, standard_params: GBMParams) -> None:
         """
         [T1] Cross-seed coefficient of variation should be <5%.
 
@@ -267,9 +246,7 @@ class TestMultiSeedStability:
 
         prices = []
         for seed in range(42, 42 + n_seeds):
-            engine = MonteCarloEngine(
-                n_paths=n_paths_per_seed, antithetic=True, seed=seed
-            )
+            engine = MonteCarloEngine(n_paths=n_paths_per_seed, antithetic=True, seed=seed)
             result = engine.price_european_call(standard_params, strike)
             prices.append(result.price)
 
@@ -277,14 +254,13 @@ class TestMultiSeedStability:
         std_price = np.std(prices, ddof=1)
         cv = std_price / mean_price
 
-        assert cv < 0.05, (
-            f"Cross-seed CV {cv:.2%} > 5% indicates unstable MC"
-        )
+        assert cv < 0.05, f"Cross-seed CV {cv:.2%} > 5% indicates unstable MC"
 
 
 # =============================================================================
 # Antithetic Correlation Tests
 # =============================================================================
+
 
 @pytest.mark.validation
 class TestAntitheticCorrelation:
@@ -295,9 +271,7 @@ class TestAntitheticCorrelation:
     between f(S(Z)) and f(S(-Z)).
     """
 
-    def test_terminal_values_negatively_correlated(
-        self, standard_params: GBMParams
-    ) -> None:
+    def test_terminal_values_negatively_correlated(self, standard_params: GBMParams) -> None:
         """
         [T1] Antithetic terminal values should be negatively correlated in log-space.
 
@@ -318,9 +292,7 @@ class TestAntitheticCorrelation:
 
         # GBM drift and vol terms
         drift = (
-            standard_params.rate
-            - standard_params.dividend
-            - 0.5 * standard_params.volatility ** 2
+            standard_params.rate - standard_params.dividend - 0.5 * standard_params.volatility**2
         ) * standard_params.time_to_expiry
         vol_term = standard_params.volatility * np.sqrt(standard_params.time_to_expiry)
 
@@ -334,9 +306,7 @@ class TestAntitheticCorrelation:
 
         # Correlation of log-returns should be -1 (perfect negative)
         corr_log = np.corrcoef(log_returns_orig, log_returns_anti)[0, 1]
-        assert corr_log < -0.99, (
-            f"Log-return correlation {corr_log:.4f} should be ≈ -1.0"
-        )
+        assert corr_log < -0.99, f"Log-return correlation {corr_log:.4f} should be ≈ -1.0"
 
         # Correlation of terminal values should be negative but not -1
         # (due to exponential transformation)
@@ -359,9 +329,7 @@ class TestAntitheticCorrelation:
         z = np.random.standard_normal(half_paths)
 
         drift = (
-            standard_params.rate
-            - standard_params.dividend
-            - 0.5 * standard_params.volatility ** 2
+            standard_params.rate - standard_params.dividend - 0.5 * standard_params.volatility**2
         ) * standard_params.time_to_expiry
         vol_term = standard_params.volatility * np.sqrt(standard_params.time_to_expiry)
 
@@ -386,6 +354,7 @@ class TestAntitheticCorrelation:
 # =============================================================================
 # Standard Error Accuracy Tests
 # =============================================================================
+
 
 @pytest.mark.validation
 class TestStandardErrorAccuracy:
@@ -417,9 +386,7 @@ class TestStandardErrorAccuracy:
 
         ci_contains_bs = 0
         for seed in range(42, 42 + n_runs):
-            engine = MonteCarloEngine(
-                n_paths=n_paths_per_run, antithetic=True, seed=seed
-            )
+            engine = MonteCarloEngine(n_paths=n_paths_per_run, antithetic=True, seed=seed)
             result = engine.price_european_call(standard_params, strike)
 
             # Check if BS price is within 95% CI
@@ -466,15 +433,14 @@ class TestStandardErrorAccuracy:
 # Variance Reduction Reporting Tests
 # =============================================================================
 
+
 @pytest.mark.validation
 class TestVarianceReductionReporting:
     """
     Tests for variance reduction effectiveness reporting.
     """
 
-    def test_antithetic_doesnt_hurt_across_moneyness(
-        self, standard_params: GBMParams
-    ) -> None:
+    def test_antithetic_doesnt_hurt_across_moneyness(self, standard_params: GBMParams) -> None:
         """
         [T1] Verify antithetic doesn't significantly degrade performance.
 
@@ -488,14 +454,10 @@ class TestVarianceReductionReporting:
         for moneyness in moneyness_levels:
             strike = standard_params.spot * moneyness
 
-            engine_normal = MonteCarloEngine(
-                n_paths=n_paths, antithetic=False, seed=42
-            )
+            engine_normal = MonteCarloEngine(n_paths=n_paths, antithetic=False, seed=42)
             result_normal = engine_normal.price_european_call(standard_params, strike)
 
-            engine_anti = MonteCarloEngine(
-                n_paths=n_paths, antithetic=True, seed=42
-            )
+            engine_anti = MonteCarloEngine(n_paths=n_paths, antithetic=True, seed=42)
             result_anti = engine_anti.price_european_call(standard_params, strike)
 
             variance_ratio = (result_anti.standard_error / result_normal.standard_error) ** 2

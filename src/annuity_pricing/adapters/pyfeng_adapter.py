@@ -130,9 +130,7 @@ class PyfengAdapter(BaseAdapter):
         self.require_available()
 
         model = pf.Bsm(sigma=volatility, intr=rate, divr=dividend)
-        price = model.price(
-            strike=strike, spot=spot, texp=time_to_expiry, cp=-1
-        )
+        price = model.price(strike=strike, spot=spot, texp=time_to_expiry, cp=-1)
 
         return float(price)
 

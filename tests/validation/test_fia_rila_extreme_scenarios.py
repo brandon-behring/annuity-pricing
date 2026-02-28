@@ -75,9 +75,7 @@ class TestBSExtremeVolatility:
         dividend = 0.02
         T = 1.0
 
-        result = black_scholes_greeks(
-            spot, strike, rate, dividend, volatility, T, OptionType.CALL
-        )
+        result = black_scholes_greeks(spot, strike, rate, dividend, volatility, T, OptionType.CALL)
 
         assert np.isfinite(result.delta), f"Delta not finite: {result.delta}"
         assert np.isfinite(result.gamma), f"Gamma not finite: {result.gamma}"
@@ -114,9 +112,7 @@ class TestBSNegativeRates:
         expected_diff = spot * np.exp(-dividend * T) - strike * np.exp(-rate * T)
         actual_diff = call_price - put_price
         parity_error = abs(actual_diff - expected_diff)
-        assert parity_error < 1e-8, (
-            f"Put-call parity violated at r={rate}: error={parity_error}"
-        )
+        assert parity_error < 1e-8, f"Put-call parity violated at r={rate}: error={parity_error}"
 
 
 class TestBSNearExpiry:
@@ -162,9 +158,7 @@ class TestBSNearExpiry:
         volatility = 0.20
         T = days_to_expiry / 365.0
 
-        result = black_scholes_greeks(
-            spot, strike, rate, dividend, volatility, T, OptionType.CALL
-        )
+        result = black_scholes_greeks(spot, strike, rate, dividend, volatility, T, OptionType.CALL)
 
         # All Greeks should be finite
         assert np.isfinite(result.price), f"Price not finite: {result.price}"

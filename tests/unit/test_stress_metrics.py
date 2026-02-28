@@ -260,8 +260,7 @@ class TestCreateSummary:
     def test_percentiles_calculated(self) -> None:
         """Should calculate percentiles."""
         metrics_list = [
-            create_stress_metrics(f"s{i}", 100_000, 100_000 + i * 10_000)
-            for i in range(10)
+            create_stress_metrics(f"s{i}", 100_000, 100_000 + i * 10_000) for i in range(10)
         ]
         summary = create_summary(metrics_list)
         assert 50 in summary.percentiles

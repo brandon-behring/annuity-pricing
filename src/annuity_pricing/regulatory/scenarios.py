@@ -312,12 +312,8 @@ class ScenarioGenerator:
         rate_shocks, equity_shocks = self._generate_correlated_shocks(correlation)
 
         # Generate rate and equity paths
-        rate_paths = self._generate_vasicek_paths(
-            initial_rate, rate_params, rate_shocks
-        )
-        equity_paths = self._generate_gbm_returns(
-            equity_params, equity_shocks
-        )
+        rate_paths = self._generate_vasicek_paths(initial_rate, rate_params, rate_shocks)
+        equity_paths = self._generate_gbm_returns(equity_params, equity_shocks)
 
         # Build scenario objects
         scenarios = []
@@ -401,9 +397,7 @@ class ScenarioGenerator:
         rate_shocks, equity_shocks = self._generate_correlated_shocks(correlation)
 
         # Generate rate paths from Vasicek
-        rate_paths = self._generate_vasicek_paths(
-            initial_rate, rate_params, rate_shocks
-        )
+        rate_paths = self._generate_vasicek_paths(initial_rate, rate_params, rate_shocks)
 
         # Generate equity returns using risk-neutral drift
         equity_paths = self._generate_gbm_returns(

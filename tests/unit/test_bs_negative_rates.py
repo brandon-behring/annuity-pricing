@@ -44,9 +44,7 @@ class TestPutCallParityNegativeRates:
         put = black_scholes_put(spot, strike, rate, dividend, volatility, time)
 
         # C - P = S*exp(-qT) - K*exp(-rT)
-        expected_diff = (
-            spot * np.exp(-dividend * time) - strike * np.exp(-rate * time)
-        )
+        expected_diff = spot * np.exp(-dividend * time) - strike * np.exp(-rate * time)
         actual_diff = call - put
 
         assert abs(actual_diff - expected_diff) < PUT_CALL_PARITY_TOLERANCE, (
@@ -56,9 +54,7 @@ class TestPutCallParityNegativeRates:
 
     @pytest.mark.parametrize("rate", [-0.05, -0.02, -0.01])
     @pytest.mark.parametrize("moneyness", [0.8, 0.9, 1.0, 1.1, 1.2])
-    def test_parity_negative_rates_moneyness(
-        self, rate: float, moneyness: float
-    ) -> None:
+    def test_parity_negative_rates_moneyness(self, rate: float, moneyness: float) -> None:
         """Put-call parity holds across moneyness levels for negative rates."""
         spot = 100.0
         strike = spot * moneyness
@@ -67,9 +63,7 @@ class TestPutCallParityNegativeRates:
         call = black_scholes_call(spot, strike, rate, dividend, volatility, time)
         put = black_scholes_put(spot, strike, rate, dividend, volatility, time)
 
-        parity_holds, error = put_call_parity_check(
-            call, put, spot, strike, rate, dividend, time
-        )
+        parity_holds, error = put_call_parity_check(call, put, spot, strike, rate, dividend, time)
 
         assert parity_holds, f"Parity violated at r={rate}, K/S={moneyness}: error={error}"
 
@@ -90,9 +84,7 @@ class TestCallBoundsNegativeRates:
 
     @pytest.mark.parametrize("rate", [-0.05, -0.02, 0.0, 0.02, 0.05])
     @pytest.mark.parametrize("moneyness", [0.5, 0.8, 1.0, 1.2, 1.5])
-    def test_call_bounds_moneyness_sweep(
-        self, rate: float, moneyness: float
-    ) -> None:
+    def test_call_bounds_moneyness_sweep(self, rate: float, moneyness: float) -> None:
         """Call bounds hold across moneyness and rate combinations."""
         spot = 100.0
         strike = spot * moneyness
@@ -195,8 +187,7 @@ class TestGreeksNegativeRates:
         )
 
         assert abs(call_greeks.gamma - put_greeks.gamma) < ANTI_PATTERN_TOLERANCE, (
-            f"Gamma equality violated at r={rate}: "
-            f"call={call_greeks.gamma}, put={put_greeks.gamma}"
+            f"Gamma equality violated at r={rate}: call={call_greeks.gamma}, put={put_greeks.gamma}"
         )
 
 
@@ -219,9 +210,7 @@ class TestNumericalStabilityNegativeRates:
         assert put > 0, f"Put should be positive at ATM: {put}"
 
         # Parity should still hold
-        parity_holds, error = put_call_parity_check(
-            call, put, spot, strike, rate, dividend, time
-        )
+        parity_holds, error = put_call_parity_check(call, put, spot, strike, rate, dividend, time)
         assert parity_holds, f"Parity violated at r={rate}: error={error}"
 
     def test_negative_rate_long_maturity(self) -> None:
@@ -253,12 +242,8 @@ class TestNumericalStabilityNegativeRates:
         spot, strike = 100.0, 100.0
         dividend, volatility, time = 0.0, 0.20, 1.0
 
-        call_negative = black_scholes_call(
-            spot, strike, rate, dividend, volatility, time
-        )
-        call_zero = black_scholes_call(
-            spot, strike, 0.0, dividend, volatility, time
-        )
+        call_negative = black_scholes_call(spot, strike, rate, dividend, volatility, time)
+        call_zero = black_scholes_call(spot, strike, 0.0, dividend, volatility, time)
 
         # Call increases with rate, so call(r<0) < call(r=0)
         assert call_negative < call_zero, (

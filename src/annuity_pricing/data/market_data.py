@@ -27,6 +27,7 @@ class MarketDataError(Exception):
 # FRED Data (Treasury Curves, VIX)
 # =============================================================================
 
+
 def fetch_fred_series(
     series_id: str,
     start_date: str | None = None,
@@ -60,9 +61,7 @@ def fetch_fred_series(
     try:
         from fredapi import Fred
     except ImportError as err:
-        raise MarketDataError(
-            "CRITICAL: fredapi not installed. Run: pip install fredapi"
-        ) from err
+        raise MarketDataError("CRITICAL: fredapi not installed. Run: pip install fredapi") from err
 
     key = api_key or os.environ.get("FRED_API_KEY")
     if not key:
@@ -81,16 +80,12 @@ def fetch_fred_series(
         )
 
         if data is None or data.empty:
-            raise MarketDataError(
-                f"CRITICAL: No data returned for FRED series '{series_id}'"
-            )
+            raise MarketDataError(f"CRITICAL: No data returned for FRED series '{series_id}'")
 
         return data
 
     except Exception as e:
-        raise MarketDataError(
-            f"CRITICAL: Failed to fetch FRED series '{series_id}': {e}"
-        ) from e
+        raise MarketDataError(f"CRITICAL: Failed to fetch FRED series '{series_id}': {e}") from e
 
 
 def fetch_treasury_curve(
@@ -124,20 +119,18 @@ def fetch_treasury_curve(
     """
     # Treasury series and their tenors in years
     treasury_series = {
-        "DTB3": 0.25,    # 3-month
-        "DGS1": 1.0,     # 1-year
-        "DGS2": 2.0,     # 2-year
-        "DGS5": 5.0,     # 5-year
-        "DGS10": 10.0,   # 10-year
-        "DGS30": 30.0,   # 30-year
+        "DTB3": 0.25,  # 3-month
+        "DGS1": 1.0,  # 1-year
+        "DGS2": 2.0,  # 2-year
+        "DGS5": 5.0,  # 5-year
+        "DGS10": 10.0,  # 10-year
+        "DGS30": 30.0,  # 30-year
     }
 
     # Determine date range
     if as_of_date:
         end = as_of_date
-        start = (datetime.strptime(as_of_date, "%Y-%m-%d") - timedelta(days=7)).strftime(
-            "%Y-%m-%d"
-        )
+        start = (datetime.strptime(as_of_date, "%Y-%m-%d") - timedelta(days=7)).strftime("%Y-%m-%d")
     else:
         end = datetime.now().strftime("%Y-%m-%d")
         start = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
@@ -149,19 +142,19 @@ def fetch_treasury_curve(
             # Get most recent non-null value
             latest = data.dropna().iloc[-1] if not data.dropna().empty else None
             if latest is not None:
-                results.append({
-                    "tenor": tenor,
-                    "yield": latest / 100.0,  # Convert from percent to decimal
-                    "series": series_id,
-                })
+                results.append(
+                    {
+                        "tenor": tenor,
+                        "yield": latest / 100.0,  # Convert from percent to decimal
+                        "series": series_id,
+                    }
+                )
         except MarketDataError:
             # Skip missing series but continue
             pass
 
     if not results:
-        raise MarketDataError(
-            "CRITICAL: Could not fetch any Treasury yields from FRED"
-        )
+        raise MarketDataError("CRITICAL: Could not fetch any Treasury yields from FRED")
 
     return pd.DataFrame(results)
 
@@ -194,6 +187,7 @@ def fetch_vix(
 # =============================================================================
 # Yahoo Finance Data (Equity Indices)
 # =============================================================================
+
 
 def fetch_yahoo_index(
     ticker: str,
@@ -234,16 +228,12 @@ def fetch_yahoo_index(
         data = ticker_obj.history(start=start_date, end=end_date)
 
         if data is None or data.empty:
-            raise MarketDataError(
-                f"CRITICAL: No data returned for Yahoo ticker '{ticker}'"
-            )
+            raise MarketDataError(f"CRITICAL: No data returned for Yahoo ticker '{ticker}'")
 
         return data
 
     except Exception as e:
-        raise MarketDataError(
-            f"CRITICAL: Failed to fetch Yahoo ticker '{ticker}': {e}"
-        ) from e
+        raise MarketDataError(f"CRITICAL: Failed to fetch Yahoo ticker '{ticker}': {e}") from e
 
 
 def fetch_sp500(
@@ -316,6 +306,7 @@ def fetch_nasdaq100(
 # Stooq Backup (Fallback for Yahoo)
 # =============================================================================
 
+
 def fetch_stooq_index(
     symbol: str,
     start_date: str | None = None,
@@ -358,9 +349,7 @@ def fetch_stooq_index(
         data = pd.read_csv(url)
 
         if data.empty:
-            raise MarketDataError(
-                f"CRITICAL: No data returned from Stooq for '{symbol}'"
-            )
+            raise MarketDataError(f"CRITICAL: No data returned from Stooq for '{symbol}'")
 
         # Parse date column
         data["Date"] = pd.to_datetime(data["Date"])
@@ -369,14 +358,13 @@ def fetch_stooq_index(
         return data
 
     except Exception as e:
-        raise MarketDataError(
-            f"CRITICAL: Failed to fetch Stooq data for '{symbol}': {e}"
-        ) from e
+        raise MarketDataError(f"CRITICAL: Failed to fetch Stooq data for '{symbol}': {e}") from e
 
 
 # =============================================================================
 # Convenience Functions
 # =============================================================================
+
 
 def get_risk_free_rate(
     tenor_years: float = 1.0,
@@ -448,8 +436,6 @@ def calculate_index_return(
         start_price = prices.loc[start_date]
         end_price = prices.loc[end_date]
     except KeyError as e:
-        raise ValueError(
-            f"CRITICAL: Date not found in price series: {e}"
-        ) from e
+        raise ValueError(f"CRITICAL: Date not found in price series: {e}") from e
 
     return (end_price - start_price) / start_price

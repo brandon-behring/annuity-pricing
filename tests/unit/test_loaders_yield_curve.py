@@ -192,9 +192,7 @@ class TestYieldCurveLoader:
 
     def test_from_nelson_siegel(self, loader: YieldCurveLoader) -> None:
         """Should create curve from Nelson-Siegel params."""
-        curve = loader.from_nelson_siegel(
-            beta0=0.06, beta1=-0.03, beta2=0.01, tau=2.0
-        )
+        curve = loader.from_nelson_siegel(beta0=0.06, beta1=-0.03, beta2=0.01, tau=2.0)
 
         assert isinstance(curve, YieldCurve)
         # Long rate should approach beta0
@@ -234,9 +232,7 @@ class TestCalculateDuration:
     def loader(self) -> YieldCurveLoader:
         return YieldCurveLoader()
 
-    def _create_bond_cash_flows(
-        self, coupon: float, maturity: float, face: float = 100.0
-    ) -> tuple:
+    def _create_bond_cash_flows(self, coupon: float, maturity: float, face: float = 100.0) -> tuple:
         """Helper to create bond cash flows."""
         times = np.arange(1, int(maturity) + 1, dtype=float)
         cash_flows = np.full_like(times, coupon * face)
@@ -431,9 +427,7 @@ class TestCurveFromFixture:
         """Path to Treasury fixture file."""
         from pathlib import Path
 
-        return str(
-            Path(__file__).parent.parent / "fixtures" / "treasury_yields_2024_01_15.csv"
-        )
+        return str(Path(__file__).parent.parent / "fixtures" / "treasury_yields_2024_01_15.csv")
 
     def test_from_fixture_loads_curve(self, fixture_path: str) -> None:
         """Should load curve from fixture file."""

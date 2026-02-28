@@ -75,9 +75,7 @@ class TestSpreadRateHALT:
             1.00,  # 100% - likely decimal error (100% instead of 0.10)
         ],
     )
-    def test_excessive_spread_rate_halts(
-        self, sanity_gate, mock_result, extreme_spread
-    ):
+    def test_excessive_spread_rate_halts(self, sanity_gate, mock_result, extreme_spread):
         """
         [F.4] Spread rates > 10% should HALT.
 
@@ -88,8 +86,7 @@ class TestSpreadRateHALT:
         result = sanity_gate.check(mock_result, **context)
 
         assert result.status == GateStatus.HALT, (
-            f"Spread rate {extreme_spread:.0%} should HALT (max 10%), "
-            f"got {result.status}"
+            f"Spread rate {extreme_spread:.0%} should HALT (max 10%), got {result.status}"
         )
         assert "exceeds" in result.message.lower() or "maximum" in result.message.lower()
 
@@ -158,9 +155,7 @@ class TestSpreadRateInValidationContext:
         # Build context and verify spread_rate is included
         context = registry._build_validation_context(product, premium=100_000)
 
-        assert "spread_rate" in context, (
-            "spread_rate should be in validation context after fix"
-        )
+        assert "spread_rate" in context, "spread_rate should be in validation context after fix"
         assert context["spread_rate"] == 0.02
 
 
@@ -204,6 +199,5 @@ class TestSpreadRateIntegration:
         result = gate.check(mock_result, **context)
 
         assert result.status == GateStatus.HALT, (
-            f"Excessive spread_rate 0.50 should cause HALT, "
-            f"got {result.status}"
+            f"Excessive spread_rate 0.50 should cause HALT, got {result.status}"
         )

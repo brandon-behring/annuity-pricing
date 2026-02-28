@@ -214,11 +214,11 @@ class TestParameterizedBounds:
     @pytest.mark.parametrize(
         "S,K,r,q,sigma,T",
         [
-            (100, 100, 0.05, 0.02, 0.20, 1.0),   # ATM baseline
-            (100, 80, 0.05, 0.02, 0.30, 0.5),    # ITM call, high vol
-            (100, 120, 0.03, 0.01, 0.15, 2.0),   # OTM call, low vol
-            (50, 50, 0.08, 0.00, 0.40, 0.25),    # No dividend, high vol
-            (200, 180, 0.02, 0.03, 0.25, 3.0),   # Dividend > rate
+            (100, 100, 0.05, 0.02, 0.20, 1.0),  # ATM baseline
+            (100, 80, 0.05, 0.02, 0.30, 0.5),  # ITM call, high vol
+            (100, 120, 0.03, 0.01, 0.15, 2.0),  # OTM call, low vol
+            (50, 50, 0.08, 0.00, 0.40, 0.25),  # No dividend, high vol
+            (200, 180, 0.02, 0.03, 0.25, 3.0),  # Dividend > rate
         ],
     )
     def test_no_arbitrage_sweep(
@@ -264,8 +264,7 @@ class TestParameterizedBounds:
         rhs = S * np.exp(-q * T) - K * np.exp(-r * T)
 
         assert abs(lhs - rhs) < 0.01, (
-            f"PUT-CALL PARITY VIOLATION: C - P = {lhs:.4f}, "
-            f"S*e^(-qT) - K*e^(-rT) = {rhs:.4f}"
+            f"PUT-CALL PARITY VIOLATION: C - P = {lhs:.4f}, S*e^(-qT) - K*e^(-rT) = {rhs:.4f}"
         )
 
     @pytest.mark.anti_pattern
@@ -279,5 +278,5 @@ class TestParameterizedBounds:
 
         assert call_high > call_low, (
             f"Call should increase with vol: "
-            f"C(σ={vol*0.9:.2f})={call_low:.4f}, C(σ={vol*1.1:.2f})={call_high:.4f}"
+            f"C(σ={vol * 0.9:.2f})={call_low:.4f}, C(σ={vol * 1.1:.2f})={call_high:.4f}"
         )

@@ -370,9 +370,7 @@ def get_pd_term_structure(
     np.ndarray
         Array of cumulative PDs from year 1 to max_years
     """
-    return np.array([
-        get_cumulative_pd(rating, year) for year in range(1, max_years + 1)
-    ])
+    return np.array([get_cumulative_pd(rating, year) for year in range(1, max_years + 1)])
 
 
 def get_hazard_rate(rating: AMBestRating) -> float:

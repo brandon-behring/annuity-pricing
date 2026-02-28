@@ -231,9 +231,7 @@ class TestPutCallParity:
         call_price = black_scholes_call(S, K, r, q, sigma, T)
         put_price = black_scholes_put(S, K, r, q, sigma, T)
 
-        is_valid, error = put_call_parity_check(
-            call_price, put_price, S, K, r, q, T
-        )
+        is_valid, error = put_call_parity_check(call_price, put_price, S, K, r, q, T)
 
         assert is_valid, f"Put-call parity check failed with error: {error}"
 
@@ -268,20 +266,20 @@ class TestParameterizedPutCallParity:
         "S,K,r,q,sigma,T",
         [
             # ATM variations
-            (100, 100, 0.05, 0.02, 0.20, 1.0),    # Standard ATM
-            (100, 100, 0.05, 0.02, 0.40, 1.0),    # High vol ATM
-            (100, 100, 0.10, 0.00, 0.20, 1.0),    # High rate, no dividend
-            (100, 100, 0.02, 0.05, 0.20, 1.0),    # Dividend > rate
+            (100, 100, 0.05, 0.02, 0.20, 1.0),  # Standard ATM
+            (100, 100, 0.05, 0.02, 0.40, 1.0),  # High vol ATM
+            (100, 100, 0.10, 0.00, 0.20, 1.0),  # High rate, no dividend
+            (100, 100, 0.02, 0.05, 0.20, 1.0),  # Dividend > rate
             # ITM variations
-            (100, 80, 0.05, 0.02, 0.20, 1.0),     # Deep ITM call
-            (100, 90, 0.05, 0.02, 0.30, 0.5),     # ITM call, short term
+            (100, 80, 0.05, 0.02, 0.20, 1.0),  # Deep ITM call
+            (100, 90, 0.05, 0.02, 0.30, 0.5),  # ITM call, short term
             # OTM variations
-            (100, 110, 0.05, 0.02, 0.20, 1.0),    # OTM call
-            (100, 120, 0.03, 0.01, 0.15, 2.0),    # Deep OTM call, long term
+            (100, 110, 0.05, 0.02, 0.20, 1.0),  # OTM call
+            (100, 120, 0.03, 0.01, 0.15, 2.0),  # Deep OTM call, long term
             # Extreme parameters
-            (50, 50, 0.08, 0.00, 0.50, 0.25),     # High vol, short term
-            (200, 180, 0.02, 0.03, 0.25, 3.0),    # Large notional, long term
-            (100, 100, 0.01, 0.01, 0.10, 5.0),    # Low rates, very long term
+            (50, 50, 0.08, 0.00, 0.50, 0.25),  # High vol, short term
+            (200, 180, 0.02, 0.03, 0.25, 3.0),  # Large notional, long term
+            (100, 100, 0.01, 0.01, 0.10, 5.0),  # Low rates, very long term
         ],
     )
     def test_put_call_parity_sweep(

@@ -96,44 +96,22 @@ def heston_cumulants(
 
     # c1: Mean of log-price (minus drift)
     # [T1] Fang & Oosterlee (2008), Appendix A
-    c1 = (
-        (rate - dividend) * T
-        + (one_minus_exp) * (theta - v0) / (2 * kappa)
-        - theta * T / 2
-    )
+    c1 = (rate - dividend) * T + (one_minus_exp) * (theta - v0) / (2 * kappa) - theta * T / 2
 
     # c2: Variance of log-price
     # [T1] From Heston variance of integrated variance
-    term1 = (
-        sigma**2 * one_minus_exp
-        * (v0 - theta) * (1 - exp_kT)
-        / (kappa**2)
-    )
-    term2 = (
-        theta * sigma**2 * T / kappa
-    )
-    term3 = (
-        theta * sigma**2 * (1 - exp_kT) / (kappa**2)
-    )
-    term4 = (
-        sigma**2 * v0 * one_minus_exp / (2 * kappa)
-    )
+    term1 = sigma**2 * one_minus_exp * (v0 - theta) * (1 - exp_kT) / (kappa**2)
+    term2 = theta * sigma**2 * T / kappa
+    term3 = theta * sigma**2 * (1 - exp_kT) / (kappa**2)
+    term4 = sigma**2 * v0 * one_minus_exp / (2 * kappa)
 
     # Simplified c2 formula [T1]
-    c2 = (
-        (1 / (8 * kappa**3))
-        * (
-            sigma * T * kappa * exp_kT * (v0 - theta) * (8 * kappa * rho - 4 * sigma)
-            + kappa * rho * sigma * (1 - exp_kT) * (16 * theta - 8 * v0)
-            + 2 * theta * kappa * T * (-4 * kappa * rho * sigma + sigma**2 + 4 * kappa**2)
-            + sigma**2
-            * (
-                (theta - 2 * v0) * exp_kT**2
-                + theta * (6 * exp_kT - 7)
-                + 2 * v0
-            )
-            + 8 * kappa**2 * (v0 - theta) * (1 - exp_kT)
-        )
+    c2 = (1 / (8 * kappa**3)) * (
+        sigma * T * kappa * exp_kT * (v0 - theta) * (8 * kappa * rho - 4 * sigma)
+        + kappa * rho * sigma * (1 - exp_kT) * (16 * theta - 8 * v0)
+        + 2 * theta * kappa * T * (-4 * kappa * rho * sigma + sigma**2 + 4 * kappa**2)
+        + sigma**2 * ((theta - 2 * v0) * exp_kT**2 + theta * (6 * exp_kT - 7) + 2 * v0)
+        + 8 * kappa**2 * (v0 - theta) * (1 - exp_kT)
     )
 
     # Ensure c2 is positive
@@ -144,9 +122,7 @@ def heston_cumulants(
     c4 = 0.0  # Zero for symmetric, use L adjustment instead
 
     # Martingale correction w
-    w = -np.log(heston_characteristic_function_cos(
-        -1j, 0.0, time, rate, dividend, params
-    ).real)
+    w = -np.log(heston_characteristic_function_cos(-1j, 0.0, time, rate, dividend, params).real)
 
     return c1, c2, c4, w
 
@@ -236,9 +212,7 @@ def heston_characteristic_function_cos(
 
     B = (xi - d) / sigma**2 * (1 - exp_neg_dt) / one_minus_g_exp
 
-    A = (kappa * theta / sigma**2) * (
-        (xi - d) * time - 2 * np.log(one_minus_g_exp / one_minus_g)
-    )
+    A = (kappa * theta / sigma**2) * ((xi - d) * time - 2 * np.log(one_minus_g_exp / one_minus_g))
 
     # Characteristic function
     phi = np.exp(A + B * v0 + 1j * u * mu * time)
@@ -417,12 +391,9 @@ def heston_price_cos(
 
     # Characteristic function values at u_k = k*pi/(b-a)
     u_k = k * np.pi / (b - a)
-    phi_k = np.array([
-        heston_characteristic_function_cos(
-            u, x, time, rate, dividend, params
-        )
-        for u in u_k
-    ])
+    phi_k = np.array(
+        [heston_characteristic_function_cos(u, x, time, rate, dividend, params) for u in u_k]
+    )
 
     # Payoff coefficients
     if option_type == OptionType.CALL:
@@ -475,7 +446,12 @@ def heston_price_call_cos(
     [T1] Convenience wrapper for heston_price_cos with option_type=CALL.
     """
     return heston_price_cos(
-        spot, strike, rate, dividend, time, params,
+        spot,
+        strike,
+        rate,
+        dividend,
+        time,
+        params,
         option_type=OptionType.CALL,
         cos_params=cos_params,
     )
@@ -496,7 +472,12 @@ def heston_price_put_cos(
     [T1] Convenience wrapper for heston_price_cos with option_type=PUT.
     """
     return heston_price_cos(
-        spot, strike, rate, dividend, time, params,
+        spot,
+        strike,
+        rate,
+        dividend,
+        time,
+        params,
         option_type=OptionType.PUT,
         cos_params=cos_params,
     )

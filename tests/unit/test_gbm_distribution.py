@@ -151,9 +151,7 @@ class TestLogReturnNormality:
 
         # Theoretical mean
         expected_mean = (
-            standard_params.rate
-            - standard_params.dividend
-            - 0.5 * standard_params.volatility**2
+            standard_params.rate - standard_params.dividend - 0.5 * standard_params.volatility**2
         ) * standard_params.time_to_expiry
 
         empirical_mean = log_returns.mean()
@@ -263,10 +261,7 @@ class TestReturnIndependence:
             autocorrs.append(corr)
 
         # Ljung-Box statistic
-        q_stat = n * (n + 2) * sum(
-            (r**2) / (n - k - 1)
-            for k, r in enumerate(autocorrs)
-        )
+        q_stat = n * (n + 2) * sum((r**2) / (n - k - 1) for k, r in enumerate(autocorrs))
 
         # Compare to chi-squared distribution with max_lag degrees of freedom
         p_value = 1 - chi2.cdf(q_stat, df=max_lag)
@@ -302,19 +297,23 @@ class TestTerminalDistribution:
         )
 
         # Theoretical log-normal parameters
-        mu = np.log(standard_params.spot) + (
-            standard_params.rate
-            - standard_params.dividend
-            - 0.5 * standard_params.volatility**2
-        ) * standard_params.time_to_expiry
+        mu = (
+            np.log(standard_params.spot)
+            + (
+                standard_params.rate
+                - standard_params.dividend
+                - 0.5 * standard_params.volatility**2
+            )
+            * standard_params.time_to_expiry
+        )
 
         sigma = standard_params.volatility * np.sqrt(standard_params.time_to_expiry)
 
         # KS test against theoretical log-normal
         stat, p_value = stats.kstest(
             terminal,
-            'lognorm',
-            args=(sigma, 0, np.exp(mu))  # shape, loc, scale for scipy
+            "lognorm",
+            args=(sigma, 0, np.exp(mu)),  # shape, loc, scale for scipy
         )
 
         assert p_value > SIGNIFICANCE_LEVEL, (
@@ -366,11 +365,7 @@ class TestTerminalDistribution:
         r_q = standard_params.rate - standard_params.dividend
         sigma = standard_params.volatility
 
-        expected_var = (
-            standard_params.spot**2
-            * np.exp(2 * r_q * T)
-            * (np.exp(sigma**2 * T) - 1)
-        )
+        expected_var = standard_params.spot**2 * np.exp(2 * r_q * T) * (np.exp(sigma**2 * T) - 1)
 
         relative_error = abs(empirical_var - expected_var) / expected_var
 
@@ -442,8 +437,7 @@ class TestAntitheticProperties:
         # Antithetic should have lower variance (or at most equal)
         # Allow small tolerance for numerical noise
         assert var_anti <= var_plain * 1.1, (
-            f"Antithetic variance {var_anti:.6f} should be <= "
-            f"plain variance {var_plain:.6f}"
+            f"Antithetic variance {var_anti:.6f} should be <= plain variance {var_plain:.6f}"
         )
 
     def test_antithetic_preserves_mean(self, standard_params):
@@ -467,9 +461,7 @@ class TestAntitheticProperties:
         # Means should be close
         rel_diff = abs(terminal_plain.mean() - terminal_anti.mean()) / terminal_plain.mean()
 
-        assert rel_diff < 0.05, (
-            f"Antithetic mean differs from plain by {rel_diff:.1%}"
-        )
+        assert rel_diff < 0.05, f"Antithetic mean differs from plain by {rel_diff:.1%}"
 
 
 # =============================================================================

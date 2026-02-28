@@ -119,9 +119,7 @@ class TestCrisis2000Dotcom:
     def test_recovery_longest(self) -> None:
         """2000 should have longest recovery time."""
         other_recoveries = [
-            c.recovery_months
-            for c in ALL_HISTORICAL_CRISES
-            if c.name != CRISIS_2000_DOTCOM.name
+            c.recovery_months for c in ALL_HISTORICAL_CRISES if c.name != CRISIS_2000_DOTCOM.name
         ]
         assert CRISIS_2000_DOTCOM.recovery_months >= max(other_recoveries)
 
@@ -196,9 +194,7 @@ class TestCrisis2022Rates:
 
     def test_only_rising_rate_crisis(self) -> None:
         """2022 should be the only crisis with positive rate shock."""
-        rising_rate_crises = [
-            c for c in ALL_HISTORICAL_CRISES if c.rate_shock > 0
-        ]
+        rising_rate_crises = [c for c in ALL_HISTORICAL_CRISES if c.rate_shock > 0]
         assert len(rising_rate_crises) == 1
         assert rising_rate_crises[0].name == "2022_rates"
 

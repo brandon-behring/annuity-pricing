@@ -168,17 +168,14 @@ class RankingAnalyzer:
         )
 
         if df.empty:
-            raise ValueError(
-                "CRITICAL: No products found for company ranking."
-            )
+            raise ValueError("CRITICAL: No products found for company ranking.")
 
         # Aggregate by company
-        company_stats = (
-            df.groupby(self.company_column)
-            .agg({
+        company_stats = df.groupby(self.company_column).agg(
+            {
                 self.rate_column: ["max", "mean", "count"],
                 self.duration_column: lambda x: tuple(sorted(x.dropna().unique())),
-            })
+            }
         )
 
         company_stats.columns = [
@@ -258,9 +255,7 @@ class RankingAnalyzer:
         )
 
         if df.empty:
-            raise ValueError(
-                "CRITICAL: No products found for product ranking."
-            )
+            raise ValueError("CRITICAL: No products found for product ranking.")
 
         # Sort by rate
         df = df.sort_values(self.rate_column, ascending=False)
@@ -410,13 +405,15 @@ class RankingAnalyzer:
             top = duration_df.nlargest(3, self.rate_column)
 
             for rank, row in enumerate(top.itertuples(), 1):
-                leaders.append({
-                    "duration": int(duration),
-                    "rank": rank,
-                    "company": getattr(row, self.company_column, "Unknown"),
-                    "product": getattr(row, self.product_column, "Unknown"),
-                    "rate": float(getattr(row, self.rate_column)),
-                })
+                leaders.append(
+                    {
+                        "duration": int(duration),
+                        "rank": rank,
+                        "company": getattr(row, self.company_column, "Unknown"),
+                        "product": getattr(row, self.product_column, "Unknown"),
+                        "rate": float(getattr(row, self.rate_column)),
+                    }
+                )
 
         return pd.DataFrame(leaders)
 
@@ -461,11 +458,10 @@ class RankingAnalyzer:
             raise ValueError("CRITICAL: No products found for competitive landscape.")
 
         # Aggregate by company
-        landscape = (
-            df.groupby(self.company_column)
-            .agg({
+        landscape = df.groupby(self.company_column).agg(
+            {
                 self.rate_column: ["max", "mean", "min", "count"],
-            })
+            }
         )
 
         landscape.columns = ["best_rate", "avg_rate", "min_rate", "product_count"]

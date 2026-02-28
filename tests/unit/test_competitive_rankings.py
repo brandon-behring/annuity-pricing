@@ -71,14 +71,16 @@ class TestRankCompanies:
 
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
-        return pd.DataFrame({
-            "fixedRate": [0.050, 0.048, 0.045, 0.046, 0.044, 0.042],
-            "guaranteeDuration": [5, 5, 5, 5, 5, 5],
-            "productGroup": ["MYGA"] * 6,
-            "status": ["current"] * 6,
-            "companyName": ["A", "A", "B", "B", "C", "C"],
-            "productName": ["A1", "A2", "B1", "B2", "C1", "C2"],
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.050, 0.048, 0.045, 0.046, 0.044, 0.042],
+                "guaranteeDuration": [5, 5, 5, 5, 5, 5],
+                "productGroup": ["MYGA"] * 6,
+                "status": ["current"] * 6,
+                "companyName": ["A", "A", "B", "B", "C", "C"],
+                "productName": ["A1", "A2", "B1", "B2", "C1", "C2"],
+            }
+        )
 
     def test_returns_company_rankings(
         self, analyzer: RankingAnalyzer, market_data: pd.DataFrame
@@ -90,9 +92,7 @@ class TestRankCompanies:
         assert len(rankings) == 3
         assert all(isinstance(r, CompanyRanking) for r in rankings)
 
-    def test_ranks_by_best_rate(
-        self, analyzer: RankingAnalyzer, market_data: pd.DataFrame
-    ) -> None:
+    def test_ranks_by_best_rate(self, analyzer: RankingAnalyzer, market_data: pd.DataFrame) -> None:
         """Should rank companies by best rate (default)."""
         rankings = analyzer.rank_companies(market_data)
 
@@ -110,9 +110,7 @@ class TestRankCompanies:
         # All companies have 2 products, so order may vary
         assert all(r.product_count == 2 for r in rankings)
 
-    def test_top_n_limit(
-        self, analyzer: RankingAnalyzer, market_data: pd.DataFrame
-    ) -> None:
+    def test_top_n_limit(self, analyzer: RankingAnalyzer, market_data: pd.DataFrame) -> None:
         """Should limit to top N companies."""
         rankings = analyzer.rank_companies(market_data, top_n=2)
 
@@ -120,34 +118,34 @@ class TestRankCompanies:
         assert rankings[0].rank == 1
         assert rankings[1].rank == 2
 
-    def test_product_group_filter(
-        self, analyzer: RankingAnalyzer
-    ) -> None:
+    def test_product_group_filter(self, analyzer: RankingAnalyzer) -> None:
         """Should filter by product group."""
-        market_data = pd.DataFrame({
-            "fixedRate": [0.050, 0.045, 0.048],
-            "guaranteeDuration": [5, 5, 5],
-            "productGroup": ["MYGA", "MYGA", "FIA"],
-            "status": ["current"] * 3,
-            "companyName": ["A", "B", "C"],
-        })
+        market_data = pd.DataFrame(
+            {
+                "fixedRate": [0.050, 0.045, 0.048],
+                "guaranteeDuration": [5, 5, 5],
+                "productGroup": ["MYGA", "MYGA", "FIA"],
+                "status": ["current"] * 3,
+                "companyName": ["A", "B", "C"],
+            }
+        )
 
         rankings = analyzer.rank_companies(market_data, product_group="MYGA")
 
         # Only 2 MYGA companies
         assert len(rankings) == 2
 
-    def test_duration_filter(
-        self, analyzer: RankingAnalyzer
-    ) -> None:
+    def test_duration_filter(self, analyzer: RankingAnalyzer) -> None:
         """Should filter by duration."""
-        market_data = pd.DataFrame({
-            "fixedRate": [0.050, 0.045, 0.048],
-            "guaranteeDuration": [5, 3, 10],
-            "productGroup": ["MYGA"] * 3,
-            "status": ["current"] * 3,
-            "companyName": ["A", "B", "C"],
-        })
+        market_data = pd.DataFrame(
+            {
+                "fixedRate": [0.050, 0.045, 0.048],
+                "guaranteeDuration": [5, 3, 10],
+                "productGroup": ["MYGA"] * 3,
+                "status": ["current"] * 3,
+                "companyName": ["A", "B", "C"],
+            }
+        )
 
         rankings = analyzer.rank_companies(
             market_data,
@@ -159,17 +157,17 @@ class TestRankCompanies:
         assert len(rankings) == 1
         assert rankings[0].company == "A"
 
-    def test_raises_on_no_products(
-        self, analyzer: RankingAnalyzer
-    ) -> None:
+    def test_raises_on_no_products(self, analyzer: RankingAnalyzer) -> None:
         """Should raise if no products found."""
-        empty_data = pd.DataFrame({
-            "fixedRate": [],
-            "guaranteeDuration": [],
-            "productGroup": [],
-            "status": [],
-            "companyName": [],
-        })
+        empty_data = pd.DataFrame(
+            {
+                "fixedRate": [],
+                "guaranteeDuration": [],
+                "productGroup": [],
+                "status": [],
+                "companyName": [],
+            }
+        )
 
         with pytest.raises(ValueError, match="CRITICAL"):
             analyzer.rank_companies(empty_data)
@@ -184,14 +182,16 @@ class TestRankProducts:
 
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
-        return pd.DataFrame({
-            "fixedRate": [0.050, 0.048, 0.045, 0.042],
-            "guaranteeDuration": [5, 5, 5, 5],
-            "productGroup": ["MYGA"] * 4,
-            "status": ["current"] * 4,
-            "companyName": ["A", "B", "C", "D"],
-            "productName": ["P1", "P2", "P3", "P4"],
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.050, 0.048, 0.045, 0.042],
+                "guaranteeDuration": [5, 5, 5, 5],
+                "productGroup": ["MYGA"] * 4,
+                "status": ["current"] * 4,
+                "companyName": ["A", "B", "C", "D"],
+                "productName": ["P1", "P2", "P3", "P4"],
+            }
+        )
 
     def test_returns_product_rankings(
         self, analyzer: RankingAnalyzer, market_data: pd.DataFrame
@@ -203,9 +203,7 @@ class TestRankProducts:
         assert len(rankings) == 4
         assert all(isinstance(r, ProductRanking) for r in rankings)
 
-    def test_ranks_by_rate(
-        self, analyzer: RankingAnalyzer, market_data: pd.DataFrame
-    ) -> None:
+    def test_ranks_by_rate(self, analyzer: RankingAnalyzer, market_data: pd.DataFrame) -> None:
         """Should rank products by rate (highest first)."""
         rankings = analyzer.rank_products(market_data)
 
@@ -214,9 +212,7 @@ class TestRankProducts:
         assert rankings[-1].rate == 0.042
         assert rankings[-1].rank == 4
 
-    def test_top_n_limit(
-        self, analyzer: RankingAnalyzer, market_data: pd.DataFrame
-    ) -> None:
+    def test_top_n_limit(self, analyzer: RankingAnalyzer, market_data: pd.DataFrame) -> None:
         """Should limit to top N products."""
         rankings = analyzer.rank_products(market_data, top_n=2)
 
@@ -232,17 +228,17 @@ class TestGetCompanyRank:
 
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
-        return pd.DataFrame({
-            "fixedRate": [0.050, 0.045, 0.040],
-            "guaranteeDuration": [5, 5, 5],
-            "productGroup": ["MYGA"] * 3,
-            "status": ["current"] * 3,
-            "companyName": ["A", "B", "C"],
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.050, 0.045, 0.040],
+                "guaranteeDuration": [5, 5, 5],
+                "productGroup": ["MYGA"] * 3,
+                "status": ["current"] * 3,
+                "companyName": ["A", "B", "C"],
+            }
+        )
 
-    def test_finds_company(
-        self, analyzer: RankingAnalyzer, market_data: pd.DataFrame
-    ) -> None:
+    def test_finds_company(self, analyzer: RankingAnalyzer, market_data: pd.DataFrame) -> None:
         """Should find and return company ranking."""
         ranking = analyzer.get_company_rank("B", market_data)
 
@@ -258,9 +254,7 @@ class TestGetCompanyRank:
 
         assert ranking is None
 
-    def test_case_insensitive(
-        self, analyzer: RankingAnalyzer, market_data: pd.DataFrame
-    ) -> None:
+    def test_case_insensitive(self, analyzer: RankingAnalyzer, market_data: pd.DataFrame) -> None:
         """Should match company name case-insensitively."""
         ranking = analyzer.get_company_rank("b", market_data)
 
@@ -277,17 +271,17 @@ class TestMarketSummary:
 
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
-        return pd.DataFrame({
-            "fixedRate": [0.050, 0.045, 0.040, 0.048],
-            "guaranteeDuration": [5, 5, 3, 7],
-            "productGroup": ["MYGA"] * 4,
-            "status": ["current"] * 4,
-            "companyName": ["A", "B", "C", "A"],
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.050, 0.045, 0.040, 0.048],
+                "guaranteeDuration": [5, 5, 3, 7],
+                "productGroup": ["MYGA"] * 4,
+                "status": ["current"] * 4,
+                "companyName": ["A", "B", "C", "A"],
+            }
+        )
 
-    def test_returns_summary(
-        self, analyzer: RankingAnalyzer, market_data: pd.DataFrame
-    ) -> None:
+    def test_returns_summary(self, analyzer: RankingAnalyzer, market_data: pd.DataFrame) -> None:
         """Should return market summary dict."""
         summary = analyzer.market_summary(market_data)
 
@@ -297,9 +291,7 @@ class TestMarketSummary:
         assert "rate_min" in summary
         assert "rate_max" in summary
 
-    def test_correct_statistics(
-        self, analyzer: RankingAnalyzer, market_data: pd.DataFrame
-    ) -> None:
+    def test_correct_statistics(self, analyzer: RankingAnalyzer, market_data: pd.DataFrame) -> None:
         """Should calculate correct statistics."""
         summary = analyzer.market_summary(market_data)
 
@@ -318,18 +310,18 @@ class TestRateLeadersByDuration:
 
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
-        return pd.DataFrame({
-            "fixedRate": [0.050, 0.048, 0.052, 0.049],
-            "guaranteeDuration": [5, 5, 7, 7],
-            "productGroup": ["MYGA"] * 4,
-            "status": ["current"] * 4,
-            "companyName": ["A", "B", "C", "D"],
-            "productName": ["A5", "B5", "C7", "D7"],
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.050, 0.048, 0.052, 0.049],
+                "guaranteeDuration": [5, 5, 7, 7],
+                "productGroup": ["MYGA"] * 4,
+                "status": ["current"] * 4,
+                "companyName": ["A", "B", "C", "D"],
+                "productName": ["A5", "B5", "C7", "D7"],
+            }
+        )
 
-    def test_returns_leaders_df(
-        self, analyzer: RankingAnalyzer, market_data: pd.DataFrame
-    ) -> None:
+    def test_returns_leaders_df(self, analyzer: RankingAnalyzer, market_data: pd.DataFrame) -> None:
         """Should return DataFrame with leaders by duration."""
         leaders = analyzer.rate_leaders_by_duration(market_data)
 
@@ -338,9 +330,7 @@ class TestRateLeadersByDuration:
         assert "rank" in leaders.columns
         assert "rate" in leaders.columns
 
-    def test_correct_leaders(
-        self, analyzer: RankingAnalyzer, market_data: pd.DataFrame
-    ) -> None:
+    def test_correct_leaders(self, analyzer: RankingAnalyzer, market_data: pd.DataFrame) -> None:
         """Should identify correct leaders for each duration."""
         leaders = analyzer.rate_leaders_by_duration(market_data)
 
@@ -364,13 +354,15 @@ class TestCompetitiveLandscape:
 
     @pytest.fixture
     def market_data(self) -> pd.DataFrame:
-        return pd.DataFrame({
-            "fixedRate": [0.050, 0.048, 0.045, 0.042, 0.040],
-            "guaranteeDuration": [5] * 5,
-            "productGroup": ["MYGA"] * 5,
-            "status": ["current"] * 5,
-            "companyName": ["A", "B", "C", "D", "E"],
-        })
+        return pd.DataFrame(
+            {
+                "fixedRate": [0.050, 0.048, 0.045, 0.042, 0.040],
+                "guaranteeDuration": [5] * 5,
+                "productGroup": ["MYGA"] * 5,
+                "status": ["current"] * 5,
+                "companyName": ["A", "B", "C", "D", "E"],
+            }
+        )
 
     def test_returns_landscape_df(
         self, analyzer: RankingAnalyzer, market_data: pd.DataFrame
@@ -383,9 +375,7 @@ class TestCompetitiveLandscape:
         assert "best_rate" in landscape.columns
         assert "tier" in landscape.columns
 
-    def test_assigns_tiers(
-        self, analyzer: RankingAnalyzer, market_data: pd.DataFrame
-    ) -> None:
+    def test_assigns_tiers(self, analyzer: RankingAnalyzer, market_data: pd.DataFrame) -> None:
         """Should assign competitive tiers."""
         landscape = analyzer.competitive_landscape(market_data)
 

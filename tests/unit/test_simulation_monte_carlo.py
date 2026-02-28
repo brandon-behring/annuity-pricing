@@ -48,9 +48,7 @@ class TestEuropeanPricing:
     @pytest.fixture
     def standard_params(self):
         """Standard GBM parameters for testing."""
-        return GBMParams(
-            spot=100, rate=0.05, dividend=0.02, volatility=0.20, time_to_expiry=1.0
-        )
+        return GBMParams(spot=100, rate=0.05, dividend=0.02, volatility=0.20, time_to_expiry=1.0)
 
     def test_call_price_positive(self, standard_params):
         """Call price should be positive."""
@@ -89,9 +87,7 @@ class TestCappedCallPricing:
     @pytest.fixture
     def standard_params(self):
         """Standard GBM parameters for testing."""
-        return GBMParams(
-            spot=100, rate=0.05, dividend=0.02, volatility=0.20, time_to_expiry=1.0
-        )
+        return GBMParams(spot=100, rate=0.05, dividend=0.02, volatility=0.20, time_to_expiry=1.0)
 
     def test_capped_call_less_than_uncapped(self, standard_params):
         """Capped call should be worth less than uncapped."""
@@ -128,9 +124,7 @@ class TestBufferPricing:
     @pytest.fixture
     def standard_params(self):
         """Standard GBM parameters for testing."""
-        return GBMParams(
-            spot=100, rate=0.05, dividend=0.02, volatility=0.20, time_to_expiry=1.0
-        )
+        return GBMParams(spot=100, rate=0.05, dividend=0.02, volatility=0.20, time_to_expiry=1.0)
 
     def test_buffer_vs_no_buffer(self, standard_params):
         """Buffer should reduce expected loss."""
@@ -165,9 +159,7 @@ class TestFloorPricing:
     @pytest.fixture
     def standard_params(self):
         """Standard GBM parameters for testing."""
-        return GBMParams(
-            spot=100, rate=0.05, dividend=0.02, volatility=0.20, time_to_expiry=1.0
-        )
+        return GBMParams(spot=100, rate=0.05, dividend=0.02, volatility=0.20, time_to_expiry=1.0)
 
     def test_floor_limits_loss(self, standard_params):
         """Floor should limit maximum loss."""

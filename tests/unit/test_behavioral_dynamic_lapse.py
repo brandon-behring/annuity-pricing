@@ -157,11 +157,15 @@ class TestDynamicLapseModel:
         """
         # Low sensitivity
         model_low = DynamicLapseModel(LapseAssumptions(sensitivity=0.5))
-        result_low = model_low.calculate_lapse(gwb=80_000, av=100_000, surrender_period_complete=True)
+        result_low = model_low.calculate_lapse(
+            gwb=80_000, av=100_000, surrender_period_complete=True
+        )
 
         # High sensitivity
         model_high = DynamicLapseModel(LapseAssumptions(sensitivity=2.0))
-        result_high = model_high.calculate_lapse(gwb=80_000, av=100_000, surrender_period_complete=True)
+        result_high = model_high.calculate_lapse(
+            gwb=80_000, av=100_000, surrender_period_complete=True
+        )
 
         # High sensitivity should have larger adjustment
         assert result_high.adjustment_factor > result_low.adjustment_factor
@@ -225,9 +229,7 @@ class TestPathLapses:
         av_path = np.array([100_000, 100_000, 100_000, 100_000, 100_000])
 
         # Surrender period ends at step 3
-        lapse_rates = model.calculate_path_lapses(
-            gwb_path, av_path, surrender_period_ends=3
-        )
+        lapse_rates = model.calculate_path_lapses(gwb_path, av_path, surrender_period_ends=3)
 
         # First 3 periods: lower lapse (in surrender)
         assert lapse_rates[0] < 0.05

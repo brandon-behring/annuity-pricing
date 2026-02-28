@@ -45,18 +45,12 @@ class TestCallBoundsExtremeVol:
 
         call = black_scholes_call(spot, strike, rate, dividend, sigma, time)
 
-        assert call >= -ANTI_PATTERN_TOLERANCE, (
-            f"Call negative at σ={sigma}: {call}"
-        )
-        assert call <= spot + ANTI_PATTERN_TOLERANCE, (
-            f"Call > S at σ={sigma}: {call}"
-        )
+        assert call >= -ANTI_PATTERN_TOLERANCE, f"Call negative at σ={sigma}: {call}"
+        assert call <= spot + ANTI_PATTERN_TOLERANCE, f"Call > S at σ={sigma}: {call}"
 
     @pytest.mark.parametrize("sigma", [0.001, 0.50, 1.5, 2.5])
     @pytest.mark.parametrize("moneyness", [0.7, 0.9, 1.0, 1.1, 1.3])
-    def test_call_bounds_vol_moneyness_grid(
-        self, sigma: float, moneyness: float
-    ) -> None:
+    def test_call_bounds_vol_moneyness_grid(self, sigma: float, moneyness: float) -> None:
         """Call bounds hold across volatility and moneyness combinations."""
         spot = 100.0
         strike = spot * moneyness
@@ -87,17 +81,13 @@ class TestPutCallParityExtremeVol:
         call = black_scholes_call(spot, strike, rate, dividend, sigma, time)
         put = black_scholes_put(spot, strike, rate, dividend, sigma, time)
 
-        parity_holds, error = put_call_parity_check(
-            call, put, spot, strike, rate, dividend, time
-        )
+        parity_holds, error = put_call_parity_check(call, put, spot, strike, rate, dividend, time)
 
         assert parity_holds, f"Parity violated at σ={sigma}: error={error}"
 
     @pytest.mark.parametrize("sigma", [0.01, 0.50, 1.5])
     @pytest.mark.parametrize("moneyness", [0.8, 1.0, 1.2])
-    def test_parity_vol_moneyness_grid(
-        self, sigma: float, moneyness: float
-    ) -> None:
+    def test_parity_vol_moneyness_grid(self, sigma: float, moneyness: float) -> None:
         """Parity holds across volatility/moneyness grid."""
         spot = 100.0
         strike = spot * moneyness
@@ -106,13 +96,9 @@ class TestPutCallParityExtremeVol:
         call = black_scholes_call(spot, strike, rate, dividend, sigma, time)
         put = black_scholes_put(spot, strike, rate, dividend, sigma, time)
 
-        parity_holds, error = put_call_parity_check(
-            call, put, spot, strike, rate, dividend, time
-        )
+        parity_holds, error = put_call_parity_check(call, put, spot, strike, rate, dividend, time)
 
-        assert parity_holds, (
-            f"Parity violated at σ={sigma}, K/S={moneyness}: error={error}"
-        )
+        assert parity_holds, f"Parity violated at σ={sigma}, K/S={moneyness}: error={error}"
 
 
 class TestNearZeroVolatility:
@@ -138,8 +124,7 @@ class TestNearZeroVolatility:
 
         # At near-zero vol, should be close to forward intrinsic
         assert abs(call - forward_intrinsic) < 0.1, (
-            f"Near-zero vol ITM call not near intrinsic: "
-            f"call={call}, expected≈{forward_intrinsic}"
+            f"Near-zero vol ITM call not near intrinsic: call={call}, expected≈{forward_intrinsic}"
         )
 
     def test_near_zero_vol_call_otm(self) -> None:
@@ -188,14 +173,13 @@ class TestVeryHighVolatility:
         for i in range(len(calls) - 1):
             assert calls[i] < calls[i + 1], (
                 f"Call not increasing with vol: "
-                f"C(σ={sigmas[i]})={calls[i]}, C(σ={sigmas[i+1]})={calls[i+1]}"
+                f"C(σ={sigmas[i]})={calls[i]}, C(σ={sigmas[i + 1]})={calls[i + 1]}"
             )
 
         # At very high vol, call should be close to S*exp(-qT)
         limit = spot * np.exp(-dividend * time)
         assert calls[-1] > 0.9 * limit, (
-            f"High vol call not approaching limit: "
-            f"call={calls[-1]}, limit={limit}"
+            f"High vol call not approaching limit: call={calls[-1]}, limit={limit}"
         )
 
     def test_high_vol_put_approaches_strike(self) -> None:
@@ -217,7 +201,7 @@ class TestVeryHighVolatility:
         for i in range(len(puts) - 1):
             assert puts[i] < puts[i + 1], (
                 f"Put not increasing with vol: "
-                f"P(σ={sigmas[i]})={puts[i]}, P(σ={sigmas[i+1]})={puts[i+1]}"
+                f"P(σ={sigmas[i]})={puts[i]}, P(σ={sigmas[i + 1]})={puts[i + 1]}"
             )
 
     def test_crisis_vol_levels_stable(self) -> None:
@@ -250,9 +234,7 @@ class TestGreeksExtremeVol:
         call_greeks = black_scholes_greeks(
             spot, strike, rate, dividend, sigma, time, OptionType.CALL
         )
-        put_greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, sigma, time, OptionType.PUT
-        )
+        put_greeks = black_scholes_greeks(spot, strike, rate, dividend, sigma, time, OptionType.PUT)
 
         assert 0 <= call_greeks.delta <= 1, (
             f"Call delta out of bounds at σ={sigma}: {call_greeks.delta}"
@@ -271,9 +253,7 @@ class TestGreeksExtremeVol:
             spot, strike, rate, dividend, sigma, time, OptionType.CALL
         )
 
-        assert call_greeks.gamma > 0, (
-            f"Gamma not positive at σ={sigma}: {call_greeks.gamma}"
-        )
+        assert call_greeks.gamma > 0, f"Gamma not positive at σ={sigma}: {call_greeks.gamma}"
 
     @pytest.mark.parametrize("sigma", [0.01, 0.20, 1.0, 2.0])
     def test_vega_positive_extreme_vol(self, sigma: float) -> None:
@@ -285,9 +265,7 @@ class TestGreeksExtremeVol:
             spot, strike, rate, dividend, sigma, time, OptionType.CALL
         )
 
-        assert call_greeks.vega > 0, (
-            f"Vega not positive at σ={sigma}: {call_greeks.vega}"
-        )
+        assert call_greeks.vega > 0, f"Vega not positive at σ={sigma}: {call_greeks.vega}"
 
     def test_vega_peaks_at_forward(self) -> None:
         """
@@ -343,8 +321,8 @@ class TestGreeksExtremeVol:
         # Vegas should be approximately equal
         assert abs(greeks_below.vega - greeks_above.vega) < 0.05, (
             f"Vega asymmetric around forward: "
-            f"vega({forward-offset:.0f})={greeks_below.vega:.4f}, "
-            f"vega({forward+offset:.0f})={greeks_above.vega:.4f}"
+            f"vega({forward - offset:.0f})={greeks_below.vega:.4f}, "
+            f"vega({forward + offset:.0f})={greeks_above.vega:.4f}"
         )
 
 
@@ -357,15 +335,12 @@ class TestVolatilityMonotonicity:
         rate, dividend, time = 0.05, 0.02, 1.0
 
         sigmas = [0.05, 0.10, 0.20, 0.40, 0.80]
-        calls = [
-            black_scholes_call(spot, strike, rate, dividend, sigma, time)
-            for sigma in sigmas
-        ]
+        calls = [black_scholes_call(spot, strike, rate, dividend, sigma, time) for sigma in sigmas]
 
         for i in range(len(calls) - 1):
             assert calls[i] < calls[i + 1], (
                 f"Call not monotonic in vol: "
-                f"C(σ={sigmas[i]})={calls[i]} >= C(σ={sigmas[i+1]})={calls[i+1]}"
+                f"C(σ={sigmas[i]})={calls[i]} >= C(σ={sigmas[i + 1]})={calls[i + 1]}"
             )
 
     def test_put_increases_with_vol(self) -> None:
@@ -374,15 +349,12 @@ class TestVolatilityMonotonicity:
         rate, dividend, time = 0.05, 0.02, 1.0
 
         sigmas = [0.05, 0.10, 0.20, 0.40, 0.80]
-        puts = [
-            black_scholes_put(spot, strike, rate, dividend, sigma, time)
-            for sigma in sigmas
-        ]
+        puts = [black_scholes_put(spot, strike, rate, dividend, sigma, time) for sigma in sigmas]
 
         for i in range(len(puts) - 1):
             assert puts[i] < puts[i + 1], (
                 f"Put not monotonic in vol: "
-                f"P(σ={sigmas[i]})={puts[i]} >= P(σ={sigmas[i+1]})={puts[i+1]}"
+                f"P(σ={sigmas[i]})={puts[i]} >= P(σ={sigmas[i + 1]})={puts[i + 1]}"
             )
 
 

@@ -140,12 +140,18 @@ class TestCapPricing:
     def test_higher_cap_higher_value(self, pricer):
         """Higher cap should give higher expected credit."""
         low_cap = FIAProduct(
-            company_name="Test", product_name="Low Cap", product_group="FIA",
-            status="current", cap_rate=0.05,
+            company_name="Test",
+            product_name="Low Cap",
+            product_group="FIA",
+            status="current",
+            cap_rate=0.05,
         )
         high_cap = FIAProduct(
-            company_name="Test", product_name="High Cap", product_group="FIA",
-            status="current", cap_rate=0.15,
+            company_name="Test",
+            product_name="High Cap",
+            product_group="FIA",
+            status="current",
+            cap_rate=0.15,
         )
 
         low_result = pricer.price(low_cap, term_years=1.0)
@@ -167,12 +173,18 @@ class TestParticipationPricing:
     def test_higher_participation_higher_value(self, pricer):
         """Higher participation should give higher expected credit."""
         low_par = FIAProduct(
-            company_name="Test", product_name="Low Par", product_group="FIA",
-            status="current", participation_rate=0.50,
+            company_name="Test",
+            product_name="Low Par",
+            product_group="FIA",
+            status="current",
+            participation_rate=0.50,
         )
         high_par = FIAProduct(
-            company_name="Test", product_name="High Par", product_group="FIA",
-            status="current", participation_rate=1.00,
+            company_name="Test",
+            product_name="High Par",
+            product_group="FIA",
+            status="current",
+            participation_rate=1.00,
         )
 
         low_result = pricer.price(low_par, term_years=1.0)
@@ -208,8 +220,11 @@ class TestFairTermCalculation:
         )
 
         product = FIAProduct(
-            company_name="Test", product_name="Test", product_group="FIA",
-            status="current", cap_rate=0.10,
+            company_name="Test",
+            product_name="Test",
+            product_group="FIA",
+            status="current",
+            cap_rate=0.10,
         )
 
         low_result = low_budget_pricer.price(product, term_years=1.0)
@@ -224,12 +239,14 @@ class TestCompetitivePosition:
     @pytest.fixture
     def market_data(self):
         """Sample FIA market data."""
-        return pd.DataFrame({
-            "productGroup": ["FIA"] * 10,
-            "capRate": [0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15],
-            "participationRate": [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4],
-            "indexUsed": ["S&P 500"] * 10,
-        })
+        return pd.DataFrame(
+            {
+                "productGroup": ["FIA"] * 10,
+                "capRate": [0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15],
+                "participationRate": [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4],
+                "indexUsed": ["S&P 500"] * 10,
+            }
+        )
 
     def test_competitive_position_cap(self, pricer, cap_product, market_data):
         """Should calculate percentile for cap product."""
@@ -241,12 +258,18 @@ class TestCompetitivePosition:
     def test_competitive_position_rank(self, pricer, market_data):
         """Higher cap should have higher percentile."""
         low_cap = FIAProduct(
-            company_name="Test", product_name="Low", product_group="FIA",
-            status="current", cap_rate=0.06,
+            company_name="Test",
+            product_name="Low",
+            product_group="FIA",
+            status="current",
+            cap_rate=0.06,
         )
         high_cap = FIAProduct(
-            company_name="Test", product_name="High", product_group="FIA",
-            status="current", cap_rate=0.15,
+            company_name="Test",
+            product_name="High",
+            product_group="FIA",
+            status="current",
+            cap_rate=0.15,
         )
 
         low_position = pricer.competitive_position(low_cap, market_data)
@@ -263,8 +286,12 @@ class TestEdgeCases:
         from annuity_pricing.data.schemas import MYGAProduct
 
         myga = MYGAProduct(
-            company_name="Test", product_name="Test", product_group="MYGA",
-            status="current", fixed_rate=0.04, guarantee_duration=5,
+            company_name="Test",
+            product_name="Test",
+            product_group="MYGA",
+            status="current",
+            fixed_rate=0.04,
+            guarantee_duration=5,
         )
 
         with pytest.raises(ValueError, match="Expected FIAProduct"):
@@ -276,7 +303,9 @@ class TestEdgeCases:
         [NEVER FAIL SILENTLY] - No crediting method is an error, not a default.
         """
         product = FIAProduct(
-            company_name="Test", product_name="No Method", product_group="FIA",
+            company_name="Test",
+            product_name="No Method",
+            product_group="FIA",
             status="current",
         )
 
@@ -292,12 +321,18 @@ class TestPriceMultiple:
         """Should price multiple products."""
         products = [
             FIAProduct(
-                company_name="A", product_name="Cap 8%", product_group="FIA",
-                status="current", cap_rate=0.08,
+                company_name="A",
+                product_name="Cap 8%",
+                product_group="FIA",
+                status="current",
+                cap_rate=0.08,
             ),
             FIAProduct(
-                company_name="B", product_name="Cap 10%", product_group="FIA",
-                status="current", cap_rate=0.10,
+                company_name="B",
+                product_name="Cap 10%",
+                product_group="FIA",
+                status="current",
+                cap_rate=0.10,
             ),
         ]
 
@@ -387,8 +422,7 @@ class TestTermYearsRequirement:
         # See: codex-audit-report.md Finding 3
         ratio = result_5y.option_budget / result_1y.option_budget
         assert 4.0 < ratio < 5.0, (
-            f"5Y/1Y budget ratio {ratio:.2f} should be between 4 and 5 "
-            f"(discounted, not linear)"
+            f"5Y/1Y budget ratio {ratio:.2f} should be between 4 and 5 (discounted, not linear)"
         )
 
     def test_fia_invalid_term_raises(self, pricer, cap_product):
@@ -403,12 +437,20 @@ class TestTermYearsRequirement:
         """price_multiple should use each product's term_years when not specified."""
         products = [
             FIAProduct(
-                company_name="A", product_name="3Y Cap", product_group="FIA",
-                status="current", cap_rate=0.08, term_years=3,
+                company_name="A",
+                product_name="3Y Cap",
+                product_group="FIA",
+                status="current",
+                cap_rate=0.08,
+                term_years=3,
             ),
             FIAProduct(
-                company_name="B", product_name="5Y Cap", product_group="FIA",
-                status="current", cap_rate=0.10, term_years=5,
+                company_name="B",
+                product_name="5Y Cap",
+                product_group="FIA",
+                status="current",
+                cap_rate=0.10,
+                term_years=5,
             ),
         ]
 
@@ -466,8 +508,9 @@ class TestMonthlyAveraging:
             )
 
             result = pricer.price(product)
-            assert result.details["method"] == "monthly_average", \
+            assert result.details["method"] == "monthly_average", (
                 f"Failed to detect monthly averaging for: {indexing_method}"
+            )
 
     def test_monthly_averaging_requires_cap_rate(self, pricer):
         """Monthly averaging should raise if no cap_rate (only cap supported)."""

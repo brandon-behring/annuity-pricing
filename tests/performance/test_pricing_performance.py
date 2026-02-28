@@ -171,12 +171,8 @@ class TestFIAMCDeterminism:
         self, market_env: MarketEnvironment, sample_fia: FIAProduct
     ) -> None:
         """FIA MC with seeded RNG is reproducible."""
-        registry1 = ProductRegistry(
-            market_env=market_env, n_mc_paths=10000, seed=BENCHMARK_SEED
-        )
-        registry2 = ProductRegistry(
-            market_env=market_env, n_mc_paths=10000, seed=BENCHMARK_SEED
-        )
+        registry1 = ProductRegistry(market_env=market_env, n_mc_paths=10000, seed=BENCHMARK_SEED)
+        registry2 = ProductRegistry(market_env=market_env, n_mc_paths=10000, seed=BENCHMARK_SEED)
 
         result1 = registry1.price(sample_fia, term_years=1.0, validate=False)
         result2 = registry2.price(sample_fia, term_years=1.0, validate=False)
@@ -190,12 +186,8 @@ class TestFIAMCDeterminism:
         self, market_env: MarketEnvironment, sample_fia: FIAProduct
     ) -> None:
         """Different seeds should produce different MC results."""
-        registry1 = ProductRegistry(
-            market_env=market_env, n_mc_paths=10000, seed=42
-        )
-        registry2 = ProductRegistry(
-            market_env=market_env, n_mc_paths=10000, seed=123
-        )
+        registry1 = ProductRegistry(market_env=market_env, n_mc_paths=10000, seed=42)
+        registry2 = ProductRegistry(market_env=market_env, n_mc_paths=10000, seed=123)
 
         result1 = registry1.price(sample_fia, term_years=1.0, validate=False)
         result2 = registry2.price(sample_fia, term_years=1.0, validate=False)
@@ -203,8 +195,9 @@ class TestFIAMCDeterminism:
         # Different seeds should give different expected_credit
         # (PV might be close but expected_credit depends on MC paths)
         # Allow for rare chance of identical results with tolerance
-        assert result1.expected_credit != pytest.approx(result2.expected_credit, rel=1e-10) or \
-               result1.present_value != pytest.approx(result2.present_value, rel=1e-10)
+        assert result1.expected_credit != pytest.approx(
+            result2.expected_credit, rel=1e-10
+        ) or result1.present_value != pytest.approx(result2.present_value, rel=1e-10)
 
 
 # =============================================================================
@@ -215,9 +208,7 @@ class TestFIAMCDeterminism:
 class TestBatchScaling:
     """Tests for batch pricing scaling behavior."""
 
-    def test_myga_batch_scaling_relative(
-        self, market_env: MarketEnvironment
-    ) -> None:
+    def test_myga_batch_scaling_relative(self, market_env: MarketEnvironment) -> None:
         """Batch pricing scales roughly linearly (relative threshold)."""
         registry = ProductRegistry(market_env=market_env, seed=BENCHMARK_SEED)
 
@@ -238,17 +229,13 @@ class TestBatchScaling:
         # This is a very generous threshold to avoid flaky tests
         assert time_100 < time_10 * 20, (
             f"Batch scaling exceeded threshold: 100 products took {time_100:.3f}s, "
-            f"10 products took {time_10:.3f}s (ratio: {time_100/time_10:.1f}x)"
+            f"10 products took {time_10:.3f}s (ratio: {time_100 / time_10:.1f}x)"
         )
 
-    def test_fia_batch_scaling_relative(
-        self, market_env: MarketEnvironment
-    ) -> None:
+    def test_fia_batch_scaling_relative(self, market_env: MarketEnvironment) -> None:
         """FIA batch pricing scales reasonably."""
         # Use fewer MC paths for speed
-        registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED
-        )
+        registry = ProductRegistry(market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED)
 
         # Time 5 products
         products_5 = create_fia_batch(5)
@@ -266,7 +253,7 @@ class TestBatchScaling:
         # (4x linear + 2x overhead allowance)
         assert time_20 < time_5 * 8, (
             f"FIA batch scaling exceeded threshold: 20 products took {time_20:.3f}s, "
-            f"5 products took {time_5:.3f}s (ratio: {time_20/time_5:.1f}x)"
+            f"5 products took {time_5:.3f}s (ratio: {time_20 / time_5:.1f}x)"
         )
 
 
@@ -283,17 +270,13 @@ class TestPathScaling:
     ) -> None:
         """MC path count scales sub-linearly (vectorization benefits)."""
         # Registry with 1k paths
-        registry_1k = ProductRegistry(
-            market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED
-        )
+        registry_1k = ProductRegistry(market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED)
         start = time.perf_counter()
         registry_1k.price(sample_fia, term_years=1.0, validate=False)
         time_1k = time.perf_counter() - start
 
         # Registry with 10k paths
-        registry_10k = ProductRegistry(
-            market_env=market_env, n_mc_paths=10000, seed=BENCHMARK_SEED
-        )
+        registry_10k = ProductRegistry(market_env=market_env, n_mc_paths=10000, seed=BENCHMARK_SEED)
         start = time.perf_counter()
         registry_10k.price(sample_fia, term_years=1.0, validate=False)
         time_10k = time.perf_counter() - start
@@ -302,7 +285,7 @@ class TestPathScaling:
         # Very generous to avoid flaky tests
         assert time_10k < time_1k * 15, (
             f"Path scaling exceeded threshold: 10k paths took {time_10k:.3f}s, "
-            f"1k paths took {time_1k:.3f}s (ratio: {time_10k/time_1k:.1f}x)"
+            f"1k paths took {time_1k:.3f}s (ratio: {time_10k / time_1k:.1f}x)"
         )
 
 
@@ -335,9 +318,7 @@ class TestMemoryStability:
 
         # Peak should be < 100MB for 1000 simple MYGA pricings
         # (MYGA is deterministic, no MC memory)
-        assert peak < 100 * 1024 * 1024, (
-            f"Memory usage too high: peak {peak / 1024 / 1024:.1f}MB"
-        )
+        assert peak < 100 * 1024 * 1024, f"Memory usage too high: peak {peak / 1024 / 1024:.1f}MB"
 
     def test_fia_memory_stability(
         self, market_env: MarketEnvironment, sample_fia: FIAProduct
@@ -349,9 +330,7 @@ class TestMemoryStability:
             pytest.skip("tracemalloc not available")
 
         # Use fewer paths to keep memory reasonable
-        registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED
-        )
+        registry = ProductRegistry(market_env=market_env, n_mc_paths=1000, seed=BENCHMARK_SEED)
 
         tracemalloc.start()
 
@@ -362,9 +341,7 @@ class TestMemoryStability:
         tracemalloc.stop()
 
         # Peak should be < 200MB for 100 FIA pricings with 1k paths each
-        assert peak < 200 * 1024 * 1024, (
-            f"Memory usage too high: peak {peak / 1024 / 1024:.1f}MB"
-        )
+        assert peak < 200 * 1024 * 1024, f"Memory usage too high: peak {peak / 1024 / 1024:.1f}MB"
 
 
 # =============================================================================

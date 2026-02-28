@@ -68,6 +68,7 @@ scale_strategy = st.floats(min_value=0.1, max_value=10.0, allow_nan=False, allow
 # Bound Properties
 # =============================================================================
 
+
 class TestCallBoundsProperty:
     """[T1] Call option bounds: 0 <= C <= S for all inputs."""
 
@@ -103,10 +104,7 @@ class TestCallBoundsProperty:
     ) -> None:
         """[T1] Call value >= max(0, S*exp(-qT) - K*exp(-rT))."""
         call = black_scholes_call(spot, strike, rate, dividend, vol, time)
-        lower_bound = max(
-            0.0,
-            spot * np.exp(-dividend * time) - strike * np.exp(-rate * time)
-        )
+        lower_bound = max(0.0, spot * np.exp(-dividend * time) - strike * np.exp(-rate * time))
 
         assert call >= lower_bound - ANTI_PATTERN_TOLERANCE, (
             f"Call below lower bound: C={call}, bound={lower_bound}"
@@ -151,10 +149,7 @@ class TestPutBoundsProperty:
     ) -> None:
         """[T1] Put value >= max(0, K*exp(-rT) - S*exp(-qT))."""
         put = black_scholes_put(spot, strike, rate, dividend, vol, time)
-        lower_bound = max(
-            0.0,
-            strike * np.exp(-rate * time) - spot * np.exp(-dividend * time)
-        )
+        lower_bound = max(0.0, strike * np.exp(-rate * time) - spot * np.exp(-dividend * time))
 
         assert put >= lower_bound - ANTI_PATTERN_TOLERANCE, (
             f"Put below lower bound: P={put}, bound={lower_bound}"
@@ -164,6 +159,7 @@ class TestPutBoundsProperty:
 # =============================================================================
 # Parity Property
 # =============================================================================
+
 
 class TestPutCallParityProperty:
     """[T1] Put-call parity: C - P = S*exp(-qT) - K*exp(-rT)."""
@@ -184,9 +180,7 @@ class TestPutCallParityProperty:
         call = black_scholes_call(spot, strike, rate, dividend, vol, time)
         put = black_scholes_put(spot, strike, rate, dividend, vol, time)
 
-        parity_holds, error = put_call_parity_check(
-            call, put, spot, strike, rate, dividend, time
-        )
+        parity_holds, error = put_call_parity_check(call, put, spot, strike, rate, dividend, time)
 
         assert parity_holds, (
             f"Parity violated: error={error}, "
@@ -197,6 +191,7 @@ class TestPutCallParityProperty:
 # =============================================================================
 # Monotonicity Properties
 # =============================================================================
+
 
 class TestStrikeMonotonicity:
     """[T1] Option prices are monotonic in strike."""
@@ -212,8 +207,14 @@ class TestStrikeMonotonicity:
     )
     @settings(max_examples=200)
     def test_call_decreases_with_strike(
-        self, spot: float, strike1: float, strike2: float,
-        rate: float, dividend: float, vol: float, time: float
+        self,
+        spot: float,
+        strike1: float,
+        strike2: float,
+        rate: float,
+        dividend: float,
+        vol: float,
+        time: float,
     ) -> None:
         """[T1] C(K1) > C(K2) when K1 < K2."""
         # Only test when strikes are sufficiently different
@@ -242,8 +243,14 @@ class TestStrikeMonotonicity:
     )
     @settings(max_examples=200)
     def test_put_increases_with_strike(
-        self, spot: float, strike1: float, strike2: float,
-        rate: float, dividend: float, vol: float, time: float
+        self,
+        spot: float,
+        strike1: float,
+        strike2: float,
+        rate: float,
+        dividend: float,
+        vol: float,
+        time: float,
     ) -> None:
         """[T1] P(K1) < P(K2) when K1 < K2."""
         assume(abs(strike1 - strike2) > 1.0)
@@ -275,8 +282,14 @@ class TestSpotMonotonicity:
     )
     @settings(max_examples=200)
     def test_call_increases_with_spot(
-        self, spot1: float, spot2: float, strike: float,
-        rate: float, dividend: float, vol: float, time: float
+        self,
+        spot1: float,
+        spot2: float,
+        strike: float,
+        rate: float,
+        dividend: float,
+        vol: float,
+        time: float,
     ) -> None:
         """[T1] C(S1) < C(S2) when S1 < S2."""
         assume(abs(spot1 - spot2) > 1.0)
@@ -308,8 +321,14 @@ class TestVolatilityMonotonicity:
     )
     @settings(max_examples=200)
     def test_call_increases_with_vol(
-        self, spot: float, strike: float, rate: float, dividend: float,
-        vol1: float, vol2: float, time: float
+        self,
+        spot: float,
+        strike: float,
+        rate: float,
+        dividend: float,
+        vol1: float,
+        vol2: float,
+        time: float,
     ) -> None:
         """[T1] C(σ1) < C(σ2) when σ1 < σ2."""
         assume(abs(vol1 - vol2) > 0.01)
@@ -331,6 +350,7 @@ class TestVolatilityMonotonicity:
 # Scaling Property
 # =============================================================================
 
+
 class TestScalingProperty:
     """[T1] Homogeneity: C(λS, λK) = λ × C(S, K)."""
 
@@ -345,26 +365,31 @@ class TestScalingProperty:
     )
     @settings(max_examples=200)
     def test_call_scaling(
-        self, spot: float, strike: float, rate: float, dividend: float,
-        vol: float, time: float, scale: float
+        self,
+        spot: float,
+        strike: float,
+        rate: float,
+        dividend: float,
+        vol: float,
+        time: float,
+        scale: float,
     ) -> None:
         """[T1] C(λS, λK) = λ × C(S, K) (homogeneity of degree 1)."""
         # Original price
         call_original = black_scholes_call(spot, strike, rate, dividend, vol, time)
 
         # Scaled price
-        call_scaled = black_scholes_call(
-            spot * scale, strike * scale, rate, dividend, vol, time
-        )
+        call_scaled = black_scholes_call(spot * scale, strike * scale, rate, dividend, vol, time)
 
         expected = scale * call_original
 
         # Relative tolerance since values can be small
         rel_tol = 1e-8
         if expected > 0:
-            assert abs(call_scaled - expected) / expected < rel_tol or abs(call_scaled - expected) < ANTI_PATTERN_TOLERANCE, (
-                f"Scaling violated: C(λS, λK)={call_scaled}, λ×C={expected}, λ={scale}"
-            )
+            assert (
+                abs(call_scaled - expected) / expected < rel_tol
+                or abs(call_scaled - expected) < ANTI_PATTERN_TOLERANCE
+            ), f"Scaling violated: C(λS, λK)={call_scaled}, λ×C={expected}, λ={scale}"
         else:
             assert abs(call_scaled - expected) < ANTI_PATTERN_TOLERANCE, (
                 f"Scaling violated at zero: C(λS, λK)={call_scaled}, λ×C={expected}"
@@ -374,6 +399,7 @@ class TestScalingProperty:
 # =============================================================================
 # Non-negativity (No-Arbitrage)
 # =============================================================================
+
 
 class TestNoArbitrage:
     """[T1] Option values are always non-negative."""
@@ -414,6 +440,7 @@ class TestNoArbitrage:
 # =============================================================================
 # Numerical Stability
 # =============================================================================
+
 
 class TestNumericalStability:
     """All outputs are finite for valid inputs."""

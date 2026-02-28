@@ -48,6 +48,7 @@ time_strategy = st.floats(min_value=0.01, max_value=10.0, allow_nan=False, allow
 # Delta Properties
 # =============================================================================
 
+
 class TestDeltaBounds:
     """[T1] Delta is bounded: call ∈ [0, 1], put ∈ [-1, 0]."""
 
@@ -61,20 +62,13 @@ class TestDeltaBounds:
     )
     @settings(max_examples=200)
     def test_call_delta_bounds(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """[T1] Call delta in [0, 1]."""
-        greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, vol, time, OptionType.CALL
-        )
+        greeks = black_scholes_greeks(spot, strike, rate, dividend, vol, time, OptionType.CALL)
 
-        assert greeks.delta >= -ANTI_PATTERN_TOLERANCE, (
-            f"Call delta below 0: {greeks.delta}"
-        )
-        assert greeks.delta <= 1.0 + ANTI_PATTERN_TOLERANCE, (
-            f"Call delta above 1: {greeks.delta}"
-        )
+        assert greeks.delta >= -ANTI_PATTERN_TOLERANCE, f"Call delta below 0: {greeks.delta}"
+        assert greeks.delta <= 1.0 + ANTI_PATTERN_TOLERANCE, f"Call delta above 1: {greeks.delta}"
 
     @given(
         spot=spot_strategy,
@@ -86,20 +80,13 @@ class TestDeltaBounds:
     )
     @settings(max_examples=200)
     def test_put_delta_bounds(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """[T1] Put delta in [-1, 0]."""
-        greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, vol, time, OptionType.PUT
-        )
+        greeks = black_scholes_greeks(spot, strike, rate, dividend, vol, time, OptionType.PUT)
 
-        assert greeks.delta >= -1.0 - ANTI_PATTERN_TOLERANCE, (
-            f"Put delta below -1: {greeks.delta}"
-        )
-        assert greeks.delta <= ANTI_PATTERN_TOLERANCE, (
-            f"Put delta above 0: {greeks.delta}"
-        )
+        assert greeks.delta >= -1.0 - ANTI_PATTERN_TOLERANCE, f"Put delta below -1: {greeks.delta}"
+        assert greeks.delta <= ANTI_PATTERN_TOLERANCE, f"Put delta above 0: {greeks.delta}"
 
 
 class TestDeltaPutCallRelationship:
@@ -115,16 +102,11 @@ class TestDeltaPutCallRelationship:
     )
     @settings(max_examples=200)
     def test_delta_relationship(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """[T1] Δ_put = Δ_call - e^(-qT)."""
-        call_greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, vol, time, OptionType.CALL
-        )
-        put_greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, vol, time, OptionType.PUT
-        )
+        call_greeks = black_scholes_greeks(spot, strike, rate, dividend, vol, time, OptionType.CALL)
+        put_greeks = black_scholes_greeks(spot, strike, rate, dividend, vol, time, OptionType.PUT)
 
         expected_put_delta = call_greeks.delta - np.exp(-dividend * time)
         actual_put_delta = put_greeks.delta
@@ -140,6 +122,7 @@ class TestDeltaPutCallRelationship:
 # Gamma Properties
 # =============================================================================
 
+
 class TestGammaProperties:
     """[T1] Gamma is always positive and equal for calls and puts."""
 
@@ -153,16 +136,11 @@ class TestGammaProperties:
     )
     @settings(max_examples=200)
     def test_gamma_positive(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """[T1] Γ > 0 for all options."""
-        call_greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, vol, time, OptionType.CALL
-        )
-        put_greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, vol, time, OptionType.PUT
-        )
+        call_greeks = black_scholes_greeks(spot, strike, rate, dividend, vol, time, OptionType.CALL)
+        put_greeks = black_scholes_greeks(spot, strike, rate, dividend, vol, time, OptionType.PUT)
 
         assert call_greeks.gamma > -ANTI_PATTERN_TOLERANCE, (
             f"Call gamma not positive: {call_greeks.gamma}"
@@ -181,26 +159,21 @@ class TestGammaProperties:
     )
     @settings(max_examples=200)
     def test_gamma_equality(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """[T1] Γ_call = Γ_put at same strike."""
-        call_greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, vol, time, OptionType.CALL
-        )
-        put_greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, vol, time, OptionType.PUT
-        )
+        call_greeks = black_scholes_greeks(spot, strike, rate, dividend, vol, time, OptionType.CALL)
+        put_greeks = black_scholes_greeks(spot, strike, rate, dividend, vol, time, OptionType.PUT)
 
         assert abs(call_greeks.gamma - put_greeks.gamma) < GREEKS_NUMERICAL_TOLERANCE, (
-            f"Gamma equality violated: "
-            f"Γ_call={call_greeks.gamma}, Γ_put={put_greeks.gamma}"
+            f"Gamma equality violated: Γ_call={call_greeks.gamma}, Γ_put={put_greeks.gamma}"
         )
 
 
 # =============================================================================
 # Vega Properties
 # =============================================================================
+
 
 class TestVegaProperties:
     """[T1] Vega is always positive and equal for calls and puts."""
@@ -215,16 +188,11 @@ class TestVegaProperties:
     )
     @settings(max_examples=200)
     def test_vega_positive(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """[T1] V > 0 for all options."""
-        call_greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, vol, time, OptionType.CALL
-        )
-        put_greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, vol, time, OptionType.PUT
-        )
+        call_greeks = black_scholes_greeks(spot, strike, rate, dividend, vol, time, OptionType.CALL)
+        put_greeks = black_scholes_greeks(spot, strike, rate, dividend, vol, time, OptionType.PUT)
 
         assert call_greeks.vega > -ANTI_PATTERN_TOLERANCE, (
             f"Call vega not positive: {call_greeks.vega}"
@@ -243,26 +211,21 @@ class TestVegaProperties:
     )
     @settings(max_examples=200)
     def test_vega_equality(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """[T1] V_call = V_put at same strike."""
-        call_greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, vol, time, OptionType.CALL
-        )
-        put_greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, vol, time, OptionType.PUT
-        )
+        call_greeks = black_scholes_greeks(spot, strike, rate, dividend, vol, time, OptionType.CALL)
+        put_greeks = black_scholes_greeks(spot, strike, rate, dividend, vol, time, OptionType.PUT)
 
         assert abs(call_greeks.vega - put_greeks.vega) < GREEKS_NUMERICAL_TOLERANCE, (
-            f"Vega equality violated: "
-            f"V_call={call_greeks.vega}, V_put={put_greeks.vega}"
+            f"Vega equality violated: V_call={call_greeks.vega}, V_put={put_greeks.vega}"
         )
 
 
 # =============================================================================
 # Rho Properties
 # =============================================================================
+
 
 class TestRhoProperties:
     """[T1] Rho has sign based on option type."""
@@ -277,18 +240,13 @@ class TestRhoProperties:
     )
     @settings(max_examples=200)
     def test_call_rho_positive(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """[T1] Call rho is positive (call gains from higher rates)."""
-        greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, vol, time, OptionType.CALL
-        )
+        greeks = black_scholes_greeks(spot, strike, rate, dividend, vol, time, OptionType.CALL)
 
         # Rho should be positive for calls (higher rate increases call value)
-        assert greeks.rho >= -ANTI_PATTERN_TOLERANCE, (
-            f"Call rho should be positive: {greeks.rho}"
-        )
+        assert greeks.rho >= -ANTI_PATTERN_TOLERANCE, f"Call rho should be positive: {greeks.rho}"
 
     @given(
         spot=spot_strategy,
@@ -300,23 +258,19 @@ class TestRhoProperties:
     )
     @settings(max_examples=200)
     def test_put_rho_negative(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """[T1] Put rho is negative (put loses from higher rates)."""
-        greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, vol, time, OptionType.PUT
-        )
+        greeks = black_scholes_greeks(spot, strike, rate, dividend, vol, time, OptionType.PUT)
 
         # Rho should be negative for puts (higher rate decreases put value)
-        assert greeks.rho <= ANTI_PATTERN_TOLERANCE, (
-            f"Put rho should be negative: {greeks.rho}"
-        )
+        assert greeks.rho <= ANTI_PATTERN_TOLERANCE, f"Put rho should be negative: {greeks.rho}"
 
 
 # =============================================================================
 # Finite Values Property
 # =============================================================================
+
 
 class TestGreeksFinite:
     """All Greeks are finite for valid inputs."""
@@ -331,13 +285,10 @@ class TestGreeksFinite:
     )
     @settings(max_examples=200)
     def test_all_greeks_finite(
-        self, spot: float, strike: float, rate: float,
-        dividend: float, vol: float, time: float
+        self, spot: float, strike: float, rate: float, dividend: float, vol: float, time: float
     ) -> None:
         """All Greeks are finite values."""
-        call_greeks = black_scholes_greeks(
-            spot, strike, rate, dividend, vol, time, OptionType.CALL
-        )
+        call_greeks = black_scholes_greeks(spot, strike, rate, dividend, vol, time, OptionType.CALL)
 
         assert np.isfinite(call_greeks.price), f"Price not finite: {call_greeks.price}"
         assert np.isfinite(call_greeks.delta), f"Delta not finite: {call_greeks.delta}"

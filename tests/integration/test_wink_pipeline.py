@@ -143,6 +143,7 @@ class TestWinkChecksumValidation:
 # Pipeline Integration Tests
 # =============================================================================
 
+
 @pytest.mark.integration
 class TestWinkPipelineIntegration:
     """Integration tests for full WINK data pipeline."""
@@ -216,15 +217,15 @@ class TestWinkPipelineIntegration:
             f"MYGA pricing failed: PV must be positive, got {result.present_value}"
         )
         # Check details for guaranteed_value if present
-        if hasattr(result, 'details') and result.details:
-            guaranteed_value = result.details.get('guaranteed_value', 0)
+        if hasattr(result, "details") and result.details:
+            guaranteed_value = result.details.get("guaranteed_value", 0)
             assert guaranteed_value >= 0, (
                 f"MYGA guaranteed_value must be non-negative, got {guaranteed_value}"
             )
             # Golden expectation: guaranteed_value should be at least premium for MYGA
             # (since MYGA guarantees return of principal at minimum)
-            if 'premium' in result.details:
-                assert guaranteed_value >= result.details['premium'] * 0.95, (
+            if "premium" in result.details:
+                assert guaranteed_value >= result.details["premium"] * 0.95, (
                     f"MYGA guaranteed_value {guaranteed_value} should be >= 95% of premium"
                 )
 

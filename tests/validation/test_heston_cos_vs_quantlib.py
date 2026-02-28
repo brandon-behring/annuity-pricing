@@ -34,6 +34,7 @@ import QuantLib as ql
 # Test Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def standard_params():
     """Standard Heston parameters (Feller satisfied)."""
@@ -87,17 +88,12 @@ def quantlib_heston_price(
     today = ql.Date.todaysDate()
     ql.Settings.instance().evaluationDate = today
 
-    rate_ts = ql.YieldTermStructureHandle(
-        ql.FlatForward(today, rate, ql.Actual365Fixed())
-    )
-    dividend_ts = ql.YieldTermStructureHandle(
-        ql.FlatForward(today, dividend, ql.Actual365Fixed())
-    )
+    rate_ts = ql.YieldTermStructureHandle(ql.FlatForward(today, rate, ql.Actual365Fixed()))
+    dividend_ts = ql.YieldTermStructureHandle(ql.FlatForward(today, dividend, ql.Actual365Fixed()))
     spot_handle = ql.QuoteHandle(ql.SimpleQuote(spot))
 
     heston_process = ql.HestonProcess(
-        rate_ts, dividend_ts, spot_handle,
-        v0, kappa, theta, sigma, rho
+        rate_ts, dividend_ts, spot_handle, v0, kappa, theta, sigma, rho
     )
     heston_model = ql.HestonModel(heston_process)
     engine = ql.AnalyticHestonEngine(heston_model)
@@ -117,6 +113,7 @@ def quantlib_heston_price(
 # COS Method Validation Tests
 # =============================================================================
 
+
 class TestHestonCOSvsQuantLib:
     """
     Validate COS method against QuantLib AnalyticHestonEngine.
@@ -130,17 +127,24 @@ class TestHestonCOSvsQuantLib:
         """ATM call should match QuantLib within tolerance."""
         p = standard_params
         params = HestonParams(
-            v0=p["v0"], kappa=p["kappa"], theta=p["theta"],
-            sigma=p["sigma"], rho=p["rho"]
+            v0=p["v0"], kappa=p["kappa"], theta=p["theta"], sigma=p["sigma"], rho=p["rho"]
         )
 
         ql_price = quantlib_heston_price(
-            p["spot"], p["spot"], p["rate"], p["dividend"], p["time"],
-            p["v0"], p["kappa"], p["theta"], p["sigma"], p["rho"], "call"
+            p["spot"],
+            p["spot"],
+            p["rate"],
+            p["dividend"],
+            p["time"],
+            p["v0"],
+            p["kappa"],
+            p["theta"],
+            p["sigma"],
+            p["rho"],
+            "call",
         )
         cos_price = heston_price_cos(
-            p["spot"], p["spot"], p["rate"], p["dividend"], p["time"],
-            params, OptionType.CALL
+            p["spot"], p["spot"], p["rate"], p["dividend"], p["time"], params, OptionType.CALL
         )
 
         rel_error = abs(cos_price - ql_price) / ql_price
@@ -152,18 +156,25 @@ class TestHestonCOSvsQuantLib:
         """ITM call (K=90) should match QuantLib."""
         p = standard_params
         params = HestonParams(
-            v0=p["v0"], kappa=p["kappa"], theta=p["theta"],
-            sigma=p["sigma"], rho=p["rho"]
+            v0=p["v0"], kappa=p["kappa"], theta=p["theta"], sigma=p["sigma"], rho=p["rho"]
         )
         strike = 90.0
 
         ql_price = quantlib_heston_price(
-            p["spot"], strike, p["rate"], p["dividend"], p["time"],
-            p["v0"], p["kappa"], p["theta"], p["sigma"], p["rho"], "call"
+            p["spot"],
+            strike,
+            p["rate"],
+            p["dividend"],
+            p["time"],
+            p["v0"],
+            p["kappa"],
+            p["theta"],
+            p["sigma"],
+            p["rho"],
+            "call",
         )
         cos_price = heston_price_cos(
-            p["spot"], strike, p["rate"], p["dividend"], p["time"],
-            params, OptionType.CALL
+            p["spot"], strike, p["rate"], p["dividend"], p["time"], params, OptionType.CALL
         )
 
         rel_error = abs(cos_price - ql_price) / ql_price
@@ -173,18 +184,25 @@ class TestHestonCOSvsQuantLib:
         """OTM call (K=110) should match QuantLib."""
         p = standard_params
         params = HestonParams(
-            v0=p["v0"], kappa=p["kappa"], theta=p["theta"],
-            sigma=p["sigma"], rho=p["rho"]
+            v0=p["v0"], kappa=p["kappa"], theta=p["theta"], sigma=p["sigma"], rho=p["rho"]
         )
         strike = 110.0
 
         ql_price = quantlib_heston_price(
-            p["spot"], strike, p["rate"], p["dividend"], p["time"],
-            p["v0"], p["kappa"], p["theta"], p["sigma"], p["rho"], "call"
+            p["spot"],
+            strike,
+            p["rate"],
+            p["dividend"],
+            p["time"],
+            p["v0"],
+            p["kappa"],
+            p["theta"],
+            p["sigma"],
+            p["rho"],
+            "call",
         )
         cos_price = heston_price_cos(
-            p["spot"], strike, p["rate"], p["dividend"], p["time"],
-            params, OptionType.CALL
+            p["spot"], strike, p["rate"], p["dividend"], p["time"], params, OptionType.CALL
         )
 
         rel_error = abs(cos_price - ql_price) / ql_price
@@ -194,17 +212,24 @@ class TestHestonCOSvsQuantLib:
         """ATM put should match QuantLib."""
         p = standard_params
         params = HestonParams(
-            v0=p["v0"], kappa=p["kappa"], theta=p["theta"],
-            sigma=p["sigma"], rho=p["rho"]
+            v0=p["v0"], kappa=p["kappa"], theta=p["theta"], sigma=p["sigma"], rho=p["rho"]
         )
 
         ql_price = quantlib_heston_price(
-            p["spot"], p["spot"], p["rate"], p["dividend"], p["time"],
-            p["v0"], p["kappa"], p["theta"], p["sigma"], p["rho"], "put"
+            p["spot"],
+            p["spot"],
+            p["rate"],
+            p["dividend"],
+            p["time"],
+            p["v0"],
+            p["kappa"],
+            p["theta"],
+            p["sigma"],
+            p["rho"],
+            "put",
         )
         cos_price = heston_price_cos(
-            p["spot"], p["spot"], p["rate"], p["dividend"], p["time"],
-            params, OptionType.PUT
+            p["spot"], p["spot"], p["rate"], p["dividend"], p["time"], params, OptionType.PUT
         )
 
         rel_error = abs(cos_price - ql_price) / ql_price
@@ -214,18 +239,15 @@ class TestHestonCOSvsQuantLib:
         """Put-call parity: C - P = (F - K) * DF."""
         p = standard_params
         params = HestonParams(
-            v0=p["v0"], kappa=p["kappa"], theta=p["theta"],
-            sigma=p["sigma"], rho=p["rho"]
+            v0=p["v0"], kappa=p["kappa"], theta=p["theta"], sigma=p["sigma"], rho=p["rho"]
         )
         strike = p["spot"]
 
         call = heston_price_cos(
-            p["spot"], strike, p["rate"], p["dividend"], p["time"],
-            params, OptionType.CALL
+            p["spot"], strike, p["rate"], p["dividend"], p["time"], params, OptionType.CALL
         )
         put = heston_price_cos(
-            p["spot"], strike, p["rate"], p["dividend"], p["time"],
-            params, OptionType.PUT
+            p["spot"], strike, p["rate"], p["dividend"], p["time"], params, OptionType.PUT
         )
 
         forward = p["spot"] * np.exp((p["rate"] - p["dividend"]) * p["time"])
@@ -239,8 +261,7 @@ class TestHestonCOSvsQuantLib:
         """Test across strike range [80, 120]."""
         p = standard_params
         params = HestonParams(
-            v0=p["v0"], kappa=p["kappa"], theta=p["theta"],
-            sigma=p["sigma"], rho=p["rho"]
+            v0=p["v0"], kappa=p["kappa"], theta=p["theta"], sigma=p["sigma"], rho=p["rho"]
         )
 
         strikes = [80, 90, 95, 100, 105, 110, 120]
@@ -248,12 +269,20 @@ class TestHestonCOSvsQuantLib:
 
         for strike in strikes:
             ql_price = quantlib_heston_price(
-                p["spot"], strike, p["rate"], p["dividend"], p["time"],
-                p["v0"], p["kappa"], p["theta"], p["sigma"], p["rho"], "call"
+                p["spot"],
+                strike,
+                p["rate"],
+                p["dividend"],
+                p["time"],
+                p["v0"],
+                p["kappa"],
+                p["theta"],
+                p["sigma"],
+                p["rho"],
+                "call",
             )
             cos_price = heston_price_cos(
-                p["spot"], strike, p["rate"], p["dividend"], p["time"],
-                params, OptionType.CALL
+                p["spot"], strike, p["rate"], p["dividend"], p["time"], params, OptionType.CALL
             )
             rel_error = abs(cos_price - ql_price) / ql_price
             errors.append(rel_error)
@@ -267,8 +296,7 @@ class TestHestonCOSvsQuantLib:
         """Feller-violated case (sigma=0.6) should still work."""
         p = high_vol_params
         params = HestonParams(
-            v0=p["v0"], kappa=p["kappa"], theta=p["theta"],
-            sigma=p["sigma"], rho=p["rho"]
+            v0=p["v0"], kappa=p["kappa"], theta=p["theta"], sigma=p["sigma"], rho=p["rho"]
         )
 
         assert not params.satisfies_feller(), "Should violate Feller"
@@ -277,12 +305,20 @@ class TestHestonCOSvsQuantLib:
 
         for strike in strikes:
             ql_price = quantlib_heston_price(
-                p["spot"], strike, p["rate"], p["dividend"], p["time"],
-                p["v0"], p["kappa"], p["theta"], p["sigma"], p["rho"], "call"
+                p["spot"],
+                strike,
+                p["rate"],
+                p["dividend"],
+                p["time"],
+                p["v0"],
+                p["kappa"],
+                p["theta"],
+                p["sigma"],
+                p["rho"],
+                "call",
             )
             cos_price = heston_price_cos(
-                p["spot"], strike, p["rate"], p["dividend"], p["time"],
-                params, OptionType.CALL
+                p["spot"], strike, p["rate"], p["dividend"], p["time"], params, OptionType.CALL
             )
 
             # Allow slightly higher tolerance for Feller-violated
@@ -293,18 +329,25 @@ class TestHestonCOSvsQuantLib:
         """Long maturity (T=5) should match QuantLib."""
         p = standard_params
         params = HestonParams(
-            v0=p["v0"], kappa=p["kappa"], theta=p["theta"],
-            sigma=p["sigma"], rho=p["rho"]
+            v0=p["v0"], kappa=p["kappa"], theta=p["theta"], sigma=p["sigma"], rho=p["rho"]
         )
         time = 5.0  # 5 years
 
         ql_price = quantlib_heston_price(
-            p["spot"], p["spot"], p["rate"], p["dividend"], time,
-            p["v0"], p["kappa"], p["theta"], p["sigma"], p["rho"], "call"
+            p["spot"],
+            p["spot"],
+            p["rate"],
+            p["dividend"],
+            time,
+            p["v0"],
+            p["kappa"],
+            p["theta"],
+            p["sigma"],
+            p["rho"],
+            "call",
         )
         cos_price = heston_price_cos(
-            p["spot"], p["spot"], p["rate"], p["dividend"], time,
-            params, OptionType.CALL
+            p["spot"], p["spot"], p["rate"], p["dividend"], time, params, OptionType.CALL
         )
 
         rel_error = abs(cos_price - ql_price) / ql_price
@@ -319,19 +362,26 @@ class TestHestonCOSvsQuantLib:
         """
         p = standard_params
         params = HestonParams(
-            v0=p["v0"], kappa=p["kappa"], theta=p["theta"],
-            sigma=p["sigma"], rho=p["rho"]
+            v0=p["v0"], kappa=p["kappa"], theta=p["theta"], sigma=p["sigma"], rho=p["rho"]
         )
         time = 0.1  # ~1 month
 
         ql_price = quantlib_heston_price(
-            p["spot"], p["spot"], p["rate"], p["dividend"], time,
-            p["v0"], p["kappa"], p["theta"], p["sigma"], p["rho"], "call"
+            p["spot"],
+            p["spot"],
+            p["rate"],
+            p["dividend"],
+            time,
+            p["v0"],
+            p["kappa"],
+            p["theta"],
+            p["sigma"],
+            p["rho"],
+            "call",
         )
 
         cos_price = heston_price_cos(
-            p["spot"], p["spot"], p["rate"], p["dividend"], time,
-            params, OptionType.CALL
+            p["spot"], p["spot"], p["rate"], p["dividend"], time, params, OptionType.CALL
         )
 
         # Allow 1% for short maturities (known COS limitation)
@@ -349,21 +399,35 @@ class TestCOSConvergence:
         """Error should decrease rapidly with N."""
         p = standard_params
         params = HestonParams(
-            v0=p["v0"], kappa=p["kappa"], theta=p["theta"],
-            sigma=p["sigma"], rho=p["rho"]
+            v0=p["v0"], kappa=p["kappa"], theta=p["theta"], sigma=p["sigma"], rho=p["rho"]
         )
 
         ql_ref = quantlib_heston_price(
-            p["spot"], p["spot"], p["rate"], p["dividend"], p["time"],
-            p["v0"], p["kappa"], p["theta"], p["sigma"], p["rho"], "call"
+            p["spot"],
+            p["spot"],
+            p["rate"],
+            p["dividend"],
+            p["time"],
+            p["v0"],
+            p["kappa"],
+            p["theta"],
+            p["sigma"],
+            p["rho"],
+            "call",
         )
 
         errors = {}
         for N in [32, 64, 128, 256, 512]:
             cos_params = COSParams(N=N, L=10.0)
             cos_price = heston_price_cos(
-                p["spot"], p["spot"], p["rate"], p["dividend"], p["time"],
-                params, OptionType.CALL, cos_params=cos_params
+                p["spot"],
+                p["spot"],
+                p["rate"],
+                p["dividend"],
+                p["time"],
+                params,
+                OptionType.CALL,
+                cos_params=cos_params,
             )
             errors[N] = abs(cos_price - ql_ref) / ql_ref
 
@@ -380,8 +444,7 @@ class TestCOSConvergence:
         """N=64 achieves <0.1% error target."""
         p = standard_params
         params = HestonParams(
-            v0=p["v0"], kappa=p["kappa"], theta=p["theta"],
-            sigma=p["sigma"], rho=p["rho"]
+            v0=p["v0"], kappa=p["kappa"], theta=p["theta"], sigma=p["sigma"], rho=p["rho"]
         )
 
         cos_params = COSParams(N=64, L=10.0)
@@ -389,18 +452,31 @@ class TestCOSConvergence:
 
         for strike in strikes:
             ql_price = quantlib_heston_price(
-                p["spot"], strike, p["rate"], p["dividend"], p["time"],
-                p["v0"], p["kappa"], p["theta"], p["sigma"], p["rho"], "call"
+                p["spot"],
+                strike,
+                p["rate"],
+                p["dividend"],
+                p["time"],
+                p["v0"],
+                p["kappa"],
+                p["theta"],
+                p["sigma"],
+                p["rho"],
+                "call",
             )
             cos_price = heston_price_cos(
-                p["spot"], strike, p["rate"], p["dividend"], p["time"],
-                params, OptionType.CALL, cos_params=cos_params
+                p["spot"],
+                strike,
+                p["rate"],
+                p["dividend"],
+                p["time"],
+                params,
+                OptionType.CALL,
+                cos_params=cos_params,
             )
 
             rel_error = abs(cos_price - ql_price) / ql_price
-            assert rel_error < 0.001, (
-                f"N=64 error {rel_error:.6f} > 0.1% at K={strike}"
-            )
+            assert rel_error < 0.001, f"N=64 error {rel_error:.6f} > 0.1% at K={strike}"
 
 
 class TestUnifiedInterface:
@@ -410,44 +486,52 @@ class TestUnifiedInterface:
         """Default method should be COS."""
         p = standard_params
         params = HestonParams(
-            v0=p["v0"], kappa=p["kappa"], theta=p["theta"],
-            sigma=p["sigma"], rho=p["rho"]
+            v0=p["v0"], kappa=p["kappa"], theta=p["theta"], sigma=p["sigma"], rho=p["rho"]
         )
 
         # Unified interface (should use COS)
         price_unified = heston_price(
-            p["spot"], p["spot"], p["rate"], p["dividend"], p["time"],
-            params, OptionType.CALL
+            p["spot"], p["spot"], p["rate"], p["dividend"], p["time"], params, OptionType.CALL
         )
 
         # Explicit COS
         price_cos = heston_price_cos(
-            p["spot"], p["spot"], p["rate"], p["dividend"], p["time"],
-            params, OptionType.CALL
+            p["spot"], p["spot"], p["rate"], p["dividend"], p["time"], params, OptionType.CALL
         )
 
-        assert abs(price_unified - price_cos) < 1e-10, (
-            "Unified should match COS"
-        )
+        assert abs(price_unified - price_cos) < 1e-10, "Unified should match COS"
 
     def test_method_selection(self, standard_params):
         """Can select different methods explicitly."""
         p = standard_params
         params = HestonParams(
-            v0=p["v0"], kappa=p["kappa"], theta=p["theta"],
-            sigma=p["sigma"], rho=p["rho"]
+            v0=p["v0"], kappa=p["kappa"], theta=p["theta"], sigma=p["sigma"], rho=p["rho"]
         )
 
         # COS method
         price_cos = heston_price(
-            p["spot"], p["spot"], p["rate"], p["dividend"], p["time"],
-            params, OptionType.CALL, method="cos"
+            p["spot"],
+            p["spot"],
+            p["rate"],
+            p["dividend"],
+            p["time"],
+            params,
+            OptionType.CALL,
+            method="cos",
         )
 
         # MC method (with seed for reproducibility)
         price_mc = heston_price(
-            p["spot"], p["spot"], p["rate"], p["dividend"], p["time"],
-            params, OptionType.CALL, method="mc", paths=10000, seed=42
+            p["spot"],
+            p["spot"],
+            p["rate"],
+            p["dividend"],
+            p["time"],
+            params,
+            OptionType.CALL,
+            method="mc",
+            paths=10000,
+            seed=42,
         )
 
         # Both should be reasonable

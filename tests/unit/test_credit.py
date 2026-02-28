@@ -50,9 +50,22 @@ class TestAMBestRating:
     def test_all_ratings_defined(self):
         """All expected AM Best ratings are in the enum."""
         expected = [
-            "A++", "A+", "A", "A-", "B++", "B+",
-            "B", "B-", "C++", "C+", "C", "C-",
-            "D", "E", "F", "S"
+            "A++",
+            "A+",
+            "A",
+            "A-",
+            "B++",
+            "B+",
+            "B",
+            "B-",
+            "C++",
+            "C+",
+            "C",
+            "C-",
+            "D",
+            "E",
+            "F",
+            "S",
         ]
         for rating_str in expected:
             rating = rating_from_string(rating_str)
@@ -273,15 +286,11 @@ class TestCoverageCalculations:
     def test_different_coverage_types(self):
         """Different coverage types have different limits."""
         # Annuity payout has $300k limit in TX
-        payout_covered = calculate_covered_amount(
-            400_000, "TX", CoverageType.ANNUITY_PAYOUT
-        )
+        payout_covered = calculate_covered_amount(400_000, "TX", CoverageType.ANNUITY_PAYOUT)
         assert payout_covered == 300_000
 
         # Group annuity has $5M limit
-        group_covered = calculate_covered_amount(
-            3_000_000, "TX", CoverageType.GROUP_ANNUITY
-        )
+        group_covered = calculate_covered_amount(3_000_000, "TX", CoverageType.GROUP_ANNUITY)
         assert group_covered == 3_000_000
 
 

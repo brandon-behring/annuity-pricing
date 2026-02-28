@@ -80,6 +80,7 @@ def calculate_hedge_effectiveness(
 # Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def market_env() -> MarketEnvironment:
     """Standard market environment for hedge tests."""
@@ -130,6 +131,7 @@ def golden_data() -> dict:
 # Delta Hedge Effectiveness Tests
 # =============================================================================
 
+
 @pytest.mark.integration
 class TestDeltaHedgeEffectiveness:
     """
@@ -154,12 +156,8 @@ class TestDeltaHedgeEffectiveness:
         shock_pct = 0.01  # 1% spot shock
 
         # Base pricing
-        base_registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=n_paths, seed=42
-        )
-        base_result = base_registry.price(
-            fia_product, term_years=1.0, premium=100_000.0
-        )
+        base_registry = ProductRegistry(market_env=market_env, n_mc_paths=n_paths, seed=42)
+        base_result = base_registry.price(fia_product, term_years=1.0, premium=100_000.0)
 
         # Shocked market (spot up)
         shocked_market = MarketEnvironment(
@@ -169,17 +167,11 @@ class TestDeltaHedgeEffectiveness:
             volatility=market_env.volatility,
             option_budget_pct=market_env.option_budget_pct,
         )
-        shocked_registry = ProductRegistry(
-            market_env=shocked_market, n_mc_paths=n_paths, seed=42
-        )
-        shocked_result = shocked_registry.price(
-            fia_product, term_years=1.0, premium=100_000.0
-        )
+        shocked_registry = ProductRegistry(market_env=shocked_market, n_mc_paths=n_paths, seed=42)
+        shocked_result = shocked_registry.price(fia_product, term_years=1.0, premium=100_000.0)
 
         # Unhedged P&L
-        unhedged_pnl = (
-            shocked_result.embedded_option_value - base_result.embedded_option_value
-        )
+        unhedged_pnl = shocked_result.embedded_option_value - base_result.embedded_option_value
 
         # Delta estimate via finite difference
         spot_change = market_env.spot * shock_pct
@@ -211,12 +203,8 @@ class TestDeltaHedgeEffectiveness:
         shock_pct = 0.01
 
         # Base pricing
-        base_registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=n_paths, seed=42
-        )
-        base_result = base_registry.price(
-            rila_product, term_years=1.0, premium=100_000.0
-        )
+        base_registry = ProductRegistry(market_env=market_env, n_mc_paths=n_paths, seed=42)
+        base_result = base_registry.price(rila_product, term_years=1.0, premium=100_000.0)
 
         # Shocked market
         shocked_market = MarketEnvironment(
@@ -226,12 +214,8 @@ class TestDeltaHedgeEffectiveness:
             volatility=market_env.volatility,
             option_budget_pct=market_env.option_budget_pct,
         )
-        shocked_registry = ProductRegistry(
-            market_env=shocked_market, n_mc_paths=n_paths, seed=42
-        )
-        shocked_result = shocked_registry.price(
-            rila_product, term_years=1.0, premium=100_000.0
-        )
+        shocked_registry = ProductRegistry(market_env=shocked_market, n_mc_paths=n_paths, seed=42)
+        shocked_result = shocked_registry.price(rila_product, term_years=1.0, premium=100_000.0)
 
         # Unhedged P&L on protection value
         unhedged_pnl = shocked_result.protection_value - base_result.protection_value
@@ -256,6 +240,7 @@ class TestDeltaHedgeEffectiveness:
 # Vega Hedge Effectiveness Tests
 # =============================================================================
 
+
 @pytest.mark.integration
 class TestVegaHedgeEffectiveness:
     """
@@ -278,12 +263,8 @@ class TestVegaHedgeEffectiveness:
         vol_shock = 0.01  # 1% absolute vol change
 
         # Base pricing
-        base_registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=n_paths, seed=42
-        )
-        base_result = base_registry.price(
-            fia_product, term_years=1.0, premium=100_000.0
-        )
+        base_registry = ProductRegistry(market_env=market_env, n_mc_paths=n_paths, seed=42)
+        base_result = base_registry.price(fia_product, term_years=1.0, premium=100_000.0)
 
         # Shocked market (vol up)
         shocked_market = MarketEnvironment(
@@ -293,17 +274,11 @@ class TestVegaHedgeEffectiveness:
             volatility=market_env.volatility + vol_shock,
             option_budget_pct=market_env.option_budget_pct,
         )
-        shocked_registry = ProductRegistry(
-            market_env=shocked_market, n_mc_paths=n_paths, seed=42
-        )
-        shocked_result = shocked_registry.price(
-            fia_product, term_years=1.0, premium=100_000.0
-        )
+        shocked_registry = ProductRegistry(market_env=shocked_market, n_mc_paths=n_paths, seed=42)
+        shocked_result = shocked_registry.price(fia_product, term_years=1.0, premium=100_000.0)
 
         # Unhedged P&L
-        unhedged_pnl = (
-            shocked_result.embedded_option_value - base_result.embedded_option_value
-        )
+        unhedged_pnl = shocked_result.embedded_option_value - base_result.embedded_option_value
 
         # Vega estimate
         vega_estimate = unhedged_pnl / vol_shock
@@ -330,12 +305,8 @@ class TestVegaHedgeEffectiveness:
         n_paths = 50_000
         vol_shock = 0.01
 
-        base_registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=n_paths, seed=42
-        )
-        base_result = base_registry.price(
-            rila_product, term_years=1.0, premium=100_000.0
-        )
+        base_registry = ProductRegistry(market_env=market_env, n_mc_paths=n_paths, seed=42)
+        base_result = base_registry.price(rila_product, term_years=1.0, premium=100_000.0)
 
         shocked_market = MarketEnvironment(
             risk_free_rate=market_env.risk_free_rate,
@@ -344,12 +315,8 @@ class TestVegaHedgeEffectiveness:
             volatility=market_env.volatility + vol_shock,
             option_budget_pct=market_env.option_budget_pct,
         )
-        shocked_registry = ProductRegistry(
-            market_env=shocked_market, n_mc_paths=n_paths, seed=42
-        )
-        shocked_result = shocked_registry.price(
-            rila_product, term_years=1.0, premium=100_000.0
-        )
+        shocked_registry = ProductRegistry(market_env=shocked_market, n_mc_paths=n_paths, seed=42)
+        shocked_result = shocked_registry.price(rila_product, term_years=1.0, premium=100_000.0)
 
         unhedged_pnl = shocked_result.protection_value - base_result.protection_value
         vega_estimate = unhedged_pnl / vol_shock
@@ -365,6 +332,7 @@ class TestVegaHedgeEffectiveness:
 # =============================================================================
 # Combined Delta-Vega Hedge Tests
 # =============================================================================
+
 
 @pytest.mark.integration
 class TestCombinedHedgeEffectiveness:
@@ -389,12 +357,8 @@ class TestCombinedHedgeEffectiveness:
         vol_shock = 0.01
 
         # Base pricing
-        base_registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=n_paths, seed=42
-        )
-        base_result = base_registry.price(
-            fia_product, term_years=1.0, premium=100_000.0
-        )
+        base_registry = ProductRegistry(market_env=market_env, n_mc_paths=n_paths, seed=42)
+        base_result = base_registry.price(fia_product, term_years=1.0, premium=100_000.0)
 
         # Estimate delta (spot bump only)
         spot_up_market = MarketEnvironment(
@@ -404,15 +368,9 @@ class TestCombinedHedgeEffectiveness:
             volatility=market_env.volatility,
             option_budget_pct=market_env.option_budget_pct,
         )
-        spot_up_registry = ProductRegistry(
-            market_env=spot_up_market, n_mc_paths=n_paths, seed=42
-        )
-        spot_up_result = spot_up_registry.price(
-            fia_product, term_years=1.0, premium=100_000.0
-        )
-        delta_pnl = (
-            spot_up_result.embedded_option_value - base_result.embedded_option_value
-        )
+        spot_up_registry = ProductRegistry(market_env=spot_up_market, n_mc_paths=n_paths, seed=42)
+        spot_up_result = spot_up_registry.price(fia_product, term_years=1.0, premium=100_000.0)
+        delta_pnl = spot_up_result.embedded_option_value - base_result.embedded_option_value
         spot_change = market_env.spot * spot_shock_pct
         delta_estimate = delta_pnl / spot_change
 
@@ -424,15 +382,9 @@ class TestCombinedHedgeEffectiveness:
             volatility=market_env.volatility + vol_shock,
             option_budget_pct=market_env.option_budget_pct,
         )
-        vol_up_registry = ProductRegistry(
-            market_env=vol_up_market, n_mc_paths=n_paths, seed=42
-        )
-        vol_up_result = vol_up_registry.price(
-            fia_product, term_years=1.0, premium=100_000.0
-        )
-        vega_pnl = (
-            vol_up_result.embedded_option_value - base_result.embedded_option_value
-        )
+        vol_up_registry = ProductRegistry(market_env=vol_up_market, n_mc_paths=n_paths, seed=42)
+        vol_up_result = vol_up_registry.price(fia_product, term_years=1.0, premium=100_000.0)
+        vega_pnl = vol_up_result.embedded_option_value - base_result.embedded_option_value
         vega_estimate = vega_pnl / vol_shock
 
         # Combined shock scenario
@@ -443,17 +395,11 @@ class TestCombinedHedgeEffectiveness:
             volatility=market_env.volatility + vol_shock,
             option_budget_pct=market_env.option_budget_pct,
         )
-        combined_registry = ProductRegistry(
-            market_env=combined_market, n_mc_paths=n_paths, seed=42
-        )
-        combined_result = combined_registry.price(
-            fia_product, term_years=1.0, premium=100_000.0
-        )
+        combined_registry = ProductRegistry(market_env=combined_market, n_mc_paths=n_paths, seed=42)
+        combined_result = combined_registry.price(fia_product, term_years=1.0, premium=100_000.0)
 
         # Unhedged P&L under combined shock
-        unhedged_pnl = (
-            combined_result.embedded_option_value - base_result.embedded_option_value
-        )
+        unhedged_pnl = combined_result.embedded_option_value - base_result.embedded_option_value
 
         # Hedged P&L: subtract delta and vega hedge gains
         delta_hedge_gain = delta_estimate * spot_change
@@ -474,6 +420,7 @@ class TestCombinedHedgeEffectiveness:
 # =============================================================================
 # Gamma P&L Attribution Tests
 # =============================================================================
+
 
 @pytest.mark.integration
 class TestGammaPnLAttribution:
@@ -497,12 +444,8 @@ class TestGammaPnLAttribution:
         large_shock_pct = 0.05  # 5% spot move
 
         # Base pricing
-        base_registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=n_paths, seed=42
-        )
-        base_result = base_registry.price(
-            fia_product, term_years=1.0, premium=100_000.0
-        )
+        base_registry = ProductRegistry(market_env=market_env, n_mc_paths=n_paths, seed=42)
+        base_result = base_registry.price(fia_product, term_years=1.0, premium=100_000.0)
 
         # Price at three spot levels for gamma estimation
         spots = [
@@ -527,9 +470,7 @@ class TestGammaPnLAttribution:
         # Finite difference delta and gamma estimates
         h = market_env.spot * 0.01
         delta_estimate = (option_values[2] - option_values[0]) / (2 * h)
-        gamma_estimate = (option_values[2] - 2 * option_values[1] + option_values[0]) / (
-            h**2
-        )
+        gamma_estimate = (option_values[2] - 2 * option_values[1] + option_values[0]) / (h**2)
 
         # Large shock scenario
         large_shocked_market = MarketEnvironment(
@@ -547,16 +488,12 @@ class TestGammaPnLAttribution:
         )
 
         # Actual P&L
-        actual_pnl = (
-            large_shocked_result.embedded_option_value
-            - base_result.embedded_option_value
-        )
+        actual_pnl = large_shocked_result.embedded_option_value - base_result.embedded_option_value
 
         # Taylor expansion P&L: Delta * ΔS + 0.5 * Gamma * (ΔS)²
         large_spot_change = market_env.spot * large_shock_pct
         taylor_pnl = (
-            delta_estimate * large_spot_change
-            + 0.5 * gamma_estimate * large_spot_change**2
+            delta_estimate * large_spot_change + 0.5 * gamma_estimate * large_spot_change**2
         )
 
         # Taylor approximation should be within 30% of actual for 5% move
@@ -572,6 +509,7 @@ class TestGammaPnLAttribution:
 # =============================================================================
 # Parametrized Shock Scenario Tests
 # =============================================================================
+
 
 @pytest.mark.integration
 class TestHedgeEffectivenessAcrossShocks:
@@ -597,12 +535,8 @@ class TestHedgeEffectivenessAcrossShocks:
         n_paths = 30_000  # Fewer paths for parametrized tests
 
         # Base pricing
-        base_registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=n_paths, seed=42
-        )
-        base_result = base_registry.price(
-            fia_product, term_years=1.0, premium=100_000.0
-        )
+        base_registry = ProductRegistry(market_env=market_env, n_mc_paths=n_paths, seed=42)
+        base_result = base_registry.price(fia_product, term_years=1.0, premium=100_000.0)
 
         # Estimate delta via small bump
         small_bump_market = MarketEnvironment(
@@ -630,17 +564,11 @@ class TestHedgeEffectivenessAcrossShocks:
             volatility=market_env.volatility,
             option_budget_pct=market_env.option_budget_pct,
         )
-        shocked_registry = ProductRegistry(
-            market_env=shocked_market, n_mc_paths=n_paths, seed=42
-        )
-        shocked_result = shocked_registry.price(
-            fia_product, term_years=1.0, premium=100_000.0
-        )
+        shocked_registry = ProductRegistry(market_env=shocked_market, n_mc_paths=n_paths, seed=42)
+        shocked_result = shocked_registry.price(fia_product, term_years=1.0, premium=100_000.0)
 
         # P&L calculation
-        unhedged_pnl = (
-            shocked_result.embedded_option_value - base_result.embedded_option_value
-        )
+        unhedged_pnl = shocked_result.embedded_option_value - base_result.embedded_option_value
         spot_change = market_env.spot * spot_shock_pct
         hedged_pnl = unhedged_pnl - delta_estimate * spot_change
 
@@ -675,12 +603,8 @@ class TestHedgeEffectivenessAcrossShocks:
         n_paths = 30_000
 
         # Base pricing
-        base_registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=n_paths, seed=42
-        )
-        base_result = base_registry.price(
-            fia_product, term_years=1.0, premium=100_000.0
-        )
+        base_registry = ProductRegistry(market_env=market_env, n_mc_paths=n_paths, seed=42)
+        base_result = base_registry.price(fia_product, term_years=1.0, premium=100_000.0)
 
         # Estimate vega via small bump
         small_bump_market = MarketEnvironment(
@@ -708,17 +632,11 @@ class TestHedgeEffectivenessAcrossShocks:
             volatility=market_env.volatility + vol_shock_pct,
             option_budget_pct=market_env.option_budget_pct,
         )
-        shocked_registry = ProductRegistry(
-            market_env=shocked_market, n_mc_paths=n_paths, seed=42
-        )
-        shocked_result = shocked_registry.price(
-            fia_product, term_years=1.0, premium=100_000.0
-        )
+        shocked_registry = ProductRegistry(market_env=shocked_market, n_mc_paths=n_paths, seed=42)
+        shocked_result = shocked_registry.price(fia_product, term_years=1.0, premium=100_000.0)
 
         # P&L calculation
-        unhedged_pnl = (
-            shocked_result.embedded_option_value - base_result.embedded_option_value
-        )
+        unhedged_pnl = shocked_result.embedded_option_value - base_result.embedded_option_value
         hedged_pnl = unhedged_pnl - vega_estimate * vol_shock_pct
 
         # Skip if P&L is negligible
@@ -739,6 +657,7 @@ class TestHedgeEffectivenessAcrossShocks:
 # =============================================================================
 # Golden Baseline Tests
 # =============================================================================
+
 
 @pytest.mark.integration
 class TestHedgeEffectivenessGoldenBaselines:
@@ -775,12 +694,8 @@ class TestHedgeEffectivenessGoldenBaselines:
         n_paths = 50_000
         spot_shock_pct = scenario["spot_shock_pct"] / 100.0  # Convert from % to decimal
 
-        base_registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=n_paths, seed=42
-        )
-        base_result = base_registry.price(
-            fia_product, term_years=1.0, premium=100_000.0
-        )
+        base_registry = ProductRegistry(market_env=market_env, n_mc_paths=n_paths, seed=42)
+        base_result = base_registry.price(fia_product, term_years=1.0, premium=100_000.0)
 
         shocked_market = MarketEnvironment(
             risk_free_rate=market_env.risk_free_rate,
@@ -789,16 +704,10 @@ class TestHedgeEffectivenessGoldenBaselines:
             volatility=market_env.volatility,
             option_budget_pct=market_env.option_budget_pct,
         )
-        shocked_registry = ProductRegistry(
-            market_env=shocked_market, n_mc_paths=n_paths, seed=42
-        )
-        shocked_result = shocked_registry.price(
-            fia_product, term_years=1.0, premium=100_000.0
-        )
+        shocked_registry = ProductRegistry(market_env=shocked_market, n_mc_paths=n_paths, seed=42)
+        shocked_result = shocked_registry.price(fia_product, term_years=1.0, premium=100_000.0)
 
-        unhedged_pnl = (
-            shocked_result.embedded_option_value - base_result.embedded_option_value
-        )
+        unhedged_pnl = shocked_result.embedded_option_value - base_result.embedded_option_value
         spot_change = market_env.spot * spot_shock_pct
         delta_estimate = unhedged_pnl / spot_change
         hedged_pnl = unhedged_pnl - delta_estimate * spot_change
@@ -833,12 +742,8 @@ class TestHedgeEffectivenessGoldenBaselines:
         n_paths = 50_000
         spot_shock_pct = scenario["spot_shock_pct"] / 100.0
 
-        base_registry = ProductRegistry(
-            market_env=market_env, n_mc_paths=n_paths, seed=42
-        )
-        base_result = base_registry.price(
-            rila_product, term_years=1.0, premium=100_000.0
-        )
+        base_registry = ProductRegistry(market_env=market_env, n_mc_paths=n_paths, seed=42)
+        base_result = base_registry.price(rila_product, term_years=1.0, premium=100_000.0)
 
         shocked_market = MarketEnvironment(
             risk_free_rate=market_env.risk_free_rate,
@@ -847,12 +752,8 @@ class TestHedgeEffectivenessGoldenBaselines:
             volatility=market_env.volatility,
             option_budget_pct=market_env.option_budget_pct,
         )
-        shocked_registry = ProductRegistry(
-            market_env=shocked_market, n_mc_paths=n_paths, seed=42
-        )
-        shocked_result = shocked_registry.price(
-            rila_product, term_years=1.0, premium=100_000.0
-        )
+        shocked_registry = ProductRegistry(market_env=shocked_market, n_mc_paths=n_paths, seed=42)
+        shocked_result = shocked_registry.price(rila_product, term_years=1.0, premium=100_000.0)
 
         unhedged_pnl = shocked_result.protection_value - base_result.protection_value
         spot_change = market_env.spot * spot_shock_pct

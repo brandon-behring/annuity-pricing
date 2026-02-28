@@ -383,9 +383,7 @@ class TestGreeksAcrossVolatilities:
     @pytest.mark.validation
     @pytest.mark.parametrize("volatility", [0.10, 0.20, 0.30, 0.40, 0.50])
     @pytest.mark.parametrize("option_type", ["call", "put"])
-    def test_all_greeks_across_volatilities(
-        self, quantlib_adapter, volatility, option_type
-    ):
+    def test_all_greeks_across_volatilities(self, quantlib_adapter, volatility, option_type):
         """[T1] All Greeks match QuantLib across volatility spectrum."""
         spot = 100.0
         strike = 100.0
@@ -444,9 +442,7 @@ class TestGreeksAcrossTerms:
     @pytest.mark.validation
     @pytest.mark.parametrize("time_to_expiry", [0.25, 0.5, 1.0, 2.0, 3.0])
     @pytest.mark.parametrize("option_type", ["call", "put"])
-    def test_all_greeks_across_terms(
-        self, quantlib_adapter, time_to_expiry, option_type
-    ):
+    def test_all_greeks_across_terms(self, quantlib_adapter, time_to_expiry, option_type):
         """[T1] All Greeks match QuantLib across time horizons."""
         spot = 100.0
         strike = 100.0
@@ -638,6 +634,4 @@ class TestRILAPositionGreeks:
         # Floor (long OTM put) should have negative delta
         assert floor_greeks["delta"] < 0, "Floor (long OTM put) should have negative delta"
         # OTM put delta magnitude should be less than 0.5
-        assert abs(floor_greeks["delta"]) < 0.5, (
-            "OTM put delta magnitude should be less than 0.5"
-        )
+        assert abs(floor_greeks["delta"]) < 0.5, "OTM put delta magnitude should be less than 0.5"

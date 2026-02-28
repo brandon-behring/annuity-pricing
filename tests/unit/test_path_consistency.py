@@ -123,11 +123,11 @@ class TestTerminalVsFullPath:
         payoffs_full = np.maximum(full_path.terminal_values - strike, 0)
 
         # Mean payoffs should be similar
-        rel_diff = abs(payoffs_terminal.mean() - payoffs_full.mean()) / (payoffs_terminal.mean() + 1e-10)
-
-        assert rel_diff < PAYOFF_TOLERANCE, (
-            f"Call payoff means differ by {rel_diff:.1%}"
+        rel_diff = abs(payoffs_terminal.mean() - payoffs_full.mean()) / (
+            payoffs_terminal.mean() + 1e-10
         )
+
+        assert rel_diff < PAYOFF_TOLERANCE, f"Call payoff means differ by {rel_diff:.1%}"
 
     def test_put_payoff_same_distribution(self, standard_params):
         """
@@ -152,7 +152,9 @@ class TestTerminalVsFullPath:
         )
         payoffs_full = np.maximum(strike - full_path.terminal_values, 0)
 
-        rel_diff = abs(payoffs_terminal.mean() - payoffs_full.mean()) / (payoffs_terminal.mean() + 1e-10)
+        rel_diff = abs(payoffs_terminal.mean() - payoffs_full.mean()) / (
+            payoffs_terminal.mean() + 1e-10
+        )
 
         assert rel_diff < PAYOFF_TOLERANCE
 
@@ -404,9 +406,8 @@ class TestAntitheticConsistency:
         products = first_half * second_half
 
         # Expected product: S_0^2 * exp(2*(r-q-σ²/2)*T)
-        expected_product = (
-            standard_params.spot**2
-            * np.exp(2 * standard_params.drift * standard_params.time_to_expiry)
+        expected_product = standard_params.spot**2 * np.exp(
+            2 * standard_params.drift * standard_params.time_to_expiry
         )
 
         mean_product = products.mean()
@@ -477,8 +478,7 @@ class TestMCEnginePathConsistency:
 
         # Should be identical (same RNG, same calculation)
         assert abs(engine_result.price - manual_price) < 0.01, (
-            f"Engine price {engine_result.price:.4f} differs from "
-            f"manual {manual_price:.4f}"
+            f"Engine price {engine_result.price:.4f} differs from manual {manual_price:.4f}"
         )
 
     def test_capped_call_consistent(self, standard_params):

@@ -158,9 +158,7 @@ class GLWBPricer(BasePricer):
 
         # Convert GLWBProduct to GWBConfig
         rollup_type = (
-            RollupType.COMPOUND
-            if product.rollup_type == "compound"
-            else RollupType.SIMPLE
+            RollupType.COMPOUND if product.rollup_type == "compound" else RollupType.SIMPLE
         )
 
         gwb_config = GWBConfig(

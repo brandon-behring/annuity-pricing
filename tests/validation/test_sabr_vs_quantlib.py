@@ -20,6 +20,7 @@ import pytest
 # Check if QuantLib is available
 try:
     import QuantLib as ql
+
     QUANTLIB_AVAILABLE = True
 except ImportError:
     QUANTLIB_AVAILABLE = False
@@ -75,9 +76,9 @@ class TestSABRvsQuantLib:
 
     # SABR parameters
     ALPHA = 0.2  # ~20% ATM vol
-    BETA = 0.5   # Square-root backbone (typical for rates)
-    RHO = -0.3   # Negative correlation (typical for equities)
-    NU = 0.4     # Vol of vol
+    BETA = 0.5  # Square-root backbone (typical for rates)
+    RHO = -0.3  # Negative correlation (typical for equities)
+    NU = 0.4  # Vol of vol
 
     # Analytical tolerance (should be very tight)
     TOLERANCE = 0.01  # 1%
@@ -88,8 +89,7 @@ class TestSABRvsQuantLib:
 
         # QuantLib reference
         ql_vol = quantlib_sabr_implied_vol(
-            self.FORWARD, strike, self.TIME,
-            self.ALPHA, self.BETA, self.RHO, self.NU
+            self.FORWARD, strike, self.TIME, self.ALPHA, self.BETA, self.RHO, self.NU
         )
 
         try:
@@ -112,19 +112,17 @@ class TestSABRvsQuantLib:
         rel_error = abs(our_vol - ql_vol) / ql_vol
 
         assert rel_error < self.TOLERANCE, (
-            f"ATM: our={our_vol:.6f}, QL={ql_vol:.6f}, "
-            f"error={rel_error*100:.4f}%"
+            f"ATM: our={our_vol:.6f}, QL={ql_vol:.6f}, error={rel_error * 100:.4f}%"
         )
 
-        print(f"ATM: our={our_vol:.6f}, QL={ql_vol:.6f}, error={rel_error*100:.4f}%")
+        print(f"ATM: our={our_vol:.6f}, QL={ql_vol:.6f}, error={rel_error * 100:.4f}%")
 
     def test_itm(self):
         """ITM implied volatility validation (K < F)."""
         strike = 90.0
 
         ql_vol = quantlib_sabr_implied_vol(
-            self.FORWARD, strike, self.TIME,
-            self.ALPHA, self.BETA, self.RHO, self.NU
+            self.FORWARD, strike, self.TIME, self.ALPHA, self.BETA, self.RHO, self.NU
         )
 
         try:
@@ -135,28 +133,24 @@ class TestSABRvsQuantLib:
         except ImportError:
             pytest.skip("SABR module not available")
 
-        params = SABRParams(
-            alpha=self.ALPHA, beta=self.BETA, rho=self.RHO, nu=self.NU
-        )
+        params = SABRParams(alpha=self.ALPHA, beta=self.BETA, rho=self.RHO, nu=self.NU)
 
         our_vol = sabr_implied_volatility(self.FORWARD, strike, self.TIME, params)
 
         rel_error = abs(our_vol - ql_vol) / ql_vol
 
         assert rel_error < self.TOLERANCE, (
-            f"ITM: our={our_vol:.6f}, QL={ql_vol:.6f}, "
-            f"error={rel_error*100:.4f}%"
+            f"ITM: our={our_vol:.6f}, QL={ql_vol:.6f}, error={rel_error * 100:.4f}%"
         )
 
-        print(f"ITM: our={our_vol:.6f}, QL={ql_vol:.6f}, error={rel_error*100:.4f}%")
+        print(f"ITM: our={our_vol:.6f}, QL={ql_vol:.6f}, error={rel_error * 100:.4f}%")
 
     def test_otm(self):
         """OTM implied volatility validation (K > F)."""
         strike = 110.0
 
         ql_vol = quantlib_sabr_implied_vol(
-            self.FORWARD, strike, self.TIME,
-            self.ALPHA, self.BETA, self.RHO, self.NU
+            self.FORWARD, strike, self.TIME, self.ALPHA, self.BETA, self.RHO, self.NU
         )
 
         try:
@@ -167,20 +161,17 @@ class TestSABRvsQuantLib:
         except ImportError:
             pytest.skip("SABR module not available")
 
-        params = SABRParams(
-            alpha=self.ALPHA, beta=self.BETA, rho=self.RHO, nu=self.NU
-        )
+        params = SABRParams(alpha=self.ALPHA, beta=self.BETA, rho=self.RHO, nu=self.NU)
 
         our_vol = sabr_implied_volatility(self.FORWARD, strike, self.TIME, params)
 
         rel_error = abs(our_vol - ql_vol) / ql_vol
 
         assert rel_error < self.TOLERANCE, (
-            f"OTM: our={our_vol:.6f}, QL={ql_vol:.6f}, "
-            f"error={rel_error*100:.4f}%"
+            f"OTM: our={our_vol:.6f}, QL={ql_vol:.6f}, error={rel_error * 100:.4f}%"
         )
 
-        print(f"OTM: our={our_vol:.6f}, QL={ql_vol:.6f}, error={rel_error*100:.4f}%")
+        print(f"OTM: our={our_vol:.6f}, QL={ql_vol:.6f}, error={rel_error * 100:.4f}%")
 
     def test_multiple_strikes(self):
         """
@@ -198,15 +189,12 @@ class TestSABRvsQuantLib:
         except ImportError:
             pytest.skip("SABR module not available")
 
-        params = SABRParams(
-            alpha=self.ALPHA, beta=self.BETA, rho=self.RHO, nu=self.NU
-        )
+        params = SABRParams(alpha=self.ALPHA, beta=self.BETA, rho=self.RHO, nu=self.NU)
 
         results = []
         for strike in strikes:
             ql_vol = quantlib_sabr_implied_vol(
-                self.FORWARD, strike, self.TIME,
-                self.ALPHA, self.BETA, self.RHO, self.NU
+                self.FORWARD, strike, self.TIME, self.ALPHA, self.BETA, self.RHO, self.NU
             )
 
             our_vol = sabr_implied_volatility(self.FORWARD, strike, self.TIME, params)
@@ -223,12 +211,12 @@ class TestSABRvsQuantLib:
             status = "✓" if err < self.TOLERANCE else "✗"
             # Approximate delta (rough)
             delta = 0.5 if strike == self.FORWARD else (0.8 if strike < self.FORWARD else 0.2)
-            print(f"{strike:>8} {our:>12.6f} {ql:>12.6f} {err*100:>9.4f}% {status}")
+            print(f"{strike:>8} {our:>12.6f} {ql:>12.6f} {err * 100:>9.4f}% {status}")
 
         # All should pass
         max_error = max(r[3] for r in results)
         assert max_error < self.TOLERANCE, (
-            f"Max error {max_error*100:.4f}% exceeds tolerance {self.TOLERANCE*100}%"
+            f"Max error {max_error * 100:.4f}% exceeds tolerance {self.TOLERANCE * 100}%"
         )
 
     def test_beta_lognormal(self):
@@ -262,7 +250,7 @@ class TestSABRvsQuantLib:
             )
             our_vol = sabr_implied_volatility(self.FORWARD, strike, self.TIME, params)
             rel_error = abs(our_vol - ql_vol) / ql_vol
-            print(f"K={strike}: our={our_vol:.6f}, QL={ql_vol:.6f}, error={rel_error*100:.4f}%")
+            print(f"K={strike}: our={our_vol:.6f}, QL={ql_vol:.6f}, error={rel_error * 100:.4f}%")
 
             assert rel_error < self.TOLERANCE, f"β=1, K={strike} failed"
 
@@ -330,20 +318,17 @@ class TestSABRvsQuantLib:
         except ImportError:
             pytest.skip("SABR module not available")
 
-        params = SABRParams(
-            alpha=self.ALPHA, beta=self.BETA, rho=self.RHO, nu=self.NU
-        )
+        params = SABRParams(alpha=self.ALPHA, beta=self.BETA, rho=self.RHO, nu=self.NU)
 
         print("\nShort Expiry (T=0.1) Test:")
         print("-" * 60)
         for strike in strikes:
             ql_vol = quantlib_sabr_implied_vol(
-                self.FORWARD, strike, time,
-                self.ALPHA, self.BETA, self.RHO, self.NU
+                self.FORWARD, strike, time, self.ALPHA, self.BETA, self.RHO, self.NU
             )
             our_vol = sabr_implied_volatility(self.FORWARD, strike, time, params)
             rel_error = abs(our_vol - ql_vol) / ql_vol
-            print(f"K={strike}: our={our_vol:.6f}, QL={ql_vol:.6f}, error={rel_error*100:.4f}%")
+            print(f"K={strike}: our={our_vol:.6f}, QL={ql_vol:.6f}, error={rel_error * 100:.4f}%")
 
             assert rel_error < self.TOLERANCE, f"T=0.1, K={strike} failed"
 
@@ -365,20 +350,17 @@ class TestSABRvsQuantLib:
         except ImportError:
             pytest.skip("SABR module not available")
 
-        params = SABRParams(
-            alpha=self.ALPHA, beta=self.BETA, rho=self.RHO, nu=nu
-        )
+        params = SABRParams(alpha=self.ALPHA, beta=self.BETA, rho=self.RHO, nu=nu)
 
         print("\nHigh Vol-of-Vol (ν=0.8) Test:")
         print("-" * 60)
         for strike in strikes:
             ql_vol = quantlib_sabr_implied_vol(
-                self.FORWARD, strike, self.TIME,
-                self.ALPHA, self.BETA, self.RHO, nu
+                self.FORWARD, strike, self.TIME, self.ALPHA, self.BETA, self.RHO, nu
             )
             our_vol = sabr_implied_volatility(self.FORWARD, strike, self.TIME, params)
             rel_error = abs(our_vol - ql_vol) / ql_vol
-            print(f"K={strike}: our={our_vol:.6f}, QL={ql_vol:.6f}, error={rel_error*100:.4f}%")
+            print(f"K={strike}: our={our_vol:.6f}, QL={ql_vol:.6f}, error={rel_error * 100:.4f}%")
 
             # Slightly higher tolerance for extreme parameters
             assert rel_error < self.TOLERANCE * 1.5, f"High ν, K={strike} failed"

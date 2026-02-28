@@ -97,6 +97,7 @@ class HestonVolatility(VolatilityModel):
     def get_initial_vol(self) -> float:
         """Return sqrt(v0) as initial volatility."""
         import numpy as np
+
         return float(np.sqrt(self.params.v0))
 
 

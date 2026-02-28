@@ -314,9 +314,7 @@ def calibrate_sabr(
             f"Got: strikes={len(strikes)}, market_vols={len(market_vols)}"
         )
     if len(strikes) < 3:
-        raise ValueError(
-            f"CRITICAL: Need at least 3 strikes for calibration. Got: {len(strikes)}"
-        )
+        raise ValueError(f"CRITICAL: Need at least 3 strikes for calibration. Got: {len(strikes)}")
 
     strikes_arr = np.array(strikes)
     market_vols_arr = np.array(market_vols)
@@ -347,9 +345,9 @@ def calibrate_sabr(
         return rmse
 
     bounds = [
-        (1e-6, 5.0),      # alpha > 0
+        (1e-6, 5.0),  # alpha > 0
         (-0.999, 0.999),  # -1 < rho < 1
-        (1e-6, 5.0),      # nu > 0
+        (1e-6, 5.0),  # nu > 0
     ]
 
     result = minimize(

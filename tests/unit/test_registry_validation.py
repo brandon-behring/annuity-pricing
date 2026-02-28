@@ -24,6 +24,7 @@ from annuity_pricing.validation.gates import (
 # Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def market_env() -> MarketEnvironment:
     """Standard market environment."""
@@ -87,16 +88,19 @@ def valid_rila() -> RILAProduct:
 # Validation Wiring Tests
 # =============================================================================
 
+
 @pytest.mark.unit
 class TestRegistryValidationWiring:
     """Tests for validation wiring in ProductRegistry."""
 
     def test_registry_has_validation_engine(self, registry: ProductRegistry) -> None:
         """Registry should have a validation engine."""
-        assert hasattr(registry, '_validation_engine')
+        assert hasattr(registry, "_validation_engine")
         assert isinstance(registry._validation_engine, ValidationEngine)
 
-    def test_price_has_validate_parameter(self, registry: ProductRegistry, valid_myga: MYGAProduct) -> None:
+    def test_price_has_validate_parameter(
+        self, registry: ProductRegistry, valid_myga: MYGAProduct
+    ) -> None:
         """price() should accept validate parameter."""
         # Should work with explicit validate=True (use realistic premium)
         result = registry.price(valid_myga, premium=100_000.0, validate=True)
@@ -106,9 +110,11 @@ class TestRegistryValidationWiring:
         result = registry.price(valid_myga, premium=100_000.0, validate=False)
         assert result is not None
 
-    def test_validation_enabled_by_default(self, registry: ProductRegistry, valid_myga: MYGAProduct) -> None:
+    def test_validation_enabled_by_default(
+        self, registry: ProductRegistry, valid_myga: MYGAProduct
+    ) -> None:
         """Validation should run by default (validate=True)."""
-        with patch.object(registry, '_validation_engine') as mock_engine:
+        with patch.object(registry, "_validation_engine") as mock_engine:
             mock_engine.validate_and_raise.return_value = MagicMock()
 
             # Don't actually validate - just check it's called
@@ -186,19 +192,18 @@ class TestCustomValidationEngine:
 
         assert registry._validation_engine is custom_engine
 
-    def test_default_engine_when_none_provided(
-        self, market_env: MarketEnvironment
-    ) -> None:
+    def test_default_engine_when_none_provided(self, market_env: MarketEnvironment) -> None:
         """Default ValidationEngine should be created when none provided."""
         registry = ProductRegistry(market_env=market_env)
 
-        assert hasattr(registry, '_validation_engine')
+        assert hasattr(registry, "_validation_engine")
         assert isinstance(registry._validation_engine, ValidationEngine)
 
 
 # =============================================================================
 # Integration Tests - Will fail until implementation
 # =============================================================================
+
 
 @pytest.mark.unit
 class TestValidationHaltBehavior:
@@ -210,7 +215,7 @@ class TestValidationHaltBehavior:
         # This requires creating an invalid result scenario
         # For now, test with mock
 
-        with patch.object(registry, '_validation_engine') as mock_engine:
+        with patch.object(registry, "_validation_engine") as mock_engine:
             mock_engine.validate_and_raise.side_effect = ValueError(
                 "CRITICAL: Validation failed. HALTs:\n  - PV > 10x premium"
             )
@@ -252,9 +257,7 @@ class TestPriceMultipleValidation:
 class TestPriceFromRowValidation:
     """Tests for validation in price_from_row."""
 
-    def test_price_from_row_has_validate_param(
-        self, registry: ProductRegistry
-    ) -> None:
+    def test_price_from_row_has_validate_param(self, registry: ProductRegistry) -> None:
         """price_from_row() should accept validate parameter."""
         # This test documents expected behavior
         # Will pass after implementation

@@ -5,7 +5,6 @@ Ensures all regulatory modules have proper [PROTOTYPE] disclaimers
 to prevent accidental use for production regulatory filings.
 """
 
-
 from annuity_pricing import regulatory
 from annuity_pricing.regulatory import scenarios, vm21, vm22
 

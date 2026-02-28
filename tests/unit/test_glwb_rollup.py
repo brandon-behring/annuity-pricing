@@ -84,7 +84,7 @@ class TestCompoundRollup:
         result = rollup.calculate(100_000, 5, 0.05)
 
         # Expected: 100k × 1.05^5 ≈ 127,628.16
-        expected = 100_000 * (1.05 ** 5)
+        expected = 100_000 * (1.05**5)
         assert result == pytest.approx(expected)
 
     def test_zero_years(self, rollup: CompoundRollup) -> None:
@@ -102,14 +102,14 @@ class TestCompoundRollup:
         result = rollup.calculate(100_000, 10, 0.10)
 
         # Expected: 100k × 1.10^10 ≈ 259,374.25
-        expected = 100_000 * (1.10 ** 10)
+        expected = 100_000 * (1.10**10)
         assert result == pytest.approx(expected)
 
     def test_fractional_years(self, rollup: CompoundRollup) -> None:
         """Fractional years should work."""
         result = rollup.calculate(100_000, 2.5, 0.05)
 
-        expected = 100_000 * (1.05 ** 2.5)
+        expected = 100_000 * (1.05**2.5)
         assert result == pytest.approx(expected)
 
 

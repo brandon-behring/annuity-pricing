@@ -91,9 +91,7 @@ class TestFIACappedCallVsFinancepy:
         "cap_rate",
         [0.05, 0.10, 0.15, 0.20, 0.25],  # 5% to 25% caps
     )
-    def test_otm_call_at_cap_matches_financepy(
-        self, financepy_adapter, standard_params, cap_rate
-    ):
+    def test_otm_call_at_cap_matches_financepy(self, financepy_adapter, standard_params, cap_rate):
         """
         [T1] OTM call at cap strike (short leg) matches financepy within 1%.
         """
@@ -120,7 +118,9 @@ class TestFIACappedCallVsFinancepy:
             time_to_expiry=standard_params["time_to_expiry"],
         )
 
-        rel_error = abs(our_price - fp_price) / fp_price if fp_price > 0.01 else abs(our_price - fp_price)
+        rel_error = (
+            abs(our_price - fp_price) / fp_price if fp_price > 0.01 else abs(our_price - fp_price)
+        )
         assert rel_error < 0.01, (
             f"OTM call at cap {cap_rate:.0%} error {rel_error:.2%} exceeds 1% tolerance. "
             f"Our: {our_price:.4f}, financepy: {fp_price:.4f}"
@@ -182,7 +182,11 @@ class TestFIACappedCallVsFinancepy:
         )
         fp_spread = fp_atm - fp_otm
 
-        rel_error = abs(our_spread - fp_spread) / fp_spread if fp_spread > 0.01 else abs(our_spread - fp_spread)
+        rel_error = (
+            abs(our_spread - fp_spread) / fp_spread
+            if fp_spread > 0.01
+            else abs(our_spread - fp_spread)
+        )
         assert rel_error < 0.01, (
             f"Capped call (cap={cap_rate:.0%}) error {rel_error:.2%} exceeds 1% tolerance. "
             f"Our spread: {our_spread:.4f}, financepy spread: {fp_spread:.4f}"
@@ -231,9 +235,7 @@ class TestFIAPricerVsFinancepy:
             (0.10, 3.0),
         ],
     )
-    def test_fia_embedded_option_value(
-        self, financepy_adapter, fia_pricer, cap_rate, term_years
-    ):
+    def test_fia_embedded_option_value(self, financepy_adapter, fia_pricer, cap_rate, term_years):
         """
         [T1] FIAPricer embedded option value matches financepy call spread.
 
@@ -316,9 +318,7 @@ class TestFIAFairCapVsFinancepy:
         "option_budget_pct",
         [0.02, 0.03, 0.04, 0.05],  # 2% to 5% budgets
     )
-    def test_fair_cap_produces_budget_value(
-        self, financepy_adapter, option_budget_pct
-    ):
+    def test_fair_cap_produces_budget_value(self, financepy_adapter, option_budget_pct):
         """
         [T1] Fair cap should produce call spread equal to option budget.
 
@@ -373,9 +373,7 @@ class TestFIAFairCapVsFinancepy:
         spread_as_pct = spread_value / spot
 
         # Budget should match spread (within 5% for solver precision)
-        rel_error = (
-            abs(spread_as_pct - option_budget_pct) / option_budget_pct
-        )
+        rel_error = abs(spread_as_pct - option_budget_pct) / option_budget_pct
         assert rel_error < 0.05, (
             f"Fair cap {fair_cap:.2%} produces spread {spread_as_pct:.2%}, "
             f"expected budget {option_budget_pct:.2%}. "
@@ -407,9 +405,7 @@ class TestFIAParticipationVsFinancepy:
         "participation_rate",
         [0.50, 0.75, 1.00, 1.25, 1.50],
     )
-    def test_participation_matches_scaled_call(
-        self, financepy_adapter, participation_rate
-    ):
+    def test_participation_matches_scaled_call(self, financepy_adapter, participation_rate):
         """
         [T1] Participation value = participation_rate * ATM call.
         """

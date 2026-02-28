@@ -26,6 +26,7 @@ class TestBufferMechanics:
         - -10% return → 0% loss (buffer absorbs)
         - -15% return → -5% loss (client absorbs 15%-10%)
         """
+
         def buffer_payoff(index_return: float, buffer: float, cap: float) -> float:
             """RILA buffer payoff."""
             if index_return >= 0:
@@ -36,7 +37,7 @@ class TestBufferMechanics:
                 return index_return + buffer  # Client absorbs excess
 
         buffer = 0.10  # 10% buffer
-        cap = 0.15     # 15% cap
+        cap = 0.15  # 15% cap
 
         # Buffer should absorb small losses completely
         assert buffer_payoff(-0.05, buffer, cap) == 0.0, (
@@ -64,6 +65,7 @@ class TestBufferMechanics:
         """
         [T1] Buffer products have capped upside.
         """
+
         def buffer_payoff(index_return: float, buffer: float, cap: float) -> float:
             if index_return >= 0:
                 return min(index_return, cap)
@@ -76,21 +78,16 @@ class TestBufferMechanics:
         cap = 0.12
 
         # Upside should be capped
-        assert buffer_payoff(0.05, buffer, cap) == 0.05, (
-            "5% gain should pass through (below cap)"
-        )
-        assert buffer_payoff(0.12, buffer, cap) == 0.12, (
-            "12% gain should equal cap"
-        )
-        assert buffer_payoff(0.20, buffer, cap) == 0.12, (
-            "20% gain should be capped at 12%"
-        )
+        assert buffer_payoff(0.05, buffer, cap) == 0.05, "5% gain should pass through (below cap)"
+        assert buffer_payoff(0.12, buffer, cap) == 0.12, "12% gain should equal cap"
+        assert buffer_payoff(0.20, buffer, cap) == 0.12, "20% gain should be capped at 12%"
 
     @pytest.mark.anti_pattern
     def test_buffer_zero_return(self) -> None:
         """
         [T1] Zero return should result in zero payoff.
         """
+
         def buffer_payoff(index_return: float, buffer: float, cap: float) -> float:
             if index_return >= 0:
                 return min(index_return, cap)
@@ -106,6 +103,7 @@ class TestBufferMechanics:
         """
         [T1] Test exact boundary conditions for buffer.
         """
+
         def buffer_payoff(index_return: float, buffer: float, cap: float) -> float:
             if index_return >= 0:
                 return min(index_return, cap)
@@ -117,15 +115,11 @@ class TestBufferMechanics:
         buffer = 0.10
 
         # Exactly at buffer boundary
-        assert buffer_payoff(-0.10, buffer, 0.15) == 0.0, (
-            "At exactly -buffer, payoff should be 0"
-        )
+        assert buffer_payoff(-0.10, buffer, 0.15) == 0.0, "At exactly -buffer, payoff should be 0"
 
         # Just beyond buffer (should start losing)
         result = buffer_payoff(-0.1001, buffer, 0.15)
-        assert result < 0, (
-            f"Just beyond buffer, client should lose. Got {result}"
-        )
+        assert result < 0, f"Just beyond buffer, client should lose. Got {result}"
 
     @pytest.mark.anti_pattern
     def test_common_buffer_levels(self) -> None:
@@ -134,6 +128,7 @@ class TestBufferMechanics:
 
         Common buffers: 10%, 15%, 20%
         """
+
         def buffer_payoff(index_return: float, buffer: float, cap: float) -> float:
             if index_return >= 0:
                 return min(index_return, cap)
@@ -170,6 +165,7 @@ class TestFloorMechanics:
         - -10% return → -10% loss (at floor)
         - -25% return → -10% loss (floor limits)
         """
+
         def floor_payoff(index_return: float, floor: float, cap: float) -> float:
             """RILA floor payoff."""
             if index_return >= 0:
@@ -186,21 +182,16 @@ class TestFloorMechanics:
         )
 
         # Floor limits large losses
-        assert floor_payoff(-0.10, floor, cap) == -0.10, (
-            "At floor, loss should be exactly -10%"
-        )
-        assert floor_payoff(-0.15, floor, cap) == -0.10, (
-            "Floor should limit -15% loss to -10%"
-        )
-        assert floor_payoff(-0.30, floor, cap) == -0.10, (
-            "Floor should limit -30% loss to -10%"
-        )
+        assert floor_payoff(-0.10, floor, cap) == -0.10, "At floor, loss should be exactly -10%"
+        assert floor_payoff(-0.15, floor, cap) == -0.10, "Floor should limit -15% loss to -10%"
+        assert floor_payoff(-0.30, floor, cap) == -0.10, "Floor should limit -30% loss to -10%"
 
     @pytest.mark.anti_pattern
     def test_floor_upside_capped(self) -> None:
         """
         [T1] Floor products also have capped upside.
         """
+
         def floor_payoff(index_return: float, floor: float, cap: float) -> float:
             if index_return >= 0:
                 return min(index_return, cap)
@@ -225,6 +216,7 @@ class TestBufferVsFloor:
         Buffer: Protects against SMALL losses
         Floor: Protects against LARGE losses
         """
+
         def buffer_payoff(index_return: float, buffer: float, cap: float) -> float:
             if index_return >= 0:
                 return min(index_return, cap)
@@ -273,6 +265,7 @@ class TestBufferVsFloor:
         "Losses Covered Up To" → Buffer
         "Losses Covered After" → Floor
         """
+
         def is_buffer(modifier: str) -> bool:
             return "up to" in modifier.lower()
 

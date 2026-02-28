@@ -82,11 +82,11 @@ class SpreadDistribution:
 
 # Treasury duration mapping (years to FRED series)
 TREASURY_SERIES = {
-    1: "DGS1",    # 1-Year Treasury
-    2: "DGS2",    # 2-Year Treasury
-    3: "DGS3",    # 3-Year Treasury (interpolate if not available)
-    5: "DGS5",    # 5-Year Treasury
-    7: "DGS7",    # 7-Year Treasury
+    1: "DGS1",  # 1-Year Treasury
+    2: "DGS2",  # 2-Year Treasury
+    3: "DGS3",  # 3-Year Treasury (interpolate if not available)
+    5: "DGS5",  # 5-Year Treasury
+    7: "DGS7",  # 7-Year Treasury
     10: "DGS10",  # 10-Year Treasury
 }
 
@@ -166,9 +166,7 @@ class SpreadAnalyzer:
             Complete spread analysis
         """
         if treasury_rate <= 0:
-            raise ValueError(
-                f"CRITICAL: treasury_rate must be > 0, got {treasury_rate}"
-            )
+            raise ValueError(f"CRITICAL: treasury_rate must be > 0, got {treasury_rate}")
 
         spread_decimal = product_rate - treasury_rate
         spread_bps = spread_decimal * 10000
@@ -290,9 +288,7 @@ class SpreadAnalyzer:
         spreads = df["spread_bps"].dropna()
 
         if spreads.empty:
-            raise ValueError(
-                "CRITICAL: No valid spreads calculated for distribution analysis."
-            )
+            raise ValueError("CRITICAL: No valid spreads calculated for distribution analysis.")
 
         return SpreadDistribution(
             min_bps=float(spreads.min()),
@@ -354,9 +350,7 @@ class SpreadAnalyzer:
         spreads = df["spread_bps"].dropna()
 
         if spreads.empty:
-            raise ValueError(
-                "CRITICAL: No valid spreads for position analysis."
-            )
+            raise ValueError("CRITICAL: No valid spreads for position analysis.")
 
         # Calculate percentile
         percentile = float((spreads <= spread_bps).sum() / len(spreads) * 100)

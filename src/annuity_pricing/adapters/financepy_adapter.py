@@ -153,17 +153,13 @@ class FinancepyAdapter(BaseAdapter):
         dividend_curve = DiscountCurveFlat(valuation_date, dividend)
 
         # Create option
-        option = EquityVanillaOption(
-            expiry_date, strike, OptionTypes.EUROPEAN_CALL
-        )
+        option = EquityVanillaOption(expiry_date, strike, OptionTypes.EUROPEAN_CALL)
 
         # Create model
         model = BlackScholes(volatility)
 
         # Price
-        value = option.value(
-            valuation_date, spot, discount_curve, dividend_curve, model
-        )
+        value = option.value(valuation_date, spot, discount_curve, dividend_curve, model)
 
         return float(value)
 
@@ -185,14 +181,10 @@ class FinancepyAdapter(BaseAdapter):
         discount_curve = DiscountCurveFlat(valuation_date, rate)
         dividend_curve = DiscountCurveFlat(valuation_date, dividend)
 
-        option = EquityVanillaOption(
-            expiry_date, strike, OptionTypes.EUROPEAN_PUT
-        )
+        option = EquityVanillaOption(expiry_date, strike, OptionTypes.EUROPEAN_PUT)
         model = BlackScholes(volatility)
 
-        value = option.value(
-            valuation_date, spot, discount_curve, dividend_curve, model
-        )
+        value = option.value(valuation_date, spot, discount_curve, dividend_curve, model)
 
         return float(value)
 
@@ -221,24 +213,14 @@ class FinancepyAdapter(BaseAdapter):
         discount_curve = DiscountCurveFlat(valuation_date, rate)
         dividend_curve = DiscountCurveFlat(valuation_date, dividend)
 
-        option = EquityVanillaOption(
-            expiry_date, strike, OptionTypes.EUROPEAN_CALL
-        )
+        option = EquityVanillaOption(expiry_date, strike, OptionTypes.EUROPEAN_CALL)
         model = BlackScholes(volatility)
 
         # financepy returns greeks as tuple
-        delta = option.delta(
-            valuation_date, spot, discount_curve, dividend_curve, model
-        )
-        gamma = option.gamma(
-            valuation_date, spot, discount_curve, dividend_curve, model
-        )
-        vega = option.vega(
-            valuation_date, spot, discount_curve, dividend_curve, model
-        )
-        theta = option.theta(
-            valuation_date, spot, discount_curve, dividend_curve, model
-        )
+        delta = option.delta(valuation_date, spot, discount_curve, dividend_curve, model)
+        gamma = option.gamma(valuation_date, spot, discount_curve, dividend_curve, model)
+        vega = option.vega(valuation_date, spot, discount_curve, dividend_curve, model)
+        theta = option.theta(valuation_date, spot, discount_curve, dividend_curve, model)
 
         return {
             "delta": float(delta),
@@ -267,29 +249,15 @@ class FinancepyAdapter(BaseAdapter):
         discount_curve = DiscountCurveFlat(valuation_date, rate)
         dividend_curve = DiscountCurveFlat(valuation_date, dividend)
 
-        option = EquityVanillaOption(
-            expiry_date, strike, OptionTypes.EUROPEAN_CALL
-        )
+        option = EquityVanillaOption(expiry_date, strike, OptionTypes.EUROPEAN_CALL)
         model = BlackScholes(volatility)
 
-        price = option.value(
-            valuation_date, spot, discount_curve, dividend_curve, model
-        )
-        delta = option.delta(
-            valuation_date, spot, discount_curve, dividend_curve, model
-        )
-        gamma = option.gamma(
-            valuation_date, spot, discount_curve, dividend_curve, model
-        )
-        vega = option.vega(
-            valuation_date, spot, discount_curve, dividend_curve, model
-        )
-        theta = option.theta(
-            valuation_date, spot, discount_curve, dividend_curve, model
-        )
-        rho = option.rho(
-            valuation_date, spot, discount_curve, dividend_curve, model
-        )
+        price = option.value(valuation_date, spot, discount_curve, dividend_curve, model)
+        delta = option.delta(valuation_date, spot, discount_curve, dividend_curve, model)
+        gamma = option.gamma(valuation_date, spot, discount_curve, dividend_curve, model)
+        vega = option.vega(valuation_date, spot, discount_curve, dividend_curve, model)
+        theta = option.theta(valuation_date, spot, discount_curve, dividend_curve, model)
+        rho = option.rho(valuation_date, spot, discount_curve, dividend_curve, model)
 
         return {
             "price": float(price),
@@ -328,9 +296,7 @@ class FinancepyAdapter(BaseAdapter):
         ValidationResult
             Comparison result
         """
-        external_price = self.price_call(
-            spot, strike, rate, dividend, volatility, time_to_expiry
-        )
+        external_price = self.price_call(spot, strike, rate, dividend, volatility, time_to_expiry)
         return self.validate(
             our_price,
             external_price,
@@ -350,9 +316,7 @@ class FinancepyAdapter(BaseAdapter):
         tolerance: float = CROSS_LIBRARY_TOLERANCE,
     ) -> ValidationResult:
         """Validate our put price against financepy."""
-        external_price = self.price_put(
-            spot, strike, rate, dividend, volatility, time_to_expiry
-        )
+        external_price = self.price_put(spot, strike, rate, dividend, volatility, time_to_expiry)
         return self.validate(
             our_price,
             external_price,

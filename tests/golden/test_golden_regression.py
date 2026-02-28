@@ -60,6 +60,7 @@ def load_golden(filename: str) -> dict:
 # Hull Textbook Examples
 # =============================================================================
 
+
 class TestHullExamples:
     """Verify pricing matches Hull textbook examples."""
 
@@ -235,6 +236,7 @@ class TestHullExamples:
 # SEC RILA Examples
 # =============================================================================
 
+
 class TestSECRILAExamples:
     """Verify RILA payoffs match SEC rule examples."""
 
@@ -378,10 +380,7 @@ class TestSECRILAExamples:
         example = sec_data["fia_cap_example"]
         params = example["parameters"]
 
-        payoff = CappedCallPayoff(
-            cap_rate=params["cap_rate"],
-            floor_rate=params["floor_rate"]
-        )
+        payoff = CappedCallPayoff(cap_rate=params["cap_rate"], floor_rate=params["floor_rate"])
         result = payoff.calculate(params["index_return"])
 
         expected = example["expected"]["credited_return"]
@@ -395,10 +394,7 @@ class TestSECRILAExamples:
         example = sec_data["fia_floor_example"]
         params = example["parameters"]
 
-        payoff = CappedCallPayoff(
-            cap_rate=params["cap_rate"],
-            floor_rate=params["floor_rate"]
-        )
+        payoff = CappedCallPayoff(cap_rate=params["cap_rate"], floor_rate=params["floor_rate"])
         result = payoff.calculate(params["index_return"])
 
         expected = example["expected"]["credited_return"]
@@ -443,13 +439,16 @@ class TestWINKGoldenProducts:
     # MYGA Tests
     # -------------------------------------------------------------------------
 
-    @pytest.mark.parametrize("product_key", [
-        "myga_3yr_median",
-        "myga_5yr_median",
-        "myga_7yr_median",
-        "myga_10yr_median",
-        "myga_edge_high_rate",
-    ])
+    @pytest.mark.parametrize(
+        "product_key",
+        [
+            "myga_3yr_median",
+            "myga_5yr_median",
+            "myga_7yr_median",
+            "myga_10yr_median",
+            "myga_edge_high_rate",
+        ],
+    )
     def test_myga_present_value(self, wink_data: dict, product_key: str) -> None:
         """[T2] MYGA present value matches golden expectation."""
         if product_key not in wink_data:
@@ -480,12 +479,15 @@ class TestWINKGoldenProducts:
             f"expected {expected_pv:.2f}, error = {relative_error:.4%}"
         )
 
-    @pytest.mark.parametrize("product_key", [
-        "myga_3yr_median",
-        "myga_5yr_median",
-        "myga_7yr_median",
-        "myga_10yr_median",
-    ])
+    @pytest.mark.parametrize(
+        "product_key",
+        [
+            "myga_3yr_median",
+            "myga_5yr_median",
+            "myga_7yr_median",
+            "myga_10yr_median",
+        ],
+    )
     def test_myga_annualized_return(self, wink_data: dict, product_key: str) -> None:
         """[T2] MYGA annualized return matches fixed rate."""
         if product_key not in wink_data:
@@ -505,12 +507,15 @@ class TestWINKGoldenProducts:
     # FIA Tests
     # -------------------------------------------------------------------------
 
-    @pytest.mark.parametrize("product_key", [
-        "fia_cap_median",
-        "fia_high_participation",
-        "fia_with_spread",
-        "fia_edge_low_cap",
-    ])
+    @pytest.mark.parametrize(
+        "product_key",
+        [
+            "fia_cap_median",
+            "fia_high_participation",
+            "fia_with_spread",
+            "fia_edge_low_cap",
+        ],
+    )
     def test_fia_option_value(self, wink_data: dict, product_key: str) -> None:
         """[T2] FIA embedded option value matches golden expectation."""
         if product_key not in wink_data:
@@ -559,14 +564,17 @@ class TestWINKGoldenProducts:
     # RILA Tests
     # -------------------------------------------------------------------------
 
-    @pytest.mark.parametrize("product_key", [
-        "rila_buffer_10",
-        "rila_buffer_15",
-        "rila_buffer_20",
-        "rila_floor_10",
-        "rila_edge_deep_buffer",
-        "rila_edge_shallow_buffer",
-    ])
+    @pytest.mark.parametrize(
+        "product_key",
+        [
+            "rila_buffer_10",
+            "rila_buffer_15",
+            "rila_buffer_20",
+            "rila_floor_10",
+            "rila_edge_deep_buffer",
+            "rila_edge_shallow_buffer",
+        ],
+    )
     def test_rila_buffer_cost(self, wink_data: dict, product_key: str) -> None:
         """[T2] RILA buffer/floor cost matches golden expectation."""
         if product_key not in wink_data:

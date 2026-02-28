@@ -132,7 +132,7 @@ class TestMYGAGradients:
             assert pvs[i] > pvs[i + 1], (
                 f"MYGA PV should decrease with rate: "
                 f"PV({RATE_GRID[i]:.2%})={pvs[i]:.2f} should be > "
-                f"PV({RATE_GRID[i+1]:.2%})={pvs[i+1]:.2f}"
+                f"PV({RATE_GRID[i + 1]:.2%})={pvs[i + 1]:.2f}"
             )
 
     def test_guaranteed_value_increases_with_term(self) -> None:
@@ -163,7 +163,7 @@ class TestMYGAGradients:
             assert guaranteed_values[i] < guaranteed_values[i + 1], (
                 f"MYGA guaranteed value should increase with term: "
                 f"GV({TENOR_GRID[i]}yr)={guaranteed_values[i]:.2f} should be < "
-                f"GV({TENOR_GRID[i+1]}yr)={guaranteed_values[i+1]:.2f}"
+                f"GV({TENOR_GRID[i + 1]}yr)={guaranteed_values[i + 1]:.2f}"
             )
 
 
@@ -227,7 +227,7 @@ class TestFIAGradients:
             assert option_values[i + 1] >= min_expected, (
                 f"FIA option value should increase with vol: "
                 f"OV({low_vol_grid[i]:.0%})={option_values[i]:.4f} should be <= "
-                f"OV({low_vol_grid[i+1]:.0%})={option_values[i+1]:.4f}"
+                f"OV({low_vol_grid[i + 1]:.0%})={option_values[i + 1]:.4f}"
             )
 
     def test_option_value_increases_with_cap(self) -> None:
@@ -265,7 +265,7 @@ class TestFIAGradients:
             assert option_values[i + 1] >= min_expected, (
                 f"FIA option value should increase with cap: "
                 f"OV({cap_grid[i]:.0%})={option_values[i]:.4f} should be <= "
-                f"OV({cap_grid[i+1]:.0%})={option_values[i+1]:.4f}"
+                f"OV({cap_grid[i + 1]:.0%})={option_values[i + 1]:.4f}"
             )
 
 
@@ -319,12 +319,10 @@ class TestRILAGradients:
             assert buffer_costs[i + 1] >= min_expected, (
                 f"Buffer cost should increase with level: "
                 f"Cost({buffer_grid[i]:.0%})={buffer_costs[i]:.4f} should be <= "
-                f"Cost({buffer_grid[i+1]:.0%})={buffer_costs[i+1]:.4f}"
+                f"Cost({buffer_grid[i + 1]:.0%})={buffer_costs[i + 1]:.4f}"
             )
 
-    def test_protection_increases_with_volatility(
-        self, rila_product: RILAProduct
-    ) -> None:
+    def test_protection_increases_with_volatility(self, rila_product: RILAProduct) -> None:
         """
         [P1] Protection value should increase with volatility.
 
@@ -353,7 +351,7 @@ class TestRILAGradients:
             assert protection_values[i + 1] >= min_expected, (
                 f"Protection value should increase with vol: "
                 f"PV({VOL_GRID[i]:.0%})={protection_values[i]:.4f} should be <= "
-                f"PV({VOL_GRID[i+1]:.0%})={protection_values[i+1]:.4f}"
+                f"PV({VOL_GRID[i + 1]:.0%})={protection_values[i + 1]:.4f}"
             )
 
     def test_max_loss_decreases_with_buffer(self) -> None:
@@ -389,7 +387,7 @@ class TestRILAGradients:
             assert max_losses[i] > max_losses[i + 1], (
                 f"Max loss should decrease with buffer: "
                 f"MaxLoss({buffer_grid[i]:.0%})={max_losses[i]:.4f} should be > "
-                f"MaxLoss({buffer_grid[i+1]:.0%})={max_losses[i+1]:.4f}"
+                f"MaxLoss({buffer_grid[i + 1]:.0%})={max_losses[i + 1]:.4f}"
             )
 
 

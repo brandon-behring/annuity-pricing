@@ -43,22 +43,23 @@ class TestSurrenderCurveVsSOA2006:
     "Contract Surrender Rates by Contract Year, 7-Year SC Schedule"
     """
 
-    @pytest.mark.parametrize("duration,expected_rate", [
-        (1, 0.014),   # Year 1: 1.4%
-        (2, 0.023),   # Year 2: 2.3%
-        (3, 0.028),   # Year 3: 2.8%
-        (4, 0.032),   # Year 4: 3.2%
-        (5, 0.037),   # Year 5: 3.7%
-        (6, 0.043),   # Year 6: 4.3%
-        (7, 0.053),   # Year 7: 5.3%
-        (8, 0.112),   # Year 8: 11.2% (POST-SC CLIFF!)
-        (9, 0.082),   # Year 9: 8.2%
-        (10, 0.077),  # Year 10: 7.7%
-        (11, 0.067),  # Year 11+: 6.7%
-    ])
-    def test_duration_surrender_rates_match_soa(
-        self, duration: int, expected_rate: float
-    ) -> None:
+    @pytest.mark.parametrize(
+        "duration,expected_rate",
+        [
+            (1, 0.014),  # Year 1: 1.4%
+            (2, 0.023),  # Year 2: 2.3%
+            (3, 0.028),  # Year 3: 2.8%
+            (4, 0.032),  # Year 4: 3.2%
+            (5, 0.037),  # Year 5: 3.7%
+            (6, 0.043),  # Year 6: 4.3%
+            (7, 0.053),  # Year 7: 5.3%
+            (8, 0.112),  # Year 8: 11.2% (POST-SC CLIFF!)
+            (9, 0.082),  # Year 9: 8.2%
+            (10, 0.077),  # Year 10: 7.7%
+            (11, 0.067),  # Year 11+: 6.7%
+        ],
+    )
+    def test_duration_surrender_rates_match_soa(self, duration: int, expected_rate: float) -> None:
         """Interpolation function should return exact SOA values."""
         result = interpolate_surrender_by_duration(duration, sc_length=7)
         assert result == expected_rate, (
@@ -134,22 +135,23 @@ class TestUtilizationCurveVsSOA2018:
     "GLWB Utilization by Year Issued"
     """
 
-    @pytest.mark.parametrize("duration,expected_util", [
-        (1, 0.111),   # Year 1: 11.1%
-        (2, 0.177),   # Year 2: 17.7%
-        (3, 0.199),   # Year 3: 19.9%
-        (4, 0.205),   # Year 4: 20.5%
-        (5, 0.215),   # Year 5: 21.5%
-        (6, 0.233),   # Year 6: 23.3%
-        (7, 0.256),   # Year 7: 25.6%
-        (8, 0.365),   # Year 8: 36.5%
-        (9, 0.459),   # Year 9: 45.9%
-        (10, 0.518),  # Year 10: 51.8%
-        (11, 0.536),  # Year 11: 53.6%
-    ])
-    def test_duration_utilization_matches_soa(
-        self, duration: int, expected_util: float
-    ) -> None:
+    @pytest.mark.parametrize(
+        "duration,expected_util",
+        [
+            (1, 0.111),  # Year 1: 11.1%
+            (2, 0.177),  # Year 2: 17.7%
+            (3, 0.199),  # Year 3: 19.9%
+            (4, 0.205),  # Year 4: 20.5%
+            (5, 0.215),  # Year 5: 21.5%
+            (6, 0.233),  # Year 6: 23.3%
+            (7, 0.256),  # Year 7: 25.6%
+            (8, 0.365),  # Year 8: 36.5%
+            (9, 0.459),  # Year 9: 45.9%
+            (10, 0.518),  # Year 10: 51.8%
+            (11, 0.536),  # Year 11: 53.6%
+        ],
+    )
+    def test_duration_utilization_matches_soa(self, duration: int, expected_util: float) -> None:
         """Interpolation function should return exact SOA values."""
         result = interpolate_utilization_by_duration(duration)
         assert result == expected_util, (
@@ -166,17 +168,18 @@ class TestUtilizationByAgeVsSOA2018:
     (Using 2008 cohort as reference)
     """
 
-    @pytest.mark.parametrize("age,expected_util", [
-        (55, 0.05),   # Under 60: ~5%
-        (62, 0.16),   # 60-64: ~16%
-        (67, 0.32),   # 65-69: ~32%
-        (72, 0.59),   # 70-74: ~59%
-        (77, 0.65),   # 75-79: ~65%
-        (82, 0.63),   # 80+: ~63%
-    ])
-    def test_age_utilization_matches_soa(
-        self, age: int, expected_util: float
-    ) -> None:
+    @pytest.mark.parametrize(
+        "age,expected_util",
+        [
+            (55, 0.05),  # Under 60: ~5%
+            (62, 0.16),  # 60-64: ~16%
+            (67, 0.32),  # 65-69: ~32%
+            (72, 0.59),  # 70-74: ~59%
+            (77, 0.65),  # 75-79: ~65%
+            (82, 0.63),  # 80+: ~63%
+        ],
+    )
+    def test_age_utilization_matches_soa(self, age: int, expected_util: float) -> None:
         """Interpolation should return values close to SOA benchmarks."""
         result = interpolate_utilization_by_age(age)
         # Allow 5% tolerance for interpolation between ages
@@ -193,14 +196,17 @@ class TestITMSensitivityVsSOA2018:
     "Withdrawal by Degree of ITM"
     """
 
-    @pytest.mark.parametrize("moneyness,expected_factor", [
-        (0.9, 1.00),    # Not ITM: baseline
-        (1.0, 1.00),    # At the money: baseline
-        (1.1, 1.39),    # ITM 100-125%
-        (1.3, 1.79),    # ITM 125-150%
-        (1.6, 2.11),    # ITM >150%
-        (2.0, 2.11),    # Deep ITM: same as >150%
-    ])
+    @pytest.mark.parametrize(
+        "moneyness,expected_factor",
+        [
+            (0.9, 1.00),  # Not ITM: baseline
+            (1.0, 1.00),  # At the money: baseline
+            (1.1, 1.39),  # ITM 100-125%
+            (1.3, 1.79),  # ITM 125-150%
+            (1.6, 2.11),  # ITM >150%
+            (2.0, 2.11),  # Deep ITM: same as >150%
+        ],
+    )
     def test_itm_sensitivity_discrete_matches_soa(
         self, moneyness: float, expected_factor: float
     ) -> None:
@@ -219,17 +225,17 @@ class TestSOADynamicLapseModelReproducesSOA:
     @pytest.fixture
     def model(self) -> SOADynamicLapseModel:
         """Model with pure duration curve (no cliff overlay)."""
-        return SOADynamicLapseModel(SOALapseAssumptions(
-            use_sc_cliff_effect=False,  # Use duration curve only
-            moneyness_sensitivity=0,     # Disable moneyness for pure test
-        ))
+        return SOADynamicLapseModel(
+            SOALapseAssumptions(
+                use_sc_cliff_effect=False,  # Use duration curve only
+                moneyness_sensitivity=0,  # Disable moneyness for pure test
+            )
+        )
 
     def test_model_reproduces_duration_curve(self, model: SOADynamicLapseModel) -> None:
         """Model base rates should match SOA duration curve."""
         for duration in range(1, 12):
-            result = model.calculate_lapse(
-                gwb=100_000, av=100_000, duration=duration
-            )
+            result = model.calculate_lapse(gwb=100_000, av=100_000, duration=duration)
             expected = SOA_2006_SURRENDER_BY_DURATION_7YR_SC[duration]
             assert abs(result.base_rate - expected) < 0.001, (
                 f"Duration {duration}: expected {expected}, got {result.base_rate}"
@@ -237,18 +243,18 @@ class TestSOADynamicLapseModelReproducesSOA:
 
     def test_model_shows_cliff_jump(self) -> None:
         """Model should show 2x+ jump from year 7 to year 8."""
-        model = SOADynamicLapseModel(SOALapseAssumptions(
-            use_sc_cliff_effect=False,
-            moneyness_sensitivity=0,
-        ))
+        model = SOADynamicLapseModel(
+            SOALapseAssumptions(
+                use_sc_cliff_effect=False,
+                moneyness_sensitivity=0,
+            )
+        )
 
         year_7 = model.calculate_lapse(gwb=100_000, av=100_000, duration=7)
         year_8 = model.calculate_lapse(gwb=100_000, av=100_000, duration=8)
 
         jump_ratio = year_8.base_rate / year_7.base_rate
-        assert jump_ratio > 2.0, (
-            f"Cliff jump ratio {jump_ratio:.2f} should be > 2.0"
-        )
+        assert jump_ratio > 2.0, f"Cliff jump ratio {jump_ratio:.2f} should be > 2.0"
 
 
 class TestSOAWithdrawalModelReproducesSOA:
@@ -259,16 +265,21 @@ class TestSOAWithdrawalModelReproducesSOA:
     @pytest.fixture
     def model(self) -> SOAWithdrawalModel:
         """Model with pure duration curve (no ITM)."""
-        return SOAWithdrawalModel(SOAWithdrawalAssumptions(
-            use_itm_sensitivity=False,
-        ))
+        return SOAWithdrawalModel(
+            SOAWithdrawalAssumptions(
+                use_itm_sensitivity=False,
+            )
+        )
 
     def test_model_reproduces_duration_utilization(self, model: SOAWithdrawalModel) -> None:
         """Model duration utilization should match SOA."""
         for duration in range(1, 12):
             result = model.calculate_withdrawal(
-                gwb=100_000, av=100_000, withdrawal_rate=0.05,
-                duration=duration, age=67  # Reference age
+                gwb=100_000,
+                av=100_000,
+                withdrawal_rate=0.05,
+                duration=duration,
+                age=67,  # Reference age
             )
             expected = SOA_2018_GLWB_UTILIZATION_BY_DURATION[duration]
             assert result.duration_utilization == expected, (
@@ -277,9 +288,11 @@ class TestSOAWithdrawalModelReproducesSOA:
 
     def test_model_shows_utilization_ramp(self) -> None:
         """Utilization should increase from year 1 to year 10."""
-        model = SOAWithdrawalModel(SOAWithdrawalAssumptions(
-            use_itm_sensitivity=False,
-        ))
+        model = SOAWithdrawalModel(
+            SOAWithdrawalAssumptions(
+                use_itm_sensitivity=False,
+            )
+        )
 
         year_1 = model.calculate_withdrawal(
             gwb=100_000, av=100_000, withdrawal_rate=0.05, duration=1, age=67
@@ -289,9 +302,7 @@ class TestSOAWithdrawalModelReproducesSOA:
         )
 
         ramp_ratio = year_10.duration_utilization / year_1.duration_utilization
-        assert ramp_ratio > 4.0, (
-            f"Utilization ramp {ramp_ratio:.1f}x should be > 4x (11%→52%)"
-        )
+        assert ramp_ratio > 4.0, f"Utilization ramp {ramp_ratio:.1f}x should be > 4x (11%→52%)"
 
 
 class TestKeySOAInsights:
@@ -301,10 +312,12 @@ class TestKeySOAInsights:
 
     def test_sc_cliff_is_dramatic(self) -> None:
         """SC cliff (year 8) should be highest surrender year."""
-        model = SOADynamicLapseModel(SOALapseAssumptions(
-            use_sc_cliff_effect=False,  # Pure duration curve
-            moneyness_sensitivity=0,
-        ))
+        model = SOADynamicLapseModel(
+            SOALapseAssumptions(
+                use_sc_cliff_effect=False,  # Pure duration curve
+                moneyness_sensitivity=0,
+            )
+        )
 
         rates = {}
         for d in range(1, 12):

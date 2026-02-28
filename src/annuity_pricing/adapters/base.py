@@ -88,10 +88,7 @@ class BaseAdapter(ABC):
             If the external library is not installed
         """
         if not self.is_available:
-            raise ImportError(
-                f"{self.name} not installed. "
-                f"Install with: {self._install_hint}"
-            )
+            raise ImportError(f"{self.name} not installed. Install with: {self._install_hint}")
 
     def validate(
         self,

@@ -176,9 +176,7 @@ class FIAPricer(BasePricer):
         seed: int | None = None,
     ):
         if option_budget_pct < 0:
-            raise ValueError(
-                f"CRITICAL: option_budget_pct must be >= 0, got {option_budget_pct}"
-            )
+            raise ValueError(f"CRITICAL: option_budget_pct must be >= 0, got {option_budget_pct}")
 
         self.market_params = market_params
         self.option_budget_pct = option_budget_pct
@@ -186,9 +184,7 @@ class FIAPricer(BasePricer):
         self.seed = seed
 
         # Initialize MC engine
-        self.mc_engine = MonteCarloEngine(
-            n_paths=n_mc_paths, antithetic=True, seed=seed
-        )
+        self.mc_engine = MonteCarloEngine(n_paths=n_mc_paths, antithetic=True, seed=seed)
 
     def price(  # type: ignore[override]  # Subclass has specific params
         self,
@@ -229,13 +225,11 @@ class FIAPricer(BasePricer):
             If term_years is not provided and product.term_years is None
         """
         if not isinstance(product, FIAProduct):
-            raise ValueError(
-                f"CRITICAL: Expected FIAProduct, got {type(product).__name__}"
-            )
+            raise ValueError(f"CRITICAL: Expected FIAProduct, got {type(product).__name__}")
 
         # [F.1] Resolve term_years: require explicit value or from product
         if term_years is None:
-            term_years = getattr(product, 'term_years', None)
+            term_years = getattr(product, "term_years", None)
             if term_years is not None:
                 term_years = float(term_years)
         if term_years is None or term_years <= 0:
@@ -265,14 +259,10 @@ class FIAPricer(BasePricer):
         option_budget = premium * self.option_budget_pct * annuity_factor
 
         # Price embedded option using Black-Scholes
-        embedded_option_value = self._price_embedded_option(
-            method, params, term_years, premium
-        )
+        embedded_option_value = self._price_embedded_option(method, params, term_years, premium)
 
         # Calculate expected credit via Monte Carlo
-        expected_credit = self._calculate_expected_credit(
-            method, params, term_years
-        )
+        expected_credit = self._calculate_expected_credit(method, params, term_years)
 
         # Calculate fair terms given option budget
         fair_cap = self._solve_fair_cap(term_years, option_budget, premium)
@@ -332,14 +322,11 @@ class FIAPricer(BasePricer):
         if kwargs.get("index_used"):
             comparables = comparables[comparables["indexUsed"] == kwargs["index_used"]]
         if kwargs.get("indexing_method"):
-            comparables = comparables[
-                comparables["indexingMethod"] == kwargs["indexing_method"]
-            ]
+            comparables = comparables[comparables["indexingMethod"] == kwargs["indexing_method"]]
 
         if comparables.empty:
             raise ValueError(
-                "CRITICAL: No comparable FIA products found. "
-                "Check filters and market data."
+                "CRITICAL: No comparable FIA products found. Check filters and market data."
             )
 
         # Determine which metric to use
@@ -350,17 +337,13 @@ class FIAPricer(BasePricer):
             rate = product.participation_rate
             rate_col = "participationRate"
         else:
-            raise ValueError(
-                "CRITICAL: FIA product must have cap_rate or participation_rate"
-            )
+            raise ValueError("CRITICAL: FIA product must have cap_rate or participation_rate")
 
         # Get distribution of comparable rates
         distribution = comparables[rate_col].dropna()
 
         if distribution.empty:
-            raise ValueError(
-                f"CRITICAL: No comparable products with {rate_col} found"
-            )
+            raise ValueError(f"CRITICAL: No comparable products with {rate_col} found")
 
         percentile = self._calculate_percentile(rate, distribution)
         rank = int((distribution > rate).sum() + 1)
@@ -372,9 +355,7 @@ class FIAPricer(BasePricer):
             total_products=len(distribution),
         )
 
-    def _determine_crediting_method(
-        self, product: FIAProduct
-    ) -> tuple[str, dict]:
+    def _determine_crediting_method(self, product: FIAProduct) -> tuple[str, dict]:
         """
         Determine crediting method and extract parameters.
 
@@ -390,7 +371,11 @@ class FIAPricer(BasePricer):
         is_monthly_avg = False
         if product.indexing_method is not None:
             indexing_lower = product.indexing_method.lower()
-            if "monthly" in indexing_lower or "averaging" in indexing_lower or "average" in indexing_lower:
+            if (
+                "monthly" in indexing_lower
+                or "averaging" in indexing_lower
+                or "average" in indexing_lower
+            ):
                 is_monthly_avg = True
 
         if is_monthly_avg:
@@ -584,8 +569,7 @@ class FIAPricer(BasePricer):
             # Calculate d1, d2 for ATM option (strike = spot)
             # Use scalar volatility for d2 (BS approximation)
             d1, d2 = _calculate_d1_d2(
-                m.spot, m.spot, m.risk_free_rate, m.dividend_yield,
-                m.volatility, term_years
+                m.spot, m.spot, m.risk_free_rate, m.dividend_yield, m.volatility, term_years
             )
 
             # N(d2) = risk-neutral probability of S_T > K

@@ -168,10 +168,9 @@ def black_scholes_call(
 
     d1, d2 = _calculate_d1_d2(spot, strike, rate, dividend, volatility, time_to_expiry)
 
-    call_price = (
-        spot * np.exp(-dividend * time_to_expiry) * stats.norm.cdf(d1)
-        - strike * np.exp(-rate * time_to_expiry) * stats.norm.cdf(d2)
-    )
+    call_price = spot * np.exp(-dividend * time_to_expiry) * stats.norm.cdf(d1) - strike * np.exp(
+        -rate * time_to_expiry
+    ) * stats.norm.cdf(d2)
 
     return float(call_price)
 
@@ -241,10 +240,9 @@ def black_scholes_put(
 
     d1, d2 = _calculate_d1_d2(spot, strike, rate, dividend, volatility, time_to_expiry)
 
-    put_price = (
-        strike * np.exp(-rate * time_to_expiry) * stats.norm.cdf(-d2)
-        - spot * np.exp(-dividend * time_to_expiry) * stats.norm.cdf(-d1)
-    )
+    put_price = strike * np.exp(-rate * time_to_expiry) * stats.norm.cdf(-d2) - spot * np.exp(
+        -dividend * time_to_expiry
+    ) * stats.norm.cdf(-d1)
 
     return float(put_price)
 
@@ -455,9 +453,8 @@ def put_call_parity_check(
         (parity_holds, error)
     """
     actual_diff = call_price - put_price
-    expected_diff = (
-        spot * np.exp(-dividend * time_to_expiry)
-        - strike * np.exp(-rate * time_to_expiry)
+    expected_diff = spot * np.exp(-dividend * time_to_expiry) - strike * np.exp(
+        -rate * time_to_expiry
     )
 
     error = abs(actual_diff - expected_diff)

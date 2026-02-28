@@ -212,7 +212,9 @@ class TestGWBRatchet:
         gwb_after_up = result1.new_state.gwb
 
         # Second: negative return
-        result2 = tracker_with_ratchet.step(result1.new_state, av_return=-0.30, dt=1.0, withdrawal=0)
+        result2 = tracker_with_ratchet.step(
+            result1.new_state, av_return=-0.30, dt=1.0, withdrawal=0
+        )
 
         # GWB should not decrease
         assert result2.new_state.gwb >= gwb_after_up
@@ -240,7 +242,7 @@ class TestRollupCap:
             state = result.new_state
 
         # GWB should be 3-year rollup, not 5-year
-        expected = 100_000 * (1.05 ** 3)
+        expected = 100_000 * (1.05**3)
         assert state.gwb == pytest.approx(expected)
 
 

@@ -144,24 +144,24 @@ class TestInterpolateSurrenderByAge:
 
     def test_full_surrender_at_age_67(self) -> None:
         """Age 67 full surrender should be ~5.8%."""
-        rate = interpolate_surrender_by_age(67, 'full')
+        rate = interpolate_surrender_by_age(67, "full")
         assert abs(rate - 0.058) < 0.005
 
     def test_partial_withdrawal_at_age_72(self) -> None:
         """Age 72 partial withdrawal should be ~31.5%."""
-        rate = interpolate_surrender_by_age(72, 'partial')
+        rate = interpolate_surrender_by_age(72, "partial")
         assert abs(rate - 0.315) < 0.02
 
     def test_partial_withdrawal_increases_with_age(self) -> None:
         """Partial withdrawal should increase from young to old."""
-        young = interpolate_surrender_by_age(35, 'partial')
-        old = interpolate_surrender_by_age(72, 'partial')
+        young = interpolate_surrender_by_age(35, "partial")
+        old = interpolate_surrender_by_age(72, "partial")
         assert old > young * 5
 
     def test_invalid_surrender_type_raises(self) -> None:
         """Invalid surrender type should raise ValueError."""
         with pytest.raises(ValueError):
-            interpolate_surrender_by_age(65, 'invalid')
+            interpolate_surrender_by_age(65, "invalid")
 
 
 class TestInterpolateUtilizationByDuration:
@@ -288,8 +288,10 @@ class TestCombinedUtilization:
 
     def test_multiplicative_vs_additive(self) -> None:
         """Multiplicative and additive should give different results."""
-        mult = combined_utilization(duration=5, age=70, moneyness=1.0, combination_method='multiplicative')
-        add = combined_utilization(duration=5, age=70, moneyness=1.0, combination_method='additive')
+        mult = combined_utilization(
+            duration=5, age=70, moneyness=1.0, combination_method="multiplicative"
+        )
+        add = combined_utilization(duration=5, age=70, moneyness=1.0, combination_method="additive")
         # They can be equal in some cases, but generally should differ
         # Both should be reasonable (0-1)
         assert 0 < mult <= 1.0

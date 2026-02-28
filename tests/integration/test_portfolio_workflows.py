@@ -30,6 +30,7 @@ from annuity_pricing.products.registry import (
 # Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def market_env():
     """Standard market environment."""
@@ -57,14 +58,16 @@ def create_myga_products(rates, terms):
     products = []
     for rate in rates:
         for term in terms:
-            products.append(MYGAProduct(
-                company_name="Sweep MYGA",
-                product_name=f"MYGA r={rate:.1%} t={term}",
-                product_group="MYGA",
-                status="current",
-                fixed_rate=rate,
-                guarantee_duration=term,
-            ))
+            products.append(
+                MYGAProduct(
+                    company_name="Sweep MYGA",
+                    product_name=f"MYGA r={rate:.1%} t={term}",
+                    product_group="MYGA",
+                    status="current",
+                    fixed_rate=rate,
+                    guarantee_duration=term,
+                )
+            )
     return products
 
 
@@ -73,14 +76,16 @@ def create_fia_products(caps, terms):
     products = []
     for cap in caps:
         for term in terms:
-            products.append(FIAProduct(
-                company_name="Sweep FIA",
-                product_name=f"FIA cap={cap:.1%} t={term}",
-                product_group="FIA",
-                status="current",
-                cap_rate=cap,
-                index_used="S&P 500",
-            ))
+            products.append(
+                FIAProduct(
+                    company_name="Sweep FIA",
+                    product_name=f"FIA cap={cap:.1%} t={term}",
+                    product_group="FIA",
+                    status="current",
+                    cap_rate=cap,
+                    index_used="S&P 500",
+                )
+            )
     return products
 
 
@@ -89,22 +94,25 @@ def create_rila_products(buffers, terms):
     products = []
     for buffer in buffers:
         for term in terms:
-            products.append(RILAProduct(
-                company_name="Sweep RILA",
-                product_name=f"RILA buf={buffer:.1%} t={term}",
-                product_group="RILA",
-                status="current",
-                buffer_rate=buffer,
-                buffer_modifier="Losses Covered Up To",
-                cap_rate=0.15,
-                index_used="S&P 500",
-            ))
+            products.append(
+                RILAProduct(
+                    company_name="Sweep RILA",
+                    product_name=f"RILA buf={buffer:.1%} t={term}",
+                    product_group="RILA",
+                    status="current",
+                    buffer_rate=buffer,
+                    buffer_modifier="Losses Covered Up To",
+                    cap_rate=0.15,
+                    index_used="S&P 500",
+                )
+            )
     return products
 
 
 # =============================================================================
 # Parametric Portfolio Tests
 # =============================================================================
+
 
 class TestParametricPortfolio:
     """Test systematic portfolio construction and pricing."""
@@ -121,8 +129,8 @@ class TestParametricPortfolio:
 
         # All should price successfully
         assert len(results_df) == 12
-        assert 'error' not in results_df.columns or results_df['error'].isna().all()
-        assert all(results_df['present_value'] > 0)
+        assert "error" not in results_df.columns or results_df["error"].isna().all()
+        assert all(results_df["present_value"] > 0)
 
     def test_fia_portfolio_sweep(self, registry):
         """Price 9-product FIA parametric portfolio (3 caps × 3 terms)."""
@@ -135,8 +143,8 @@ class TestParametricPortfolio:
         results_df = registry.price_multiple(products, term_years=1.0)
 
         assert len(results_df) == 9
-        assert 'error' not in results_df.columns or results_df['error'].isna().all()
-        assert all(results_df['present_value'] > 0)
+        assert "error" not in results_df.columns or results_df["error"].isna().all()
+        assert all(results_df["present_value"] > 0)
 
     def test_rila_portfolio_sweep(self, registry):
         """Price 6-product RILA parametric portfolio (3 buffers × 2 terms)."""
@@ -149,8 +157,8 @@ class TestParametricPortfolio:
         results_df = registry.price_multiple(products, term_years=1.0)
 
         assert len(products) == 6
-        assert 'error' not in results_df.columns or results_df['error'].isna().all()
-        assert all(results_df['present_value'] > 0)
+        assert "error" not in results_df.columns or results_df["error"].isna().all()
+        assert all(results_df["present_value"] > 0)
 
     def test_mixed_parametric_portfolio(self, registry):
         """Price 27-product mixed portfolio (9 MYGA + 9 FIA + 9 RILA)."""
@@ -164,24 +172,27 @@ class TestParametricPortfolio:
         results_df = registry.price_multiple(products, term_years=1.0)
 
         assert len(results_df) == 27
-        assert all(results_df['present_value'] > 0)
+        assert all(results_df["present_value"] > 0)
 
 
 # =============================================================================
 # Portfolio Aggregation Tests
 # =============================================================================
 
+
 class TestPortfolioAggregation:
     """Test portfolio-level calculations."""
 
     def test_total_pv_positive(self, registry):
         """Portfolio total PV should be positive."""
-        products = create_myga_products([0.04], [5]) + \
-                   create_fia_products([0.05], [1]) + \
-                   create_rila_products([0.10], [3])
+        products = (
+            create_myga_products([0.04], [5])
+            + create_fia_products([0.05], [1])
+            + create_rila_products([0.10], [3])
+        )
 
         results_df = registry.price_multiple(products, term_years=1.0)
-        total_pv = results_df['present_value'].sum()
+        total_pv = results_df["present_value"].sum()
 
         assert total_pv > 0
 
@@ -191,8 +202,8 @@ class TestPortfolioAggregation:
         results_df = registry.price_multiple(products)
 
         # Weighted average duration
-        pvs = results_df['present_value'].values
-        durations = results_df['duration'].values
+        pvs = results_df["present_value"].values
+        durations = results_df["duration"].values
 
         # Skip if any duration is None
         if any(d is None for d in durations):
@@ -206,6 +217,7 @@ class TestPortfolioAggregation:
 # Rate Shock Tests
 # =============================================================================
 
+
 class TestPortfolioRateShocks:
     """Test portfolio behavior under rate shocks."""
 
@@ -218,8 +230,8 @@ class TestPortfolioRateShocks:
         shocked_registry = ProductRegistry(market_env=shocked_market, seed=42)
 
         products = create_myga_products([0.04], [5])
-        base_pv = base_registry.price_multiple(products)['present_value'].sum()
-        shocked_pv = shocked_registry.price_multiple(products)['present_value'].sum()
+        base_pv = base_registry.price_multiple(products)["present_value"].sum()
+        shocked_pv = shocked_registry.price_multiple(products)["present_value"].sum()
 
         assert shocked_pv < base_pv, "+200bp rate shock should decrease MYGA PV"
 
@@ -231,16 +243,18 @@ class TestPortfolioRateShocks:
         base_registry = ProductRegistry(market_env=base_market, n_mc_paths=5000, seed=42)
         shocked_registry = ProductRegistry(market_env=shocked_market, n_mc_paths=5000, seed=42)
 
-        products = create_myga_products([0.04], [5]) + \
-                   create_fia_products([0.05], [1]) + \
-                   create_rila_products([0.10], [3])
+        products = (
+            create_myga_products([0.04], [5])
+            + create_fia_products([0.05], [1])
+            + create_rila_products([0.10], [3])
+        )
 
         base_results = base_registry.price_multiple(products, term_years=1.0)
         shocked_results = shocked_registry.price_multiple(products, term_years=1.0)
 
         # PV should change under rate shock
-        base_total = base_results['present_value'].sum()
-        shocked_total = shocked_results['present_value'].sum()
+        base_total = base_results["present_value"].sum()
+        shocked_total = shocked_results["present_value"].sum()
 
         # Direction depends on product mix, but values should differ
         assert abs(base_total - shocked_total) > INTEGRATION_TOLERANCE
@@ -249,6 +263,7 @@ class TestPortfolioRateShocks:
 # =============================================================================
 # Vol Shock Tests
 # =============================================================================
+
 
 class TestPortfolioVolShocks:
     """Test portfolio behavior under volatility shocks."""
@@ -283,13 +298,15 @@ class TestPortfolioVolShocks:
 
         # Protection value should increase with vol
         # (buffer is more valuable when there's more downside risk)
-        assert high_vol_result.protection_value > low_vol_result.protection_value - 0.5, \
+        assert high_vol_result.protection_value > low_vol_result.protection_value - 0.5, (
             "Higher vol should increase protection value"
+        )
 
 
 # =============================================================================
 # Portfolio Composition Tests
 # =============================================================================
+
 
 class TestPortfolioComposition:
     """Test portfolio composition effects."""
@@ -305,19 +322,19 @@ class TestPortfolioComposition:
         # Both should price successfully
         assert len(myga_results) == 2
         assert len(mixed_results) == 2
-        assert all(myga_results['present_value'] > 0)
-        assert all(mixed_results['present_value'] > 0)
+        assert all(myga_results["present_value"] > 0)
+        assert all(mixed_results["present_value"] > 0)
 
     def test_large_portfolio_pricing(self, registry):
         """Price larger portfolio (50+ products) without failure."""
         # Create 50-product portfolio
         products = (
-            create_myga_products([0.03, 0.04, 0.05], [3, 5, 7, 10]) +  # 12
-            create_myga_products([0.035, 0.045], [3, 5, 7]) +          # 6
-            create_fia_products([0.04, 0.05, 0.06], [1, 3, 5, 7]) +    # 12
-            create_fia_products([0.045, 0.055], [1, 3, 5]) +           # 6
-            create_rila_products([0.10, 0.15, 0.20, 0.25], [3, 6]) +   # 8
-            create_rila_products([0.12, 0.18], [3, 6, 9])              # 6
+            create_myga_products([0.03, 0.04, 0.05], [3, 5, 7, 10])  # 12
+            + create_myga_products([0.035, 0.045], [3, 5, 7])  # 6
+            + create_fia_products([0.04, 0.05, 0.06], [1, 3, 5, 7])  # 12
+            + create_fia_products([0.045, 0.055], [1, 3, 5])  # 6
+            + create_rila_products([0.10, 0.15, 0.20, 0.25], [3, 6])  # 8
+            + create_rila_products([0.12, 0.18], [3, 6, 9])  # 6
         )
 
         assert len(products) >= 50
@@ -326,5 +343,5 @@ class TestPortfolioComposition:
 
         assert len(results_df) == len(products)
         # Allow some failures due to extreme parameters, but most should succeed
-        success_rate = results_df['present_value'].notna().mean()
+        success_rate = results_df["present_value"].notna().mean()
         assert success_rate >= 0.90, f"Success rate {success_rate:.1%} too low"

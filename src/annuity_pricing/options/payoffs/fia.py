@@ -13,7 +13,6 @@ See: docs/knowledge/domain/crediting_methods.md
 [T1] All FIA payoffs have 0% floor (principal protection).
 """
 
-
 import numpy as np
 
 from annuity_pricing.options.payoffs.base import (
@@ -151,9 +150,7 @@ class ParticipationPayoff(BasePayoff):
         cap_rate: float | None = None,
     ):
         if participation_rate <= 0:
-            raise ValueError(
-                f"CRITICAL: participation_rate must be > 0, got {participation_rate}"
-            )
+            raise ValueError(f"CRITICAL: participation_rate must be > 0, got {participation_rate}")
         if cap_rate is not None and cap_rate <= 0:
             raise ValueError(f"CRITICAL: cap_rate must be > 0 if provided, got {cap_rate}")
 
@@ -230,11 +227,7 @@ class ParticipationPayoff(BasePayoff):
             Array of credited returns
         """
         # Apply participation to positive returns only
-        credited = np.where(
-            index_returns > 0,
-            self.participation_rate * index_returns,
-            0.0
-        )
+        credited = np.where(index_returns > 0, self.participation_rate * index_returns, 0.0)
 
         # Apply cap if specified
         if self.cap_rate is not None:
@@ -350,11 +343,7 @@ class SpreadPayoff(BasePayoff):
             Array of credited returns
         """
         # Spread only applies to positive returns
-        credited = np.where(
-            index_returns > 0,
-            index_returns - self.spread_rate,
-            0.0
-        )
+        credited = np.where(index_returns > 0, index_returns - self.spread_rate, 0.0)
 
         # Apply cap if specified
         if self.cap_rate is not None:
@@ -460,11 +449,7 @@ class TriggerPayoff(BasePayoff):
         np.ndarray
             Array of credited returns
         """
-        return np.where(
-            index_returns >= self.trigger_threshold,
-            self.trigger_rate,
-            self.floor_rate
-        )
+        return np.where(index_returns >= self.trigger_threshold, self.trigger_rate, self.floor_rate)
 
 
 class MonthlyAveragePayoff(BasePayoff):

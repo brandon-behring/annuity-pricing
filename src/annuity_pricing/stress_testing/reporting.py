@@ -149,13 +149,9 @@ class StressTestReporter:
         if reverse_stress:
             breached = reverse_stress.get_breached_results()
             if breached:
-                insights.append(
-                    f"{len(breached)} reverse stress scenarios breach their thresholds"
-                )
+                insights.append(f"{len(breached)} reverse stress scenarios breach their thresholds")
             else:
-                insights.append(
-                    "no reverse stress thresholds were breached"
-                )
+                insights.append("no reverse stress thresholds were breached")
 
         if insights:
             lines.append("Key findings: " + ", ".join(insights) + ".")
@@ -174,9 +170,7 @@ class StressTestReporter:
         ]
 
         # Sort by reserve delta descending (worst first)
-        sorted_metrics = sorted(
-            metrics, key=lambda m: m.reserve_delta_pct, reverse=True
-        )
+        sorted_metrics = sorted(metrics, key=lambda m: m.reserve_delta_pct, reverse=True)
 
         if max_rows > 0:
             sorted_metrics = sorted_metrics[:max_rows]
@@ -228,9 +222,7 @@ class StressTestReporter:
         """Format worst scenarios in detail."""
         lines = []
 
-        sorted_metrics = sorted(
-            metrics, key=lambda m: m.reserve_delta_pct, reverse=True
-        )[:top_n]
+        sorted_metrics = sorted(metrics, key=lambda m: m.reserve_delta_pct, reverse=True)[:top_n]
 
         for i, m in enumerate(sorted_metrics, 1):
             lines.append(f"**{i}. {m.scenario_name}**")
@@ -300,15 +292,11 @@ class StressTestReporter:
                 iter_str = "-"
                 status = "Not in range"
 
-            lines.append(
-                f"| {target_type} | {param} | {bp_str} | {iter_str} | {status} |"
-            )
+            lines.append(f"| {target_type} | {param} | {bp_str} | {iter_str} | {status} |")
 
         breached = report.get_breached_results()
         lines.append("")
-        lines.append(
-            f"**Thresholds Breached**: {len(breached)} / {len(report.results)}"
-        )
+        lines.append(f"**Thresholds Breached**: {len(breached)} / {len(report.results)}")
 
         return "\n".join(lines)
 
@@ -375,9 +363,7 @@ class StressTestReporter:
             sections.append("## Executive Summary")
             sections.append("")
             sections.append(
-                self.generate_executive_summary(
-                    result.summary, sensitivity, reverse_stress
-                )
+                self.generate_executive_summary(result.summary, sensitivity, reverse_stress)
             )
             sections.append("")
 
@@ -463,19 +449,21 @@ class StressTestReporter:
         """Convert TornadoData to JSON-serializable dict."""
         results = []
         for r in t.results:
-            results.append({
-                "parameter": r.parameter,
-                "display_name": r.display_name,
-                "base_value": r.base_value,
-                "base_reserve": r.base_reserve,
-                "down_value": r.down_value,
-                "down_reserve": r.down_reserve,
-                "up_value": r.up_value,
-                "up_reserve": r.up_reserve,
-                "down_delta_pct": r.down_delta_pct,
-                "up_delta_pct": r.up_delta_pct,
-                "sensitivity_width": r.sensitivity_width,
-            })
+            results.append(
+                {
+                    "parameter": r.parameter,
+                    "display_name": r.display_name,
+                    "base_value": r.base_value,
+                    "base_reserve": r.base_reserve,
+                    "down_value": r.down_value,
+                    "down_reserve": r.down_reserve,
+                    "up_value": r.up_value,
+                    "up_reserve": r.up_reserve,
+                    "down_delta_pct": r.down_delta_pct,
+                    "up_delta_pct": r.up_delta_pct,
+                    "sensitivity_width": r.sensitivity_width,
+                }
+            )
 
         return {
             "scenario_name": t.scenario_name,
@@ -490,19 +478,21 @@ class StressTestReporter:
         """Convert ReverseStressReport to JSON-serializable dict."""
         results = []
         for (target_type, param), res in r.results.items():
-            results.append({
-                "target_type": target_type,
-                "parameter": param,
-                "threshold": res.target.threshold,
-                "breach_condition": res.target.breach_condition.value,
-                "breaking_point": res.breaking_point,
-                "iterations": res.iterations,
-                "converged": res.converged,
-                "breached": res.breached,
-                "base_value": res.base_value,
-                "search_range": list(res.search_range),
-                "final_metric_value": res.final_metric_value,
-            })
+            results.append(
+                {
+                    "target_type": target_type,
+                    "parameter": param,
+                    "threshold": res.target.threshold,
+                    "breach_condition": res.target.breach_condition.value,
+                    "breaking_point": res.breaking_point,
+                    "iterations": res.iterations,
+                    "converged": res.converged,
+                    "breached": res.breached,
+                    "base_value": res.base_value,
+                    "search_range": list(res.search_range),
+                    "final_metric_value": res.final_metric_value,
+                }
+            )
 
         return {
             "base_reserve": r.base_reserve,
@@ -622,9 +612,7 @@ class StressTestReporter:
         elif format.lower() == "json":
             content = self.to_json(result, sensitivity, reverse_stress)
         else:
-            raise ValueError(
-                f"Unsupported format: {format}. Use 'markdown' or 'json'."
-            )
+            raise ValueError(f"Unsupported format: {format}. Use 'markdown' or 'json'.")
 
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(content)

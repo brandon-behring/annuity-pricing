@@ -35,6 +35,7 @@ from annuity_pricing.stress_testing import (
 # Historical Crisis Tests
 # =============================================================================
 
+
 class TestHistoricalCrises:
     """Test historical crisis definitions and conversions."""
 
@@ -74,6 +75,7 @@ class TestHistoricalCrises:
 # ORSA Scenario Tests
 # =============================================================================
 
+
 class TestORSAScenarios:
     """Test ORSA standard scenarios."""
 
@@ -109,6 +111,7 @@ class TestORSAScenarios:
 # Custom Scenario Tests
 # =============================================================================
 
+
 class TestCustomScenarios:
     """Test custom scenario creation."""
 
@@ -142,6 +145,7 @@ class TestCustomScenarios:
 # Sensitivity Analysis Tests
 # =============================================================================
 
+
 class TestSensitivityAnalysis:
     """Test sensitivity analysis workflows."""
 
@@ -152,12 +156,13 @@ class TestSensitivityAnalysis:
 
         param_names = {p.name for p in params}
         # Check that at least some shock parameters are defined
-        assert any(name in param_names for name in ['equity_shock', 'rate_shock', 'vol_shock'])
+        assert any(name in param_names for name in ["equity_shock", "rate_shock", "vol_shock"])
 
 
 # =============================================================================
 # Reverse Stress Testing Tests
 # =============================================================================
+
 
 class TestReverseStressTesting:
     """Test reverse stress testing workflows."""
@@ -171,6 +176,7 @@ class TestReverseStressTesting:
 # =============================================================================
 # Stress Workflow Integration Tests
 # =============================================================================
+
 
 class TestStressWorkflowIntegration:
     """Test complete stress testing workflows."""

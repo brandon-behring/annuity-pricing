@@ -183,7 +183,7 @@ def generate_heston_paths(
         m = theta + (v_curr - theta) * np.exp(-kappa * dt)
         s2 = (
             v_curr * sigma**2 * np.exp(-kappa * dt) / kappa * (1 - np.exp(-kappa * dt))
-            + theta * sigma**2 / (2 * kappa) * (1 - np.exp(-kappa * dt))**2
+            + theta * sigma**2 / (2 * kappa) * (1 - np.exp(-kappa * dt)) ** 2
         )
 
         # Step 2: Compute psi = s^2 / m^2
@@ -204,8 +204,8 @@ def generate_heston_paths(
         # Apply appropriate scheme [T1]
         v_next = np.where(
             psi <= psi_c,
-            a * (np.sqrt(b2) + Z2[:, i])**2,
-            np.where(p >= U, 0.0, np.log((1 - p) / (1 - U)) / beta)
+            a * (np.sqrt(b2) + Z2[:, i]) ** 2,
+            np.where(p >= U, 0.0, np.log((1 - p) / (1 - U)) / beta),
         )
 
         v[:, i + 1] = v_next
@@ -300,7 +300,7 @@ def generate_heston_terminal_spots(
         m = theta + (v_curr - theta) * np.exp(-kappa * dt)
         s2 = (
             v_curr * sigma**2 * np.exp(-kappa * dt) / kappa * (1 - np.exp(-kappa * dt))
-            + theta * sigma**2 / (2 * kappa) * (1 - np.exp(-kappa * dt))**2
+            + theta * sigma**2 / (2 * kappa) * (1 - np.exp(-kappa * dt)) ** 2
         )
         psi = s2 / (m**2 + 1e-10)
 
@@ -314,8 +314,8 @@ def generate_heston_terminal_spots(
         # Apply scheme
         v_next = np.where(
             psi <= psi_c,
-            a * (np.sqrt(b2) + Z2)**2,
-            np.where(p >= U, 0.0, np.log((1 - p) / (1 - U)) / beta)
+            a * (np.sqrt(b2) + Z2) ** 2,
+            np.where(p >= U, 0.0, np.log((1 - p) / (1 - U)) / beta),
         )
 
         # Spot update (use v_curr BEFORE updating)
@@ -370,15 +370,12 @@ def validate_heston_simulation(
     dict
         Validation results with theoretical vs simulated values
     """
-    result = generate_heston_paths(
-        spot, time, n_steps, n_paths, rate, dividend, params, seed
-    )
+    result = generate_heston_paths(spot, time, n_steps, n_paths, rate, dividend, params, seed)
 
     # Theoretical values
     expected_spot_mean = spot * np.exp((rate - dividend) * time)
-    expected_var_mean = (
-        params.v0 * np.exp(-params.kappa * time)
-        + params.theta * (1 - np.exp(-params.kappa * time))
+    expected_var_mean = params.v0 * np.exp(-params.kappa * time) + params.theta * (
+        1 - np.exp(-params.kappa * time)
     )
 
     # Simulated values
@@ -402,6 +399,8 @@ def validate_heston_simulation(
         "simulated_var_mean": simulated_var_mean,
         "var_error_pct": abs(simulated_var_mean - expected_var_mean) / expected_var_mean * 100,
         "var_se": se_var,
-        "spot_validation_passed": abs(simulated_spot_mean - expected_spot_mean) / expected_spot_mean < 0.02,
-        "var_validation_passed": abs(simulated_var_mean - expected_var_mean) / expected_var_mean < 0.05,
+        "spot_validation_passed": abs(simulated_spot_mean - expected_spot_mean) / expected_spot_mean
+        < 0.02,
+        "var_validation_passed": abs(simulated_var_mean - expected_var_mean) / expected_var_mean
+        < 0.05,
     }

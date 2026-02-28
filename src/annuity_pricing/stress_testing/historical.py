@@ -188,7 +188,9 @@ _PROFILE_2020_COVID = (
     CrisisProfile(month=0, equity_cumulative=0.00, rate_level=0.0159, vix_level=15.0),
     # Mar 2020 - Fastest 30% drop in history
     CrisisProfile(month=0.5, equity_cumulative=-0.15, rate_level=0.0100, vix_level=55.0),
-    CrisisProfile(month=1, equity_cumulative=-0.313, rate_level=0.0021, vix_level=82.69),  # VIX peak
+    CrisisProfile(
+        month=1, equity_cumulative=-0.313, rate_level=0.0021, vix_level=82.69
+    ),  # VIX peak
     CrisisProfile(month=1.2, equity_cumulative=-0.25, rate_level=0.0060, vix_level=65.0),
     # Apr 2020 - Stimulus response, rapid recovery
     CrisisProfile(month=2, equity_cumulative=-0.15, rate_level=0.0065, vix_level=40.0),
@@ -388,7 +390,9 @@ _PROFILE_2018_Q4 = (
     CrisisProfile(month=2, equity_cumulative=-0.08, rate_level=0.0305, vix_level=22.0),
     # Dec 2018 - Fed hike, capitulation
     CrisisProfile(month=3, equity_cumulative=-0.15, rate_level=0.0290, vix_level=30.0),
-    CrisisProfile(month=3.5, equity_cumulative=-0.193, rate_level=0.0286, vix_level=36.0),  # Trough, VIX peak
+    CrisisProfile(
+        month=3.5, equity_cumulative=-0.193, rate_level=0.0286, vix_level=36.0
+    ),  # Trough, VIX peak
     # Recovery (V-shaped)
     CrisisProfile(month=4, equity_cumulative=-0.10, rate_level=0.0270, vix_level=20.0),
     CrisisProfile(month=5, equity_cumulative=-0.05, rate_level=0.0265, vix_level=17.0),
@@ -502,10 +506,7 @@ def get_crisis_by_name(name: str) -> HistoricalCrisis:
     """
     if name not in _CRISIS_BY_NAME:
         valid_names = ", ".join(sorted(_CRISIS_BY_NAME.keys()))
-        raise ValueError(
-            f"Unknown crisis name: '{name}'. "
-            f"Valid names: {valid_names}"
-        )
+        raise ValueError(f"Unknown crisis name: '{name}'. Valid names: {valid_names}")
     return _CRISIS_BY_NAME[name]
 
 
@@ -558,9 +559,7 @@ def get_profile_at_month(crisis: HistoricalCrisis, month: float) -> CrisisProfil
     return None
 
 
-def interpolate_profile(
-    crisis: HistoricalCrisis, month: float
-) -> CrisisProfile:
+def interpolate_profile(crisis: HistoricalCrisis, month: float) -> CrisisProfile:
     """
     Interpolate crisis profile at any month.
 
@@ -586,13 +585,9 @@ def interpolate_profile(
     profiles = sorted(crisis.profile, key=lambda p: p.month)
 
     if month < profiles[0].month:
-        raise ValueError(
-            f"Month {month} before earliest profile ({profiles[0].month})"
-        )
+        raise ValueError(f"Month {month} before earliest profile ({profiles[0].month})")
     if month > profiles[-1].month:
-        raise ValueError(
-            f"Month {month} after latest profile ({profiles[-1].month})"
-        )
+        raise ValueError(f"Month {month} after latest profile ({profiles[-1].month})")
 
     # Find bracketing profiles
     for i in range(len(profiles) - 1):
@@ -606,7 +601,8 @@ def interpolate_profile(
 
             return CrisisProfile(
                 month=month,
-                equity_cumulative=p1.equity_cumulative + t * (p2.equity_cumulative - p1.equity_cumulative),
+                equity_cumulative=p1.equity_cumulative
+                + t * (p2.equity_cumulative - p1.equity_cumulative),
                 rate_level=p1.rate_level + t * (p2.rate_level - p1.rate_level),
                 vix_level=p1.vix_level + t * (p2.vix_level - p1.vix_level),
             )

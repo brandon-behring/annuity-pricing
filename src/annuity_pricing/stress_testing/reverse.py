@@ -167,9 +167,7 @@ def create_custom_target(
         Custom target definition
     """
     condition = (
-        BreachCondition.BELOW
-        if breach_condition.lower() == "below"
-        else BreachCondition.ABOVE
+        BreachCondition.BELOW if breach_condition.lower() == "below" else BreachCondition.ABOVE
     )
     return ReverseStressTarget(
         target_type=target_type,
@@ -266,9 +264,7 @@ class ReverseStressReport:
         self.targets_tested = len(targets)
         self.parameters_tested = len(params)
 
-    def get_result(
-        self, target_type: str, parameter_name: str
-    ) -> ReverseStressResult | None:
+    def get_result(self, target_type: str, parameter_name: str) -> ReverseStressResult | None:
         """Get result for specific target-parameter pair."""
         return self.results.get((target_type, parameter_name))
 
@@ -346,13 +342,7 @@ class ReverseStressTester:
         lapse_impact = -(lapse_multiplier - 1.0) * 0.10
         withdrawal_impact = (withdrawal_multiplier - 1.0) * 0.16
 
-        total_impact = (
-            equity_impact
-            + rate_impact
-            + vol_impact
-            + lapse_impact
-            + withdrawal_impact
-        )
+        total_impact = equity_impact + rate_impact + vol_impact + lapse_impact + withdrawal_impact
 
         stressed_reserve = base_reserve * (1.0 + total_impact)
         return max(stressed_reserve, 0.01)

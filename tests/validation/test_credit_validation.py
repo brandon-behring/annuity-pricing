@@ -161,7 +161,7 @@ class TestCVAFormulaValidation:
 
         # Manual calculation
         cum_pd = 1 - np.exp(-h * 1)  # 1-year cumulative PD
-        avg_df = np.exp(-r * 0.5)    # Midpoint discount factor
+        avg_df = np.exp(-r * 0.5)  # Midpoint discount factor
         expected_cva = lgd * exposure * cum_pd * avg_df
 
         # Module calculation

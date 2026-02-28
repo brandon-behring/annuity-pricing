@@ -30,6 +30,7 @@ from annuity_pricing.options.pricing.heston_cos import (
 # Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def standard_heston_params():
     """Standard Heston parameters satisfying Feller condition."""
@@ -45,6 +46,7 @@ def high_vol_heston_params():
 # =============================================================================
 # COSParams Tests
 # =============================================================================
+
 
 class TestCOSParams:
     """Test COSParams dataclass validation."""
@@ -81,14 +83,13 @@ class TestCOSParams:
 # Characteristic Function Tests
 # =============================================================================
 
+
 class TestCharacteristicFunction:
     """Test Heston characteristic function properties."""
 
     def test_phi_at_zero_is_one(self, standard_heston_params):
         """phi(0) = 1 (fundamental property)."""
-        phi = heston_characteristic_function_cos(
-            0.0, 0.0, 1.0, 0.05, 0.02, standard_heston_params
-        )
+        phi = heston_characteristic_function_cos(0.0, 0.0, 1.0, 0.05, 0.02, standard_heston_params)
         assert abs(phi - 1.0) < 1e-10
 
     def test_phi_magnitude_bounded(self, standard_heston_params):
@@ -127,24 +128,19 @@ class TestCharacteristicFunction:
 # Cumulant Tests
 # =============================================================================
 
+
 class TestCumulants:
     """Test Heston cumulant calculations."""
 
     def test_c2_positive(self, standard_heston_params):
         """Second cumulant (variance) must be positive."""
-        c1, c2, c4, w = heston_cumulants(
-            1.0, 0.05, 0.02, standard_heston_params
-        )
+        c1, c2, c4, w = heston_cumulants(1.0, 0.05, 0.02, standard_heston_params)
         assert c2 > 0, f"c2 = {c2} should be positive"
 
     def test_cumulants_scale_with_time(self, standard_heston_params):
         """Variance should roughly scale with time."""
-        c1_short, c2_short, _, _ = heston_cumulants(
-            0.5, 0.05, 0.02, standard_heston_params
-        )
-        c1_long, c2_long, _, _ = heston_cumulants(
-            2.0, 0.05, 0.02, standard_heston_params
-        )
+        c1_short, c2_short, _, _ = heston_cumulants(0.5, 0.05, 0.02, standard_heston_params)
+        c1_long, c2_long, _, _ = heston_cumulants(2.0, 0.05, 0.02, standard_heston_params)
 
         # c2 should increase with time (not necessarily linearly)
         assert c2_long > c2_short
@@ -153,6 +149,7 @@ class TestCumulants:
 # =============================================================================
 # Truncation Range Tests
 # =============================================================================
+
 
 class TestTruncationRange:
     """Test truncation range calculation."""
@@ -189,6 +186,7 @@ class TestTruncationRange:
 # Chi-Psi Coefficient Tests
 # =============================================================================
 
+
 class TestChiPsiCoefficients:
     """Test chi and psi payoff coefficients."""
 
@@ -211,21 +209,18 @@ class TestChiPsiCoefficients:
 # Pricing Tests
 # =============================================================================
 
+
 class TestHestonCOSPricing:
     """Test Heston COS pricing function."""
 
     def test_call_positive(self, standard_heston_params):
         """Call price should be positive."""
-        price = heston_price_cos(
-            100, 100, 0.05, 0.02, 1.0, standard_heston_params, OptionType.CALL
-        )
+        price = heston_price_cos(100, 100, 0.05, 0.02, 1.0, standard_heston_params, OptionType.CALL)
         assert price > 0
 
     def test_put_positive(self, standard_heston_params):
         """Put price should be positive."""
-        price = heston_price_cos(
-            100, 100, 0.05, 0.02, 1.0, standard_heston_params, OptionType.PUT
-        )
+        price = heston_price_cos(100, 100, 0.05, 0.02, 1.0, standard_heston_params, OptionType.PUT)
         assert price > 0
 
     def test_call_bounded_by_spot(self, standard_heston_params):
@@ -272,12 +267,10 @@ class TestHestonCOSPricing:
         rate, dividend, time = 0.05, 0.02, 1.0
 
         call = heston_price_cos(
-            spot, strike, rate, dividend, time,
-            standard_heston_params, OptionType.CALL
+            spot, strike, rate, dividend, time, standard_heston_params, OptionType.CALL
         )
         put = heston_price_cos(
-            spot, strike, rate, dividend, time,
-            standard_heston_params, OptionType.PUT
+            spot, strike, rate, dividend, time, standard_heston_params, OptionType.PUT
         )
 
         forward = spot * np.exp(-dividend * time)
@@ -303,44 +296,35 @@ class TestHestonCOSPricing:
 # Error Handling Tests
 # =============================================================================
 
+
 class TestErrorHandling:
     """Test error handling and edge cases."""
 
     def test_negative_spot_raises(self, standard_heston_params):
         """Negative spot should raise ValueError."""
         with pytest.raises(ValueError, match="spot must be > 0"):
-            heston_price_cos(
-                -100, 100, 0.05, 0.02, 1.0, standard_heston_params, OptionType.CALL
-            )
+            heston_price_cos(-100, 100, 0.05, 0.02, 1.0, standard_heston_params, OptionType.CALL)
 
     def test_zero_spot_raises(self, standard_heston_params):
         """Zero spot should raise ValueError."""
         with pytest.raises(ValueError, match="spot must be > 0"):
-            heston_price_cos(
-                0, 100, 0.05, 0.02, 1.0, standard_heston_params, OptionType.CALL
-            )
+            heston_price_cos(0, 100, 0.05, 0.02, 1.0, standard_heston_params, OptionType.CALL)
 
     def test_negative_strike_raises(self, standard_heston_params):
         """Negative strike should raise ValueError."""
         with pytest.raises(ValueError, match="strike must be > 0"):
-            heston_price_cos(
-                100, -100, 0.05, 0.02, 1.0, standard_heston_params, OptionType.CALL
-            )
+            heston_price_cos(100, -100, 0.05, 0.02, 1.0, standard_heston_params, OptionType.CALL)
 
     def test_negative_time_raises(self, standard_heston_params):
         """Negative time should raise ValueError."""
         with pytest.raises(ValueError, match="time must be > 0"):
-            heston_price_cos(
-                100, 100, 0.05, 0.02, -1.0, standard_heston_params, OptionType.CALL
-            )
+            heston_price_cos(100, 100, 0.05, 0.02, -1.0, standard_heston_params, OptionType.CALL)
 
     def test_feller_violated_still_works(self, high_vol_heston_params):
         """Should still price correctly when Feller is violated."""
         assert not high_vol_heston_params.satisfies_feller()
 
-        price = heston_price_cos(
-            100, 100, 0.05, 0.02, 1.0, high_vol_heston_params, OptionType.CALL
-        )
+        price = heston_price_cos(100, 100, 0.05, 0.02, 1.0, high_vol_heston_params, OptionType.CALL)
         assert price > 0
         assert np.isfinite(price)
 
@@ -348,6 +332,7 @@ class TestErrorHandling:
 # =============================================================================
 # Numerical Stability Tests
 # =============================================================================
+
 
 class TestNumericalStability:
     """Test numerical stability under extreme parameters."""
@@ -381,14 +366,12 @@ class TestNumericalStability:
         price = heston_price_cos(
             spot, strike, rate, div, time, standard_heston_params, OptionType.CALL
         )
-        intrinsic = (spot * np.exp(-div * time) - strike * np.exp(-rate * time))
+        intrinsic = spot * np.exp(-div * time) - strike * np.exp(-rate * time)
 
         # Price should be >= intrinsic (no early exercise for European)
         assert price >= intrinsic - 0.01
 
     def test_deep_otm_call(self, standard_heston_params):
         """Deep OTM call should be small but positive."""
-        price = heston_price_cos(
-            100, 200, 0.05, 0.02, 1.0, standard_heston_params, OptionType.CALL
-        )
+        price = heston_price_cos(100, 200, 0.05, 0.02, 1.0, standard_heston_params, OptionType.CALL)
         assert 0 < price < 1.0  # Should be very small

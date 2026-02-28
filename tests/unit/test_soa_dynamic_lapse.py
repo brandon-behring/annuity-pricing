@@ -60,40 +60,33 @@ class TestSOADynamicLapseModel:
 
     def test_year_1_base_rate(self, model: SOADynamicLapseModel) -> None:
         """[T2] Year 1 should have ~1.4% base rate from SOA."""
-        result = model.calculate_lapse(
-            gwb=100_000, av=100_000, duration=1, years_to_sc_end=6
-        )
+        result = model.calculate_lapse(gwb=100_000, av=100_000, duration=1, years_to_sc_end=6)
         assert abs(result.base_rate - 0.014) < 0.001
 
     def test_year_8_post_sc_rate(self, model: SOADynamicLapseModel) -> None:
         """[T2] Year 8 (post-SC) should have ~11.2% base rate from SOA."""
-        result = model.calculate_lapse(
-            gwb=100_000, av=100_000, duration=8, years_to_sc_end=-1
-        )
+        result = model.calculate_lapse(gwb=100_000, av=100_000, duration=8, years_to_sc_end=-1)
         assert abs(result.base_rate - 0.112) < 0.01
 
     def test_sc_cliff_effect_at_expiration(self, model: SOADynamicLapseModel) -> None:
         """SC cliff factor should be > 1 at expiration."""
-        result = model.calculate_lapse(
-            gwb=100_000, av=100_000, duration=7, years_to_sc_end=0
-        )
+        result = model.calculate_lapse(gwb=100_000, av=100_000, duration=7, years_to_sc_end=0)
         # Cliff factor should be elevated (though blending may reduce it)
         assert result.sc_cliff_factor >= 1.0
 
     def test_no_sc_cliff_far_from_expiration(self, model: SOADynamicLapseModel) -> None:
         """SC cliff factor should be 1.0 far from expiration."""
-        result = model.calculate_lapse(
-            gwb=100_000, av=100_000, duration=2, years_to_sc_end=5
-        )
+        result = model.calculate_lapse(gwb=100_000, av=100_000, duration=2, years_to_sc_end=5)
         assert result.sc_cliff_factor == 1.0
 
     def test_itm_guarantee_reduces_lapse(self, model: SOADynamicLapseModel) -> None:
         """ITM guarantee (GWB > AV) should reduce lapse rate."""
-        atm_result = model.calculate_lapse(
-            gwb=100_000, av=100_000, duration=5, years_to_sc_end=2
-        )
+        atm_result = model.calculate_lapse(gwb=100_000, av=100_000, duration=5, years_to_sc_end=2)
         itm_result = model.calculate_lapse(
-            gwb=150_000, av=100_000, duration=5, years_to_sc_end=2  # ITM
+            gwb=150_000,
+            av=100_000,
+            duration=5,
+            years_to_sc_end=2,  # ITM
         )
         assert itm_result.lapse_rate < atm_result.lapse_rate
         assert itm_result.moneyness > 1.0  # GWB/AV
@@ -101,11 +94,12 @@ class TestSOADynamicLapseModel:
 
     def test_otm_guarantee_increases_lapse(self, model: SOADynamicLapseModel) -> None:
         """OTM guarantee (GWB < AV) should increase lapse rate."""
-        atm_result = model.calculate_lapse(
-            gwb=100_000, av=100_000, duration=5, years_to_sc_end=2
-        )
+        atm_result = model.calculate_lapse(gwb=100_000, av=100_000, duration=5, years_to_sc_end=2)
         otm_result = model.calculate_lapse(
-            gwb=80_000, av=100_000, duration=5, years_to_sc_end=2  # OTM
+            gwb=80_000,
+            av=100_000,
+            duration=5,
+            years_to_sc_end=2,  # OTM
         )
         assert otm_result.lapse_rate > atm_result.lapse_rate
         assert otm_result.moneyness < 1.0
@@ -115,7 +109,10 @@ class TestSOADynamicLapseModel:
         """Lapse rate should not go below min_lapse."""
         # Very ITM guarantee should reduce lapse, but not below floor
         result = model.calculate_lapse(
-            gwb=500_000, av=100_000, duration=1, years_to_sc_end=6  # Very ITM
+            gwb=500_000,
+            av=100_000,
+            duration=1,
+            years_to_sc_end=6,  # Very ITM
         )
         assert result.lapse_rate >= model.assumptions.min_lapse
 
@@ -123,7 +120,10 @@ class TestSOADynamicLapseModel:
         """Lapse rate should not exceed max_lapse."""
         # Very OTM + post-SC cliff
         result = model.calculate_lapse(
-            gwb=10_000, av=100_000, duration=8, years_to_sc_end=-1  # Very OTM, post-SC
+            gwb=10_000,
+            av=100_000,
+            duration=8,
+            years_to_sc_end=-1,  # Very OTM, post-SC
         )
         assert result.lapse_rate <= model.assumptions.max_lapse
 
@@ -153,10 +153,12 @@ class TestSOADynamicLapseModelDurationCurve:
     @pytest.fixture
     def model(self) -> SOADynamicLapseModel:
         """Model with duration curve enabled."""
-        return SOADynamicLapseModel(SOALapseAssumptions(
-            use_sc_cliff_effect=False,  # Disable cliff for pure duration tests
-            moneyness_sensitivity=0,     # Disable moneyness
-        ))
+        return SOADynamicLapseModel(
+            SOALapseAssumptions(
+                use_sc_cliff_effect=False,  # Disable cliff for pure duration tests
+                moneyness_sensitivity=0,  # Disable moneyness
+            )
+        )
 
     def test_rates_increase_during_sc_period(self, model: SOADynamicLapseModel) -> None:
         """Base rates should increase during SC period (years 1-7)."""
@@ -275,21 +277,23 @@ class TestSOADynamicLapseModelDisabledFeatures:
 
     def test_disabled_duration_curve(self) -> None:
         """Disabled duration curve should use flat 5%."""
-        model = SOADynamicLapseModel(SOALapseAssumptions(
-            use_duration_curve=False,
-            use_sc_cliff_effect=False,
-        ))
+        model = SOADynamicLapseModel(
+            SOALapseAssumptions(
+                use_duration_curve=False,
+                use_sc_cliff_effect=False,
+            )
+        )
 
         result = model.calculate_lapse(gwb=100_000, av=100_000, duration=5)
         assert result.base_rate == 0.05
 
     def test_disabled_sc_cliff(self) -> None:
         """Disabled SC cliff should have factor = 1.0."""
-        model = SOADynamicLapseModel(SOALapseAssumptions(
-            use_sc_cliff_effect=False,
-        ))
-
-        result = model.calculate_lapse(
-            gwb=100_000, av=100_000, duration=7, years_to_sc_end=0
+        model = SOADynamicLapseModel(
+            SOALapseAssumptions(
+                use_sc_cliff_effect=False,
+            )
         )
+
+        result = model.calculate_lapse(gwb=100_000, av=100_000, duration=7, years_to_sc_end=0)
         assert result.sc_cliff_factor == 1.0

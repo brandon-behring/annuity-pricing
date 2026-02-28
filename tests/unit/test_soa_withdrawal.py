@@ -27,7 +27,7 @@ class TestSOAWithdrawalAssumptions:
         assert assumptions.use_age_curve is True
         assert assumptions.use_itm_sensitivity is True
         assert assumptions.use_continuous_itm is True
-        assert assumptions.combination_method == 'multiplicative'
+        assert assumptions.combination_method == "multiplicative"
         assert assumptions.min_utilization == 0.03
         assert assumptions.max_utilization == 1.00
 
@@ -37,7 +37,7 @@ class TestSOAWithdrawalAssumptions:
             use_duration_curve=False,
             use_age_curve=False,
             use_itm_sensitivity=False,
-            combination_method='additive',
+            combination_method="additive",
             min_utilization=0.10,
             max_utilization=0.90,
         )
@@ -45,7 +45,7 @@ class TestSOAWithdrawalAssumptions:
         assert assumptions.use_duration_curve is False
         assert assumptions.use_age_curve is False
         assert assumptions.use_itm_sensitivity is False
-        assert assumptions.combination_method == 'additive'
+        assert assumptions.combination_method == "additive"
 
 
 class TestSOAWithdrawalModel:
@@ -173,9 +173,7 @@ class TestSOAWithdrawalModel:
     def test_invalid_av_raises(self, model: SOAWithdrawalModel) -> None:
         """Zero or negative AV should raise ValueError."""
         with pytest.raises(ValueError):
-            model.calculate_withdrawal(
-                gwb=100_000, av=0, withdrawal_rate=0.05, duration=1, age=70
-            )
+            model.calculate_withdrawal(gwb=100_000, av=0, withdrawal_rate=0.05, duration=1, age=70)
         with pytest.raises(ValueError):
             model.calculate_withdrawal(
                 gwb=100_000, av=-100, withdrawal_rate=0.05, duration=1, age=70
@@ -209,10 +207,12 @@ class TestSOAWithdrawalModelCombinationMethods:
 
     def test_multiplicative_method(self) -> None:
         """Multiplicative method should scale by age adjustment."""
-        model = SOAWithdrawalModel(SOAWithdrawalAssumptions(
-            combination_method='multiplicative',
-            use_itm_sensitivity=False,  # Isolate for this test
-        ))
+        model = SOAWithdrawalModel(
+            SOAWithdrawalAssumptions(
+                combination_method="multiplicative",
+                use_itm_sensitivity=False,  # Isolate for this test
+            )
+        )
 
         result = model.calculate_withdrawal(
             gwb=100_000, av=100_000, withdrawal_rate=0.05, duration=5, age=72
@@ -226,10 +226,12 @@ class TestSOAWithdrawalModelCombinationMethods:
 
     def test_additive_method(self) -> None:
         """Additive method should average duration and age effects."""
-        model = SOAWithdrawalModel(SOAWithdrawalAssumptions(
-            combination_method='additive',
-            use_itm_sensitivity=False,
-        ))
+        model = SOAWithdrawalModel(
+            SOAWithdrawalAssumptions(
+                combination_method="additive",
+                use_itm_sensitivity=False,
+            )
+        )
 
         result = model.calculate_withdrawal(
             gwb=100_000, av=100_000, withdrawal_rate=0.05, duration=5, age=70
@@ -284,8 +286,8 @@ class TestSOAWithdrawalModelPathCalculation:
 
         assert withdrawals[0] == 0.0  # No withdrawal year 1
         assert withdrawals[1] == 0.0  # No withdrawal year 2
-        assert withdrawals[2] > 0     # First withdrawal year 3
-        assert withdrawals[3] > 0     # Continued withdrawals
+        assert withdrawals[2] > 0  # First withdrawal year 3
+        assert withdrawals[3] > 0  # Continued withdrawals
 
     def test_path_mismatched_lengths_raises(self, model: SOAWithdrawalModel) -> None:
         """Mismatched path lengths should raise ValueError."""
@@ -340,11 +342,13 @@ class TestSOAWithdrawalModelDisabledFeatures:
 
     def test_disabled_duration_curve(self) -> None:
         """Disabled duration curve should use flat 50%."""
-        model = SOAWithdrawalModel(SOAWithdrawalAssumptions(
-            use_duration_curve=False,
-            use_age_curve=False,
-            use_itm_sensitivity=False,
-        ))
+        model = SOAWithdrawalModel(
+            SOAWithdrawalAssumptions(
+                use_duration_curve=False,
+                use_age_curve=False,
+                use_itm_sensitivity=False,
+            )
+        )
 
         result = model.calculate_withdrawal(
             gwb=100_000, av=100_000, withdrawal_rate=0.05, duration=1, age=70
@@ -355,9 +359,11 @@ class TestSOAWithdrawalModelDisabledFeatures:
 
     def test_disabled_itm_sensitivity(self) -> None:
         """Disabled ITM sensitivity should have factor = 1.0."""
-        model = SOAWithdrawalModel(SOAWithdrawalAssumptions(
-            use_itm_sensitivity=False,
-        ))
+        model = SOAWithdrawalModel(
+            SOAWithdrawalAssumptions(
+                use_itm_sensitivity=False,
+            )
+        )
 
         result = model.calculate_withdrawal(
             gwb=200_000, av=100_000, withdrawal_rate=0.05, duration=5, age=70
@@ -366,12 +372,16 @@ class TestSOAWithdrawalModelDisabledFeatures:
 
     def test_discrete_vs_continuous_itm(self) -> None:
         """Discrete ITM should give step-function values."""
-        model_discrete = SOAWithdrawalModel(SOAWithdrawalAssumptions(
-            use_continuous_itm=False,
-        ))
-        model_continuous = SOAWithdrawalModel(SOAWithdrawalAssumptions(
-            use_continuous_itm=True,
-        ))
+        model_discrete = SOAWithdrawalModel(
+            SOAWithdrawalAssumptions(
+                use_continuous_itm=False,
+            )
+        )
+        model_continuous = SOAWithdrawalModel(
+            SOAWithdrawalAssumptions(
+                use_continuous_itm=True,
+            )
+        )
 
         # At boundary (moneyness = 1.1), discrete and continuous may differ
         result_discrete = model_discrete.calculate_withdrawal(
