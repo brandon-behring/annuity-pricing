@@ -157,7 +157,7 @@ class TestComplianceGapDocExists:
         )
         gap_doc_path = os.path.normpath(gap_doc_path)
 
-        with open(gap_doc_path) as f:
+        with open(gap_doc_path, encoding="utf-8") as f:
             content = f.read()
 
         # Check for key sections

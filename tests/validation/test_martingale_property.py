@@ -21,8 +21,11 @@ See: docs/knowledge/derivations/monte_carlo.md
 
 import numpy as np
 import pytest
-from hypothesis import given, settings
-from hypothesis import strategies as st
+
+hypothesis = pytest.importorskip("hypothesis", reason="hypothesis not installed")
+given = hypothesis.given
+settings = hypothesis.settings
+st = pytest.importorskip("hypothesis.strategies")
 
 from annuity_pricing.options.pricing.black_scholes import black_scholes_call, black_scholes_put
 from annuity_pricing.options.simulation.gbm import (
