@@ -98,7 +98,6 @@ guides/installation
 guides/pricing_myga
 guides/pricing_fia
 guides/pricing_rila
-guides/glwb_walkthrough
 ```
 
 ```{toctree}
