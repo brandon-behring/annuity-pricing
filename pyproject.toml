@@ -87,7 +87,7 @@ validation = [
 ]
 actuarial = [
     "actuarialmath>=1.0",     # Life contingencies (Python)
-    "lifelib>=0.8",           # Actuarial models library
+    "lifelib>=0.11.0",           # Actuarial models library
 ]
 docs = [
     "sphinx>=7.0",
